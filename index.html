@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f7f5f2">
-  <meta name="description" content="Pintura contemporánea de Rocío Villamizar. Obras, piezas disponibles y encargos. Colombia y Costa Rica.">
+  <meta name="theme-color" content="#f4f1eb">
+  <meta name="description" content="Pintura contemporánea de Rocío Villamizar. Obras, la sala, piezas disponibles y encargos. Colombia y Costa Rica.">
   <title>Rocío Villamizar — Pintura contemporánea</title>
   <link rel="canonical" href="https://rocioarts.com/">
   <meta property="og:type" content="website">
@@ -13,14 +13,19 @@
   <meta property="og:title" content="Rocío Villamizar — Pintura contemporánea">
   <meta property="og:description" content="Figuras, ciudades y la vida de todos los días, con el color adelante.">
   <meta property="og:url" content="https://rocioarts.com/">
-  <meta property="og:image" content="https://rocioarts.com/assets/works/marilyn.jpg">
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="image" href="assets/works/serenidad.jpg">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=Jost:ital,wght@0,300;0,400;1,300&display=swap">
+  <meta property="og:image" content="https://rocioarts.com/assets/works/serenidad.jpg">
+  <link rel="icon" href="assets/brand/icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/brand/icon.png">
+  <link rel="preload" as="image" type="image/avif" imagesrcset="assets/media/works/serenidad-640.avif 640w, assets/media/works/serenidad-1280.avif 1280w, assets/media/works/serenidad-1666.avif 1666w" imagesizes="100vw" fetchpriority="high">
   <link rel="stylesheet" href="css/styles.css">
-  <script>document.documentElement.classList.add("js")</script>
+  <script>
+    document.documentElement.classList.add("js");
+    try {
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches && !sessionStorage.getItem("rocio-intro") && !location.hash) {
+        document.documentElement.classList.add("show-intro");
+      }
+    } catch (err) {}
+  </script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -37,14 +42,22 @@
   }
   </script>
 </head>
-<body>
+<body class="page-home">
   <a class="skip" href="#contenido">Saltar al contenido</a>
-  <div class="veil" aria-hidden="true"></div>
+  <div class="intro" id="intro">
+    <div>
+      <img class="intro-mark" src="assets/brand/logo.webp" alt="" width="960" height="330">
+      <span class="intro-line" aria-hidden="true"></span>
+      <p class="intro-kicker">Pintura contemporánea</p>
+    </div>
+    <button type="button" class="intro-skip" onclick="try{sessionStorage.setItem('rocio-intro','1')}catch(e){}document.documentElement.classList.remove('show-intro');this.closest('.intro').remove()">Entrar</button>
+  </div>
   <header class="nav">
-    <a class="brand" href="index.html">Rocío</a>
+    <a class="brand" href="index.html"><picture><source srcset="assets/brand/logo.webp" type="image/webp"><img src="assets/brand/logo.png" alt="Rocío Villamizar" width="960" height="330"></picture></a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu">Menú</button>
     <nav id="menu" class="nav-panel" aria-label="Sitio">
       <a href="obras.html">Obras</a>
+      <a href="galeria.html">La sala</a>
       <a href="disponible.html">Disponible</a>
       <a href="encargos.html">Encargos</a>
       <a href="la-artista.html">La artista</a>
@@ -52,65 +65,101 @@
     </nav>
   </header>
   <main id="contenido">
-    <section class="hero wrap">
+    <section class="hero">
+      <a class="hero-media" href="obras.html#serenidad" data-open="serenidad" data-cursor="Ver">
+        <picture>
+          <source type="image/avif" srcset="assets/media/works/serenidad-640.avif 640w, assets/media/works/serenidad-1280.avif 1280w, assets/media/works/serenidad-1666.avif 1666w" sizes="100vw">
+          <source type="image/webp" srcset="assets/media/works/serenidad-640.webp 640w, assets/media/works/serenidad-1280.webp 1280w, assets/media/works/serenidad-1666.webp 1666w" sizes="100vw">
+          <img src="assets/media/works/serenidad-1280.jpg" srcset="assets/media/works/serenidad-640.jpg 640w, assets/media/works/serenidad-1280.jpg 1280w, assets/works/serenidad.jpg 1667w" sizes="100vw" width="1667" height="2000" alt="Serenidad, pintura de Rocío Villamizar" fetchpriority="high">
+        </picture>
+      </a>
       <div class="hero-copy">
         <p class="eyebrow">Pintura contemporánea</p>
         <h1>
-          <span class="hero-line">Rocío</span>
-          <span class="hero-line hero-line-soft">Villamizar</span>
+          <span class="mask"><span class="hero-line">Rocío</span></span>
+          <span class="mask"><span class="hero-line hero-line-soft">Villamizar</span></span>
         </h1>
         <p class="lede">Figuras, ciudades y la vida de todos los días, con el color adelante.</p>
-        <a class="text-link" href="obras.html">Ver las obras</a>
+        <p class="hero-links">
+          <a class="text-link" href="obras.html">Ver las obras</a>
+          <a class="text-link" href="galeria.html">Entrar a la sala</a>
+        </p>
       </div>
-      <a class="hero-visual" href="obras.html#serenidad" data-open="serenidad">
-        <span class="hero-frame">
-          <img src="assets/works/serenidad.jpg" width="1667" height="2000" alt="Serenidad, pintura de Rocío Villamizar" fetchpriority="high">
-        </span>
-      </a>
     </section>
 
-    <section class="pull wrap">
+    <section class="now wrap">
+      <p class="eyebrow">Ahora</p>
+      <ul>
+        <li><a href="la-artista.html#ahora">Sala VIP · Aeropuerto Juan Santamaría</a></li>
+        <li><a href="la-artista.html#ahora">FN ART Gallery</a></li>
+      </ul>
+    </section>
+
+    <section class="pull">
       <p>La figura blanca es la gente. Lo demás es el lugar donde vive.</p>
     </section>
 
-    <section class="rail" data-rail>
-      <div class="rail-pin">
-        <div class="rail-top wrap">
-          <p class="eyebrow">Selección</p>
-          <p class="rail-count" data-rail-count>01</p>
-        </div>
-        <div class="rail-viewport" data-mount="rail" data-cycle="rail"></div>
-        <p class="rail-hint wrap">Desliza</p>
+    <section class="rail">
+      <div class="rail-top">
+        <p class="eyebrow">Selección</p>
+        <p class="rail-count" data-rail-count>01</p>
       </div>
+      <div class="rail-viewport" data-mount="rail" data-cycle="rail" data-cursor="Arrastrar" tabindex="0" aria-label="Selección de obras"></div>
+      <div class="rail-progress" aria-hidden="true"><span data-rail-bar></span></div>
+      <p class="rail-hint">Desliza</p>
     </section>
 
-    <section class="statement wrap reveal">
-      <img src="assets/studio/estudio.jpg" width="1800" height="1061" alt="Rocío Villamizar en el estudio, entre sus pinturas">
-      <div class="copy">
-        <p>Soy colombiana y costarricense. Llevo más de dieciocho años pintando emociones sobre lienzo. Estudié en Inglaterra, Brasil, Colombia y Costa Rica, y ese recorrido está en la obra.</p>
+    <section class="statement">
+      <figure class="statement-photo reveal">
+        <picture>
+          <source type="image/avif" srcset="assets/media/studio/estudio-640.avif 640w, assets/media/studio/estudio-1280.avif 1280w, assets/media/studio/estudio-1800.avif 1800w" sizes="(min-width: 980px) 52vw, 100vw">
+          <source type="image/webp" srcset="assets/media/studio/estudio-640.webp 640w, assets/media/studio/estudio-1280.webp 1280w, assets/media/studio/estudio-1800.webp 1800w" sizes="(min-width: 980px) 52vw, 100vw">
+          <img src="assets/media/studio/estudio-1280.jpg" srcset="assets/media/studio/estudio-640.jpg 640w, assets/media/studio/estudio-1280.jpg 1280w, assets/studio/estudio.jpg 1800w" sizes="(min-width: 980px) 52vw, 100vw" width="1800" height="1061" alt="Rocío Villamizar en el estudio, entre sus pinturas" loading="lazy">
+        </picture>
+        <figcaption>En el estudio</figcaption>
+      </figure>
+      <div class="statement-copy reveal">
+        <p class="eyebrow">La artista</p>
+        <h2>Colombiana y costarricense.</h2>
+        <p>Llevo más de dieciocho años pintando emociones sobre lienzo. Estudié en Inglaterra, Brasil, Colombia y Costa Rica, y ese recorrido está en la obra.</p>
         <p>La naturaleza, las personas y lo que sentimos al vivir son el material. Las figuras son ese sentimiento, puesto en color.</p>
-        <a class="text-link" href="la-artista.html">La artista</a>
+        <a class="text-link" href="la-artista.html">Su historia</a>
       </div>
     </section>
 
-    <nav class="paths wrap" aria-label="Entrar">
+    <a class="portal" href="galeria.html" data-cursor="Entrar">
+      <div class="portal-stage" aria-hidden="true">
+        <img src="assets/media/works/marilyn-640.jpg" alt="" width="640" height="626">
+        <img src="assets/media/works/serenidad-640.jpg" alt="" width="640" height="768">
+        <img src="assets/media/works/ocean-eyes-640.jpg" alt="" width="640" height="756">
+      </div>
+      <div class="portal-copy">
+        <p class="eyebrow">La sala</p>
+        <h2>Entra y camina entre las obras.</h2>
+        <span class="text-link">Recorrer la sala</span>
+      </div>
+    </a>
+
+    <nav class="paths" aria-label="Entrar">
       <a href="obras.html"><em>Obras</em><span>La galería completa</span></a>
+      <a class="is-sala" href="galeria.html"><em>La sala</em><span>Las obras, colgadas</span></a>
       <a href="disponible.html"><em>Disponible</em><span>Piezas para consultar ahora</span></a>
       <a href="encargos.html"><em>Encargos</em><span>Una pintura, o un objeto, para tu casa</span></a>
     </nav>
   </main>
-  <footer class="footer wrap">
+  <footer class="footer">
+    <picture><source srcset="assets/brand/logo.webp" type="image/webp"><img class="footer-logo" src="assets/brand/logo.png" alt="Rocío Villamizar" width="960" height="330"></picture>
     <div>
-      <p class="footer-name">Rocío Villamizar</p>
+      <div class="footer-links">
+        <a href="https://instagram.com/rocioarts" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="https://wa.me/50689877207?text=Hola%20Roc%C3%ADo%2C%20vi%20tu%20trabajo%20y%20quiero%20escribirte." target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        <a href="https://www.facebook.com/profile.php?id=100063446032519" target="_blank" rel="noopener noreferrer">Facebook</a>
+      </div>
       <p class="footer-meta">Pintura contemporánea · Colombia y Costa Rica</p>
     </div>
-    <div class="footer-links">
-      <a href="https://instagram.com/rocioarts" target="_blank" rel="noopener noreferrer">Instagram</a>
-      <a href="https://wa.me/50689877207?text=Hola%20Roc%C3%ADo%2C%20vi%20tu%20trabajo%20y%20quiero%20escribirte." target="_blank" rel="noopener noreferrer">WhatsApp</a>
-      <a href="https://www.facebook.com/profile.php?id=100063446032519" target="_blank" rel="noopener noreferrer">Facebook</a>
-    </div>
-    <p class="footer-copy">© <span data-year>2026</span></p>
+    <p class="footer-copy">© <span data-year>2026</span> Rocío Villamizar</p>
   </footer>
+  <script src="js/media.js"></script>
   <script src="js/works.js"></script>
   <script src="js/main.js"></script>
 </body>

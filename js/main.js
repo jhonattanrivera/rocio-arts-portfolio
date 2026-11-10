@@ -1,12 +1,17 @@
 (function () {
-  const WORKS = window.WORKS || [];
-  const byId = Object.fromEntries(WORKS.map(function (work) { return [work.id, work]; }));
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const RAIL = ["marilyn", "ocean-eyes", "junto-a-ti", "flores", "cidade-maravilhosa", "abbey-road", "el-camino", "summer"];
+  var WORKS = window.WORKS || [];
+  var byId = {};
+  WORKS.forEach(function (work) { byId[work.id] = work; });
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  var viewTimeline = !reduce && window.CSS && CSS.supports("animation-timeline: view()");
+  if (viewTimeline) document.documentElement.classList.add("view-ok");
 
-  function wa(text) {
-    return "https://wa.me/50689877207?text=" + encodeURIComponent(text);
-  }
+  var RAIL = ["marilyn", "ocean-eyes", "junto-a-ti", "flores", "cidade-maravilhosa", "abbey-road", "el-camino", "summer", "forever"];
+
+  function wa(text) { return window.artWa ? window.artWa(text) : "https://wa.me/50689877207?text=" + encodeURIComponent(text); }
+  function facts(work) { return window.artFacts ? window.artFacts(work) : []; }
+  function askText(work) { return window.artAsk ? window.artAsk(work) : "Hola Rocío, me interesa la obra " + work.title + "."; }
 
   function availableList() {
     return WORKS.filter(function (work) { return work.available; })
@@ -17,21 +22,21 @@
     node.textContent = String(new Date().getFullYear());
   });
 
-  const nav = document.querySelector(".nav");
-  const toggle = document.querySelector(".nav-toggle");
-  let menuOpen = false;
-  let viewerOpen = false;
-  let scrollY = 0;
+  var nav = document.querySelector(".nav");
+  var toggle = document.querySelector(".nav-toggle");
+  var menuOpen = false;
+  var viewerOpen = false;
+  var scrollY = 0;
 
   function syncLock() {
-    const on = menuOpen || viewerOpen;
+    var on = menuOpen || viewerOpen;
     if (on) {
       if (!document.body.classList.contains("is-locked")) {
         scrollY = window.scrollY;
         document.body.style.top = "-" + scrollY + "px";
         document.body.classList.add("is-locked");
       }
-    } else {
+    } else if (document.body.classList.contains("is-locked")) {
       document.body.classList.remove("is-locked");
       document.body.style.top = "";
       window.scrollTo(0, scrollY);
@@ -44,25 +49,38 @@
     nav.classList.toggle("is-open", open);
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
     toggle.textContent = open ? "Cerrar" : "Menú";
+    document.querySelectorAll("main, .footer").forEach(function (node) {
+      if (open) node.setAttribute("inert", "");
+      else if (!viewerOpen) node.removeAttribute("inert");
+    });
     syncLock();
   }
 
-  if (toggle) {
-    toggle.addEventListener("click", function () { setMenu(!menuOpen); });
-  }
+  if (toggle) toggle.addEventListener("click", function () { setMenu(!menuOpen); });
   if (nav) {
     nav.querySelectorAll("a").forEach(function (link) {
       link.addEventListener("click", function () { setMenu(false); });
     });
+    var solidTick = false;
+    function solidNav() {
+      solidTick = false;
+      nav.classList.toggle("is-solid", window.scrollY > 8);
+    }
+    window.addEventListener("scroll", function () {
+      if (solidTick) return;
+      solidTick = true;
+      requestAnimationFrame(solidNav);
+    }, { passive: true });
+    solidNav();
   }
 
-  const io = new IntersectionObserver(function (entries) {
+  var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
       if (!entry.isIntersecting) return;
       entry.target.classList.add("is-in");
       io.unobserve(entry.target);
     });
-  }, { threshold: 0.16, rootMargin: "0px 0px -6% 0px" });
+  }, { threshold: 0.16, rootMargin: "0px 0px -8% 0px" });
 
   function watch(node) {
     if (!node) return;
@@ -72,37 +90,69 @@
     }
     io.observe(node);
   }
-
   document.querySelectorAll(".reveal").forEach(watch);
 
-  const railMount = document.querySelector("[data-mount='rail']");
-  if (railMount) {
-    const track = document.createElement("div");
+  function bindBar(scroller) {
+    if (!scroller) return;
+    var block = scroller.closest(".scroller-block") || scroller.parentElement;
+    var bar = block && block.querySelector("[data-progress]");
+    if (!bar) return;
+    var tick = false;
+    function place() {
+      tick = false;
+      var max = scroller.scrollWidth - scroller.clientWidth;
+      var p = max > 0 ? scroller.scrollLeft / max : 1;
+      bar.style.transform = "scaleX(" + p.toFixed(4) + ")";
+    }
+    scroller.addEventListener("scroll", function () {
+      if (tick) return;
+      tick = true;
+      requestAnimationFrame(place);
+    }, { passive: true });
+    window.addEventListener("resize", place);
+    place();
+  }
+
+  var railMount = document.querySelector("[data-mount='rail']");
+  if (railMount && window.artPicture) {
+    var track = document.createElement("div");
     track.className = "rail-track";
     RAIL.forEach(function (id) {
-      const work = byId[id];
+      var work = byId[id];
       if (!work) return;
-      track.append(workLink(work, { className: "rail-card", href: "obras.html#" + work.id, full: true }));
+      var link = document.createElement("a");
+      link.className = "rail-card";
+      link.href = "obras.html#" + work.id;
+      link.dataset.open = work.id;
+      link.setAttribute("aria-label", "Abrir " + work.title);
+      link.append(window.artPicture(work, {
+        sizes: "(min-width: 900px) 34vw, 78vw",
+        alt: work.title + ", pintura de Rocío Villamizar"
+      }));
+      var title = document.createElement("span");
+      title.className = "rail-title";
+      title.textContent = work.title;
+      link.append(title);
+      track.append(link);
     });
     railMount.append(track);
-
-    const countEl = document.querySelector("[data-rail-count]");
-    const cards = Array.prototype.slice.call(track.children);
-    let railTick = false;
-    let drag = null;
-    let dragged = false;
+    var countEl = document.querySelector("[data-rail-count]");
+    var cards = Array.prototype.slice.call(track.children);
+    var railTick = false;
+    var drag = null;
+    var dragged = false;
 
     function placeRail() {
       railTick = false;
       if (!cards.length) return;
-      const view = railMount.getBoundingClientRect();
-      const focus = view.left + Math.min(view.width * 0.34, 320);
-      let best = 0;
-      let bestDist = Infinity;
+      var view = railMount.getBoundingClientRect();
+      var focus = view.left + Math.min(view.width * 0.34, 320);
+      var best = 0;
+      var bestDist = Infinity;
       cards.forEach(function (card, i) {
-        const rect = card.getBoundingClientRect();
-        const dist = Math.abs(rect.left + rect.width * 0.5 - focus);
-        const near = reduce ? 1 : Math.max(0, 1 - dist / (view.width * 0.8));
+        var rect = card.getBoundingClientRect();
+        var dist = Math.abs(rect.left + rect.width * 0.5 - focus);
+        var near = reduce ? 1 : Math.max(0, 1 - dist / (view.width * 0.85));
         card.style.setProperty("--near", near.toFixed(3));
         if (dist < bestDist) {
           bestDist = dist;
@@ -110,14 +160,15 @@
         }
       });
       if (countEl) countEl.textContent = String(best + 1).padStart(2, "0");
+      var max = railMount.scrollWidth - railMount.clientWidth;
+      var bar = document.querySelector("[data-rail-bar]");
+      if (bar) bar.style.transform = "scaleX(" + (max > 0 ? railMount.scrollLeft / max : 1).toFixed(4) + ")";
     }
-
     function requestRail() {
       if (railTick) return;
       railTick = true;
       requestAnimationFrame(placeRail);
     }
-
     railMount.addEventListener("scroll", requestRail, { passive: true });
     window.addEventListener("resize", requestRail);
     railMount.addEventListener("pointerdown", function (event) {
@@ -129,7 +180,7 @@
     });
     railMount.addEventListener("pointermove", function (event) {
       if (!drag) return;
-      const dx = event.clientX - drag.x;
+      var dx = event.clientX - drag.x;
       if (Math.abs(dx) > 4) dragged = true;
       railMount.scrollLeft = drag.left - dx;
     });
@@ -145,111 +196,99 @@
       event.stopPropagation();
       dragged = false;
     }, true);
-    track.querySelectorAll("img").forEach(function (img) {
-      img.addEventListener("load", requestRail);
-    });
     requestRail();
   }
 
-  const heroFrame = document.querySelector(".hero-frame");
-  if (heroFrame && !reduce) {
-    let shiftTick = false;
-    function shiftHero() {
-      shiftTick = false;
-      const rect = heroFrame.getBoundingClientRect();
-      const travel = Math.min(Math.max(-rect.top, 0), rect.height);
-      heroFrame.style.setProperty("--shift", String(Math.round(-36 + travel * 0.16)));
+  document.querySelectorAll("[data-scroller]").forEach(bindBar);
+
+  var pull = document.querySelector(".pull");
+  if (pull) pull.classList.add("is-in");
+
+  var intro = document.getElementById("intro");
+  if (intro && document.documentElement.classList.contains("show-intro")) {
+    var skip = intro.querySelector(".intro-skip");
+    var introDone = false;
+    function finishIntro() {
+      if (introDone) return;
+      introDone = true;
+      try { sessionStorage.setItem("rocio-intro", "1"); } catch (err) { /* privado */ }
+      intro.classList.add("is-leaving");
+      window.setTimeout(function () {
+        document.documentElement.classList.remove("show-intro");
+        intro.remove();
+      }, 720);
     }
-    window.addEventListener("scroll", function () {
-      if (shiftTick) return;
-      shiftTick = true;
-      requestAnimationFrame(shiftHero);
+    if (skip) {
+      skip.addEventListener("click", finishIntro);
+      window.setTimeout(function () { skip.focus(); }, 30);
+    }
+    window.setTimeout(finishIntro, 2900);
+  }
+
+  if (fine && !reduce) {
+    var cursor = document.createElement("div");
+    cursor.className = "cursor";
+    cursor.setAttribute("aria-hidden", "true");
+    document.body.append(cursor);
+    var label = "";
+    window.addEventListener("pointermove", function (event) {
+      cursor.style.transform = "translate(" + event.clientX + "px," + event.clientY + "px)";
+      var target = event.target.closest ? event.target.closest("[data-open], [data-cursor]") : null;
+      var next = target ? (target.dataset.cursor || "Ver") : "";
+      if (next !== label) {
+        label = next;
+        cursor.textContent = next;
+        cursor.classList.toggle("is-on", !!next);
+      }
     }, { passive: true });
-    shiftHero();
   }
 
-  const pull = document.querySelector(".pull");
-  const pullText = pull && pull.querySelector("p");
-  if (pull && pullText) {
-    const words = pullText.textContent.trim().split(/\s+/);
-    pullText.textContent = "";
-    words.forEach(function (word, i, all) {
-      const span = document.createElement("span");
-      span.className = "w";
-      span.style.setProperty("--i", String(i));
-      span.textContent = word;
-      pullText.append(span);
-      if (i < all.length - 1) pullText.append(" ");
-    });
-    pull.classList.add("is-ready");
-    watch(pull);
-  }
+  var masonry = document.querySelector("[data-mount='masonry']");
+  var catalog = document.querySelector("[data-mount='catalog']");
+  var countNode = document.querySelector("[data-count]");
+  var visible = WORKS.slice();
+  var lastOpener = null;
 
-  document.querySelectorAll(".paths a").forEach(function (link, i) {
-    link.style.setProperty("--d", (i * 140) + "ms");
-    watch(link);
-  });
-
-  const masonry = document.querySelector("[data-mount='masonry']");
-  const catalog = document.querySelector("[data-mount='catalog']");
-  const countEl = document.querySelector("[data-count]");
-  let visible = WORKS.slice();
-
-  function workLink(work, opts) {
-    const link = document.createElement("a");
+  function card(work, opts) {
+    var link = document.createElement("a");
     link.className = opts.className;
     link.href = opts.href || ("#" + work.id);
     link.dataset.open = work.id;
+    link.style.setProperty("--tone", work.tone || "#e7e1d8");
     link.setAttribute("aria-label", "Abrir " + work.title);
-    const frame = document.createElement("span");
-    frame.className = opts.frameClass || (opts.className.indexOf("rail") === 0 ? "" : "frame");
-    if (!frame.className) {
-      const img = imageFor(work, opts);
-      const title = document.createElement("span");
-      title.className = "rail-title";
-      title.textContent = work.title;
-      link.append(img, title);
-      return link;
+    var frame = document.createElement("span");
+    frame.className = "frame";
+    var clip = document.createElement("span");
+    clip.className = "clip";
+    if (window.artPicture) {
+      clip.append(window.artPicture(work, {
+        sizes: opts.sizes,
+        eager: opts.eager,
+        alt: work.title + ", pintura de Rocío Villamizar"
+      }));
     }
-    frame.append(imageFor(work, opts));
+    frame.append(clip);
     link.append(frame);
     return link;
   }
 
-  function imageFor(work, opts) {
-    const img = document.createElement("img");
-    img.src = opts.full ? work.image : work.thumb;
-    img.width = work.w;
-    img.height = work.h;
-    img.alt = work.title + ", pintura de Rocío Villamizar";
-    img.decoding = "async";
-    if (!opts.eager) img.loading = "lazy";
-    if (opts.srcset) {
-      img.srcset = work.thumb + " 1000w, " + work.image + " " + Math.max(work.w, 1200) + "w";
-      img.sizes = opts.sizes;
-    }
-    return img;
-  }
-
   function renderMasonry(list) {
-    if (!masonry) return;
+    if (!masonry || !window.artPicture) return;
     visible = list;
     masonry.replaceChildren();
     list.forEach(function (work, i) {
-      const link = workLink(work, {
+      var link = card(work, {
         className: "card reveal",
         href: "#" + work.id,
         eager: i < 2,
-        srcset: true,
         sizes: "(min-width: 1100px) 30vw, (min-width: 720px) 46vw, 92vw"
       });
-      link.style.setProperty("--d", (i % 3) * 70 + "ms");
-      const title = document.createElement("span");
+      var title = document.createElement("span");
       title.className = "card-title";
       title.textContent = work.title;
       link.append(title);
       if (work.available) {
-        const note = document.createElement("span");
+        var note = document.createElement("span");
         note.className = "card-note";
         note.textContent = "Disponible";
         link.append(note);
@@ -257,34 +296,40 @@
       masonry.append(link);
       watch(link);
     });
-    if (countEl) countEl.textContent = String(list.length);
+    if (countNode) countNode.textContent = String(list.length);
   }
 
   function renderCatalog(list) {
-    if (!catalog) return;
+    if (!catalog || !window.artPicture) return;
     catalog.replaceChildren();
     list.forEach(function (work) {
-      const item = document.createElement("article");
+      var item = document.createElement("article");
       item.className = "catalog-item reveal";
-      const link = document.createElement("a");
-      link.className = "catalog-frame";
-      link.href = "obras.html#" + work.id;
-      link.dataset.open = work.id;
-      link.setAttribute("aria-label", "Abrir " + work.title);
-      link.append(imageFor(work, { full: true }));
-      const copy = document.createElement("div");
+      item.dataset.work = work.id;
+      var link = card(work, {
+        className: "catalog-frame",
+        href: "obras.html#" + work.id,
+        sizes: "(min-width: 900px) 46vw, 92vw",
+        eager: false
+      });
+      var copy = document.createElement("div");
       copy.className = "catalog-copy";
-      const heading = document.createElement("h2");
+      var heading = document.createElement("h2");
       heading.textContent = work.title;
-      const text = document.createElement("p");
+      var text = document.createElement("p");
       text.textContent = work.description;
-      const ask = document.createElement("a");
+      var meta = document.createElement("p");
+      meta.className = "catalog-facts";
+      var bits = facts(work);
+      meta.textContent = bits.join(" · ");
+      meta.hidden = !bits.length;
+      var ask = document.createElement("a");
       ask.className = "text-link";
-      ask.href = wa("Hola Rocío, me interesa la obra " + work.title + ". ¿Sigue disponible?");
+      ask.href = wa(askText(work));
       ask.target = "_blank";
       ask.rel = "noopener noreferrer";
       ask.textContent = "Consultar esta obra";
-      copy.append(heading, text, ask);
+      copy.append(heading, meta, text, ask);
       item.append(link, copy);
       catalog.append(item);
       watch(item);
@@ -309,44 +354,98 @@
     });
   });
 
-  const viewer = document.createElement("div");
+  var pageDock = document.querySelector("[data-dock]");
+  if (pageDock && catalog) {
+    var dockTitle = pageDock.querySelector("[data-dock-title]");
+    var currentDock = "";
+    var dockObserver = new IntersectionObserver(function (entries) {
+      var visibleOnes = entries.filter(function (entry) { return entry.isIntersecting; })
+        .sort(function (a, b) { return b.intersectionRatio - a.intersectionRatio; });
+      if (!visibleOnes.length) return;
+      var id = visibleOnes[0].target.dataset.work;
+      var work = byId[id];
+      if (!work || id === currentDock) return;
+      currentDock = id;
+      pageDock.hidden = false;
+      pageDock.href = wa(askText(work));
+      if (dockTitle) dockTitle.textContent = work.title;
+    }, { threshold: [0.35, 0.6], rootMargin: "-20% 0px -30% 0px" });
+    catalog.querySelectorAll(".catalog-item").forEach(function (item) { dockObserver.observe(item); });
+    var lastY = window.scrollY;
+    window.addEventListener("scroll", function () {
+      var y = window.scrollY;
+      if (viewerOpen) pageDock.classList.add("is-away");
+      else if (y > lastY + 8 && y > 80) pageDock.classList.add("is-away");
+      else if (y < lastY - 8) pageDock.classList.remove("is-away");
+      lastY = y;
+    }, { passive: true });
+  }
+
+  if (document.body.classList.contains("page-sala")) {
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && menuOpen) setMenu(false);
+    });
+    window.addEventListener("resize", function () {
+      if (window.innerWidth >= 980 && menuOpen) setMenu(false);
+    });
+    return;
+  }
+
+  var viewer = document.createElement("div");
   viewer.className = "viewer";
   viewer.setAttribute("role", "dialog");
   viewer.setAttribute("aria-modal", "true");
   viewer.setAttribute("aria-hidden", "true");
   viewer.setAttribute("aria-labelledby", "viewer-title");
   viewer.innerHTML =
-    '<div class="viewer-bar"><p class="viewer-count"></p><button type="button" class="viewer-close" data-close>Cerrar</button></div>' +
-    '<div class="viewer-stage"><button type="button" class="viewer-nav viewer-prev">Anterior</button><div class="viewer-photo"><img alt=""></div><button type="button" class="viewer-nav viewer-next">Siguiente</button></div>' +
-    '<div class="viewer-copy"><p class="viewer-status" hidden></p><h2 id="viewer-title"></h2><p class="viewer-desc"></p><a class="text-link viewer-ask" target="_blank" rel="noopener noreferrer"></a></div>';
+    '<div class="viewer-bar">' +
+      '<button type="button" class="viewer-prev" aria-label="Anterior"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>' +
+      '<button type="button" class="viewer-zoom" aria-pressed="false">Pincelada</button>' +
+      '<p class="viewer-count"></p>' +
+      '<button type="button" class="viewer-next" aria-label="Siguiente"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9.5 5 16.5 12l-7 7" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>' +
+      '<button type="button" class="viewer-close" data-close>Cerrar</button>' +
+    "</div>" +
+    '<div class="viewer-stage"><div class="viewer-photo"><div class="pinch"><picture><source class="src-avif" type="image/avif"><source class="src-webp" type="image/webp"><img alt=""></picture></div></div></div>' +
+    '<div class="viewer-copy"><p class="viewer-status" hidden></p><h2 id="viewer-title"></h2><p class="viewer-facts"></p><p class="viewer-desc"></p></div>' +
+    '<a class="dock viewer-dock" target="_blank" rel="noopener noreferrer"><span><small>WhatsApp</small><strong class="dock-name"></strong></span><em>Consultar esta obra</em></a>';
   document.body.append(viewer);
 
-  const viewerImg = viewer.querySelector("img");
-  const viewerCount = viewer.querySelector(".viewer-count");
-  const viewerTitle = viewer.querySelector("#viewer-title");
-  const viewerDesc = viewer.querySelector(".viewer-desc");
-  const viewerStatus = viewer.querySelector(".viewer-status");
-  const viewerAsk = viewer.querySelector(".viewer-ask");
-  let cycle = WORKS;
-  let index = 0;
-  let pushed = false;
-  let lastFocus = null;
-  let touchX = 0;
-  let touchY = 0;
+  var viewerImg = viewer.querySelector("img");
+  var srcAvif = viewer.querySelector(".src-avif");
+  var srcWebp = viewer.querySelector(".src-webp");
+  var pinch = viewer.querySelector(".pinch");
+  var photo = viewer.querySelector(".viewer-photo");
+  var viewerCount = viewer.querySelector(".viewer-count");
+  var viewerTitle = viewer.querySelector("#viewer-title");
+  var viewerDesc = viewer.querySelector(".viewer-desc");
+  var viewerFacts = viewer.querySelector(".viewer-facts");
+  var viewerStatus = viewer.querySelector(".viewer-status");
+  var viewerAsk = viewer.querySelector(".viewer-dock");
+  var viewerName = viewer.querySelector(".dock-name");
+  var zoomBtn = viewer.querySelector(".viewer-zoom");
+  var zoomOn = false;
+  var view = { s: 1, x: 0, y: 0 };
+  var pointers = new Map();
+  var pinchStart = null;
+  var cycle = WORKS;
+  var index = 0;
+  var lastFocus = null;
+  var touchX = 0;
+  var touchY = 0;
+  var moved = false;
+  var lastTap = 0;
 
   function listFor(node) {
-    const mount = node && node.closest ? node.closest("[data-cycle]") : null;
+    var mount = node && node.closest ? node.closest("[data-cycle]") : null;
     if (!mount) return WORKS;
     if (mount.dataset.cycle === "available") return availableList();
-    if (mount.dataset.cycle === "rail") {
-      return RAIL.map(function (id) { return byId[id]; }).filter(Boolean);
-    }
+    if (mount.dataset.cycle === "rail") return RAIL.map(function (id) { return byId[id]; }).filter(Boolean);
     if (mount.dataset.cycle === "visible") return visible;
     return WORKS;
   }
 
   function setPageHidden(on) {
-    document.querySelectorAll(".nav, main, .footer").forEach(function (node) {
+    document.querySelectorAll(".nav, main, .footer, .dock:not(.viewer-dock)").forEach(function (node) {
       if (on) {
         node.setAttribute("inert", "");
         node.setAttribute("aria-hidden", "true");
@@ -357,54 +456,96 @@
     });
   }
 
+  function renderPinch() {
+    pinch.style.transform = "translate3d(" + view.x + "px," + view.y + "px,0) scale(" + view.s + ")";
+  }
+
+  function resetZoom() {
+    view = { s: 1, x: 0, y: 0 };
+    renderPinch();
+    viewerImg.style.transform = "";
+    viewerImg.style.transformOrigin = "";
+  }
+
   function paint() {
-    const work = cycle[index];
+    var work = cycle[index];
     if (!work) return;
-    viewerImg.src = work.image;
+    resetZoom();
+    if (window.artSrcset) {
+      srcAvif.srcset = window.artSrcset(work, "avif");
+      srcWebp.srcset = window.artSrcset(work, "webp");
+      srcAvif.sizes = "100vw";
+      srcWebp.sizes = "100vw";
+      viewerImg.srcset = window.artSrcset(work, "jpg");
+    }
+    var list = work.widths || [];
+    var mid = list.filter(function (w) { return w < work.w - 1; }).pop();
+    viewerImg.src = mid ? "assets/media/works/" + work.id + "-" + mid + ".jpg" : work.image;
     viewerImg.width = work.w;
     viewerImg.height = work.h;
     viewerImg.alt = work.title + ", pintura de Rocío Villamizar";
+    photo.style.background = work.tone || "transparent";
     viewerCount.textContent = String(index + 1).padStart(2, "0") + "  /  " + String(cycle.length).padStart(2, "0");
     viewerTitle.textContent = work.title;
     viewerDesc.textContent = work.description;
+    var bits = facts(work);
+    viewerFacts.textContent = bits.join(" · ");
+    viewerFacts.hidden = !bits.length;
     viewerStatus.hidden = !work.available;
     viewerStatus.textContent = work.available ? "Disponible" : "";
-    viewerAsk.textContent = work.available ? "Consultar esta obra" : "Consultar disponibilidad";
-    viewerAsk.href = wa(
-      work.available
-        ? "Hola Rocío, me interesa la obra " + work.title + ". ¿Sigue disponible?"
-        : "Hola Rocío, me interesa la obra " + work.title + ". ¿Me cuentas si está disponible?"
-    );
+    viewerName.textContent = work.title;
+    viewerAsk.href = wa(askText(work));
     [-1, 1].forEach(function (dir) {
-      const neighbor = cycle[(index + dir + cycle.length) % cycle.length];
+      var neighbor = cycle[(index + dir + cycle.length) % cycle.length];
       if (!neighbor) return;
-      const pre = new Image();
+      var pre = new Image();
       pre.src = neighbor.image;
     });
   }
 
+  function show() {
+    viewer.classList.add("is-open");
+    viewer.setAttribute("aria-hidden", "false");
+    setPageHidden(true);
+    syncLock();
+    if (pageDock) pageDock.classList.add("is-away");
+    viewer.querySelector(".viewer-close").focus();
+  }
+
   function openWork(id, list, push) {
-    const nextList = list && list.length ? list : WORKS;
-    let nextIndex = nextList.findIndex(function (work) { return work.id === id; });
+    var nextList = list && list.length ? list : WORKS;
+    var nextIndex = nextList.findIndex(function (work) { return work.id === id; });
     cycle = nextIndex >= 0 ? nextList : WORKS;
     if (nextIndex < 0) nextIndex = cycle.findIndex(function (work) { return work.id === id; });
     if (nextIndex < 0) return;
     index = nextIndex;
     lastFocus = document.activeElement;
-    viewerOpen = true;
-    paint();
-    viewer.classList.add("is-open");
-    viewer.setAttribute("aria-hidden", "false");
-    setPageHidden(true);
-    syncLock();
-    viewer.querySelector(".viewer-close").focus();
-    const hash = "#" + id;
-    if (push) {
-      history.pushState({ work: id }, "", hash);
-      pushed = true;
-    } else if (location.hash !== hash) {
-      history.replaceState({ work: id }, "", hash);
+    var fromImg = lastOpener && lastOpener.querySelector("img");
+    var run = function () {
+      viewerOpen = true;
+      paint();
+      show();
+      var hash = "#" + id;
+      if (push) history.pushState({ work: id }, "", hash);
+      else if (location.hash !== hash) history.replaceState({ work: id }, "", hash);
+    };
+    if (!reduce && document.startViewTransition && fromImg) {
+      try {
+        fromImg.style.viewTransitionName = "obra";
+        var transition = document.startViewTransition(function () {
+          fromImg.style.viewTransitionName = "";
+          run();
+          viewerImg.style.viewTransitionName = "obra";
+        });
+        transition.finished.finally(function () {
+          viewerImg.style.viewTransitionName = "";
+        }).catch(function () {});
+        return;
+      } catch (err) {
+        fromImg.style.viewTransitionName = "";
+      }
     }
+    run();
   }
 
   function actuallyClose() {
@@ -414,11 +555,12 @@
     viewer.setAttribute("aria-hidden", "true");
     setPageHidden(false);
     syncLock();
+    resetZoom();
+    if (pageDock) pageDock.classList.remove("is-away");
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
 
   function requestClose() {
-    pushed = false;
     actuallyClose();
     if (location.hash) history.replaceState(null, "", location.pathname + location.search);
   }
@@ -426,39 +568,112 @@
   function step(dir) {
     if (!cycle.length) return;
     index = (index + dir + cycle.length) % cycle.length;
-    const work = cycle[index];
+    var work = cycle[index];
     history.replaceState({ work: work.id }, "", "#" + work.id);
     paint();
   }
 
   document.addEventListener("click", function (event) {
-    const opener = event.target.closest("[data-open]");
+    var opener = event.target.closest("[data-open]");
     if (!opener) return;
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button) return;
     event.preventDefault();
+    lastOpener = opener;
     openWork(opener.dataset.open, listFor(opener), true);
   });
 
   viewer.addEventListener("click", function (event) {
-    if (event.target.closest("[data-close]") || event.target.classList.contains("viewer-photo")) requestClose();
+    if (event.target.closest("[data-close]")) requestClose();
   });
   viewer.querySelector(".viewer-prev").addEventListener("click", function () { step(-1); });
   viewer.querySelector(".viewer-next").addEventListener("click", function () { step(1); });
+  zoomBtn.addEventListener("click", function () {
+    zoomOn = !zoomOn;
+    zoomBtn.setAttribute("aria-pressed", zoomOn ? "true" : "false");
+    photo.classList.toggle("is-loupe", zoomOn);
+    if (!zoomOn) {
+      viewerImg.style.transform = "";
+      viewerImg.style.transformOrigin = "";
+    }
+  });
 
-  const photo = viewer.querySelector(".viewer-photo");
-  photo.addEventListener("touchstart", function (event) {
-    touchX = event.changedTouches[0].clientX;
-    touchY = event.changedTouches[0].clientY;
-  }, { passive: true });
-  photo.addEventListener("touchend", function (event) {
-    const dx = event.changedTouches[0].clientX - touchX;
-    const dy = event.changedTouches[0].clientY - touchY;
-    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.15) step(dx < 0 ? 1 : -1);
-    else if (dy > 90 && Math.abs(dy) > Math.abs(dx) && viewer.scrollTop < 10) requestClose();
-  }, { passive: true });
+  photo.addEventListener("pointerdown", function (event) {
+    if (event.pointerType === "mouse" && zoomOn) return;
+    photo.setPointerCapture(event.pointerId);
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    touchX = event.clientX;
+    touchY = event.clientY;
+    moved = false;
+    if (pointers.size === 2) {
+      var pts = Array.from(pointers.values());
+      pinchStart = {
+        dist: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1,
+        s: view.s
+      };
+    }
+  });
+  photo.addEventListener("pointermove", function (event) {
+    if (zoomOn && event.pointerType === "mouse" && view.s === 1) {
+      var rect = photo.getBoundingClientRect();
+      var ox = ((event.clientX - rect.left) / rect.width) * 100;
+      var oy = ((event.clientY - rect.top) / rect.height) * 100;
+      viewerImg.style.transformOrigin = ox + "% " + oy + "%";
+      viewerImg.style.transform = "scale(2.45)";
+      return;
+    }
+    if (!pointers.has(event.pointerId)) return;
+    var prev = pointers.get(event.pointerId);
+    var dx = event.clientX - prev.x;
+    var dy = event.clientY - prev.y;
+    if (Math.abs(dx) + Math.abs(dy) > 4) moved = true;
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (pointers.size === 2 && pinchStart) {
+      var pts = Array.from(pointers.values());
+      var dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      view.s = Math.min(4, Math.max(1, pinchStart.s * (dist / pinchStart.dist)));
+      if (view.s === 1) { view.x = 0; view.y = 0; }
+      renderPinch();
+    } else if (pointers.size === 1 && view.s > 1) {
+      view.x += dx;
+      view.y += dy;
+      renderPinch();
+    }
+  });
+  function endPointer(event) {
+    pointers.delete(event.pointerId);
+    if (pointers.size < 2) pinchStart = null;
+    if (event.type !== "pointerup") return;
+    var dx = event.clientX - touchX;
+    var dy = event.clientY - touchY;
+    if (view.s > 1) return;
+    if (!moved) {
+      var now = performance.now();
+      if (now - lastTap < 280) {
+        view.s = 2.5;
+        view.x = 0;
+        view.y = 0;
+        renderPinch();
+        lastTap = 0;
+      } else lastTap = now;
+      return;
+    }
+    if (Math.abs(dx) > 52 && Math.abs(dx) > Math.abs(dy) * 1.2) step(dx < 0 ? 1 : -1);
+  }
+  photo.addEventListener("pointerup", endPointer);
+  photo.addEventListener("pointercancel", endPointer);
+  photo.addEventListener("pointerleave", function () {
+    if (zoomOn && view.s === 1) {
+      viewerImg.style.transform = "";
+    }
+  });
 
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape") {
+      if (intro && document.documentElement.classList.contains("show-intro") && !intro.classList.contains("is-leaving")) {
+        var skipBtn = intro.querySelector(".intro-skip");
+        if (skipBtn) skipBtn.click();
+        return;
+      }
       if (viewerOpen) requestClose();
       else if (menuOpen) setMenu(false);
       return;
@@ -467,24 +682,24 @@
     if (event.key === "ArrowRight") { event.preventDefault(); step(1); }
     if (event.key === "ArrowLeft") { event.preventDefault(); step(-1); }
     if (event.key !== "Tab") return;
-    const items = Array.from(viewer.querySelectorAll("button, a"));
+    var items = Array.prototype.slice.call(viewer.querySelectorAll("button, a"));
     if (!items.length) return;
-    const first = items[0];
-    const last = items[items.length - 1];
+    var first = items[0];
+    var last = items[items.length - 1];
     if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
   });
 
   window.addEventListener("popstate", function () {
-    const id = decodeURIComponent(location.hash.replace("#", ""));
+    var id = decodeURIComponent(location.hash.replace("#", ""));
     if (id && byId[id]) openWork(id, cycle.length ? cycle : WORKS, false);
     else actuallyClose();
   });
 
-  const start = decodeURIComponent(location.hash.replace("#", ""));
+  var start = decodeURIComponent(location.hash.replace("#", ""));
   if (start && byId[start]) openWork(start, WORKS, false);
 
   window.addEventListener("resize", function () {
-    if (window.innerWidth >= 900 && menuOpen) setMenu(false);
+    if (window.innerWidth >= 980 && menuOpen) setMenu(false);
   });
 })();

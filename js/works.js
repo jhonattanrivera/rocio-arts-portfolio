@@ -1,5 +1,14 @@
 /* Catálogo. Los títulos son los de cada obra.
-   Las descripciones son una lectura de la imagen: se pueden editar aquí. */
+   Las descripciones son una lectura de la imagen: se pueden editar aquí.
+   Ficha de comprador, lista para completar. No inventar valores:
+   si el dato no existe, queda en null y el sitio no lo muestra.
+     year       número o texto
+     medium     técnica, por ejemplo "Acrílico sobre lienzo"
+     widthCm    ancho en centímetros
+     heightCm   alto en centímetros
+   tone es un color derivado de la propia imagen, para el fondo de la ficha.
+   widths son los anchos reales de assets/media/works/{id}-{ancho}.webp|avif
+   (el JPG de respaldo está en image, y en los anchos menores). */
 window.WORKS = [
   {
     "id": "serenidad",
@@ -9,7 +18,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/serenidad.jpg",
     "w": 1667,
     "h": 2000,
-    "available": 0
+    "available": 0,
+    "tone": "#d0aeab",
+    "widths": [
+      640,
+      1280,
+      1666
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "marilyn",
@@ -19,7 +38,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/marilyn.jpg",
     "w": 1162,
     "h": 1137,
-    "available": 0
+    "available": 0,
+    "tone": "#eddd9c",
+    "widths": [
+      640,
+      1162
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "ocean-eyes",
@@ -29,7 +57,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/ocean-eyes.jpg",
     "w": 1242,
     "h": 1467,
-    "available": 0
+    "available": 0,
+    "tone": "#e0bdac",
+    "widths": [
+      640,
+      1242
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "summer",
@@ -39,7 +76,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/summer.jpg",
     "w": 1112,
     "h": 2000,
-    "available": 0
+    "available": 0,
+    "tone": "#eac1a9",
+    "widths": [
+      640,
+      1112
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "el-camino",
@@ -49,7 +95,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/el-camino.jpg",
     "w": 2000,
     "h": 1733,
-    "available": 1
+    "available": 1,
+    "tone": "#9eabb9",
+    "widths": [
+      640,
+      1280,
+      2000
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "junto-a-ti",
@@ -59,7 +115,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/junto-a-ti.jpg",
     "w": 736,
     "h": 541,
-    "available": 0
+    "available": 0,
+    "tone": "#9fcfc9",
+    "widths": [
+      640,
+      736
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "flores",
@@ -69,7 +134,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/flores.jpg",
     "w": 952,
     "h": 989,
-    "available": 0
+    "available": 0,
+    "tone": "#70abbc",
+    "widths": [
+      640,
+      952
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "cidade-maravilhosa",
@@ -79,7 +153,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/cidade-maravilhosa.jpg",
     "w": 1165,
     "h": 937,
-    "available": 0
+    "available": 0,
+    "tone": "#6ebbca",
+    "widths": [
+      640,
+      1164
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "abbey-road",
@@ -89,7 +172,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/abbey-road.jpg",
     "w": 993,
     "h": 807,
-    "available": 0
+    "available": 0,
+    "tone": "#ce7a7c",
+    "widths": [
+      640,
+      992
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "verano-memorable",
@@ -99,7 +191,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/verano-memorable.jpg",
     "w": 1654,
     "h": 2000,
-    "available": 0
+    "available": 0,
+    "tone": "#cfab9c",
+    "widths": [
+      640,
+      1280,
+      1654
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "the-crown",
@@ -109,7 +211,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/the-crown.jpg",
     "w": 985,
     "h": 985,
-    "available": 0
+    "available": 0,
+    "tone": "#8ebdbd",
+    "widths": [
+      640,
+      984
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "elefantes",
@@ -119,7 +230,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/elefantes.jpg",
     "w": 1036,
     "h": 450,
-    "available": 0
+    "available": 0,
+    "tone": "#ae9c7b",
+    "widths": [
+      640,
+      1036
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "forever",
@@ -129,7 +249,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/forever.jpg",
     "w": 1600,
     "h": 1334,
-    "available": 0
+    "available": 0,
+    "tone": "#6bd0c9",
+    "widths": [
+      640,
+      1280,
+      1600
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "40-graus",
@@ -139,7 +269,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/40-graus.jpg",
     "w": 2000,
     "h": 991,
-    "available": 0
+    "available": 0,
+    "tone": "#67ccda",
+    "widths": [
+      640,
+      1280,
+      2000
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "girasoles",
@@ -149,7 +289,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/girasoles.jpg",
     "w": 919,
     "h": 1024,
-    "available": 0
+    "available": 0,
+    "tone": "#727b87",
+    "widths": [
+      640,
+      918
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "cristo-redentor",
@@ -159,7 +308,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/cristo-redentor.jpg",
     "w": 955,
     "h": 658,
-    "available": 0
+    "available": 0,
+    "tone": "#6cccce",
+    "widths": [
+      640,
+      954
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "family",
@@ -169,7 +327,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/family.jpg",
     "w": 1024,
     "h": 538,
-    "available": 0
+    "available": 0,
+    "tone": "#6fa0a8",
+    "widths": [
+      640,
+      1024
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "take-my-hand",
@@ -179,7 +346,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/take-my-hand.jpg",
     "w": 2000,
     "h": 1033,
-    "available": 2
+    "available": 2,
+    "tone": "#6caab9",
+    "widths": [
+      640,
+      1280,
+      2000
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "lazos-de-amor",
@@ -189,7 +366,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/lazos-de-amor.jpg",
     "w": 2000,
     "h": 903,
-    "available": 0
+    "available": 0,
+    "tone": "#bdad9c",
+    "widths": [
+      640,
+      1280,
+      2000
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "vibras-de-playa",
@@ -199,7 +386,15 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/vibras-de-playa.jpg",
     "w": 581,
     "h": 712,
-    "available": 0
+    "available": 0,
+    "tone": "#8cc0cc",
+    "widths": [
+      580
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "my-love",
@@ -209,7 +404,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/my-love.jpg",
     "w": 2000,
     "h": 1730,
-    "available": 3
+    "available": 3,
+    "tone": "#6ca9cb",
+    "widths": [
+      640,
+      1280,
+      2000
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "meninas",
@@ -219,7 +424,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/meninas.jpg",
     "w": 1024,
     "h": 788,
-    "available": 0
+    "available": 0,
+    "tone": "#abbcca",
+    "widths": [
+      640,
+      1024
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "united",
@@ -229,7 +443,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/united.jpg",
     "w": 1024,
     "h": 624,
-    "available": 0
+    "available": 0,
+    "tone": "#6daabc",
+    "widths": [
+      640,
+      1024
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "amor-eterno",
@@ -239,7 +462,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/amor-eterno.jpg",
     "w": 1600,
     "h": 975,
-    "available": 0
+    "available": 0,
+    "tone": "#6cbfcb",
+    "widths": [
+      640,
+      1280,
+      1600
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "london-bridge",
@@ -249,7 +482,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/london-bridge.jpg",
     "w": 1030,
     "h": 643,
-    "available": 0
+    "available": 0,
+    "tone": "#80d2d7",
+    "widths": [
+      640,
+      1030
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "por-do-sol-corcovado",
@@ -259,7 +501,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/por-do-sol-corcovado.jpg",
     "w": 1170,
     "h": 782,
-    "available": 0
+    "available": 0,
+    "tone": "#e1ca9c",
+    "widths": [
+      640,
+      1170
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "mi-ser",
@@ -269,7 +520,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/mi-ser.jpg",
     "w": 1600,
     "h": 884,
-    "available": 0
+    "available": 0,
+    "tone": "#7fbebc",
+    "widths": [
+      640,
+      1280,
+      1600
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "floreciendo",
@@ -279,7 +540,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/floreciendo.jpg",
     "w": 1600,
     "h": 1340,
-    "available": 0
+    "available": 0,
+    "tone": "#8cbfbb",
+    "widths": [
+      640,
+      1280,
+      1600
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "familia",
@@ -289,7 +560,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/familia.jpg",
     "w": 2000,
     "h": 1233,
-    "available": 4
+    "available": 4,
+    "tone": "#68c1be",
+    "widths": [
+      640,
+      1280,
+      2000
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "arcoiris",
@@ -299,7 +580,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/arcoiris.jpg",
     "w": 1600,
     "h": 1048,
-    "available": 0
+    "available": 0,
+    "tone": "#6aadbd",
+    "widths": [
+      640,
+      1280,
+      1600
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "elefants-family",
@@ -309,7 +600,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/elefants-family.jpg",
     "w": 1600,
     "h": 886,
-    "available": 0
+    "available": 0,
+    "tone": "#d0e3e8",
+    "widths": [
+      640,
+      1280,
+      1600
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "the-bridge",
@@ -319,7 +620,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/the-bridge.jpg",
     "w": 1157,
     "h": 959,
-    "available": 0
+    "available": 0,
+    "tone": "#df807c",
+    "widths": [
+      640,
+      1156
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "amor-puro",
@@ -329,7 +639,15 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/amor-puro.jpg",
     "w": 645,
     "h": 424,
-    "available": 0
+    "available": 0,
+    "tone": "#6dc0c9",
+    "widths": [
+      644
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "mi-bendicion",
@@ -339,7 +657,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/mi-bendicion.jpg",
     "w": 934,
     "h": 596,
-    "available": 0
+    "available": 0,
+    "tone": "#aecd69",
+    "widths": [
+      640,
+      934
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "mi-refugio",
@@ -349,7 +676,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/mi-refugio.jpg",
     "w": 1600,
     "h": 844,
-    "available": 0
+    "available": 0,
+    "tone": "#69bdcc",
+    "widths": [
+      640,
+      1280,
+      1600
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "memorias",
@@ -359,7 +696,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/memorias.jpg",
     "w": 920,
     "h": 415,
-    "available": 0
+    "available": 0,
+    "tone": "#6c99a8",
+    "widths": [
+      640,
+      920
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "memorias-2",
@@ -369,7 +715,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/memorias-2.jpg",
     "w": 2000,
     "h": 934,
-    "available": 8
+    "available": 8,
+    "tone": "#7ea0b7",
+    "widths": [
+      640,
+      1280,
+      2000
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "dentro-de-la-floresta",
@@ -379,7 +735,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/dentro-de-la-floresta.jpg",
     "w": 2000,
     "h": 998,
-    "available": 0
+    "available": 0,
+    "tone": "#6baebc",
+    "widths": [
+      640,
+      1280,
+      2000
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "mi-lugar-feliz",
@@ -389,7 +755,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/mi-lugar-feliz.jpg",
     "w": 2000,
     "h": 1045,
-    "available": 5
+    "available": 5,
+    "tone": "#6ca1bc",
+    "widths": [
+      640,
+      1280,
+      2000
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "urban-city",
@@ -399,7 +775,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/urban-city.jpg",
     "w": 1965,
     "h": 2000,
-    "available": 6
+    "available": 6,
+    "tone": "#6cbcc8",
+    "widths": [
+      640,
+      1280,
+      1964
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "abstracto-azul",
@@ -409,7 +795,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/abstracto-azul.jpg",
     "w": 2000,
     "h": 1339,
-    "available": 7
+    "available": 7,
+    "tone": "#9fdcdb",
+    "widths": [
+      640,
+      1280,
+      2000
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "otono",
@@ -419,7 +815,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/otono.jpg",
     "w": 1280,
     "h": 1600,
-    "available": 0
+    "available": 0,
+    "tone": "#eae0cf",
+    "widths": [
+      640,
+      1280
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "amor",
@@ -429,7 +834,15 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/amor.jpg",
     "w": 508,
     "h": 258,
-    "available": 0
+    "available": 0,
+    "tone": "#6ca0ab",
+    "widths": [
+      508
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "oceano",
@@ -439,7 +852,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/oceano.jpg",
     "w": 2000,
     "h": 923,
-    "available": 0
+    "available": 0,
+    "tone": "#6f9ecb",
+    "widths": [
+      640,
+      1280,
+      2000
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "sin-titulo",
@@ -449,7 +872,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/sin-titulo.jpg",
     "w": 1163,
     "h": 952,
-    "available": 0
+    "available": 0,
+    "tone": "#9fd0db",
+    "widths": [
+      640,
+      1162
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "sin-titulo-2",
@@ -459,7 +891,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/sin-titulo-2.jpg",
     "w": 2000,
     "h": 985,
-    "available": 0
+    "available": 0,
+    "tone": "#bc7177",
+    "widths": [
+      640,
+      1280,
+      2000
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "sin-titulo-3",
@@ -469,7 +911,17 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/sin-titulo-3.jpg",
     "w": 2000,
     "h": 1206,
-    "available": 0
+    "available": 0,
+    "tone": "#c17f85",
+    "widths": [
+      640,
+      1280,
+      2000
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   },
   {
     "id": "sin-titulo-4",
@@ -479,6 +931,16 @@ window.WORKS = [
     "thumb": "assets/works/thumbs/sin-titulo-4.jpg",
     "w": 2000,
     "h": 1362,
-    "available": 0
+    "available": 0,
+    "tone": "#8ebfcb",
+    "widths": [
+      640,
+      1280,
+      2000
+    ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
   }
 ];
