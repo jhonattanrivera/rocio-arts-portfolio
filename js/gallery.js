@@ -23,15 +23,13 @@ var canvas = document.getElementById("sala");
 var aim = document.getElementById("aim");
 var note = document.getElementById("load-note");
 var reticle = document.querySelector(".reticle");
-var backBtn = document.getElementById("walk-back");
-var goBtn = document.getElementById("walk-go");
 var listBtn = document.getElementById("to-list");
 var returnBtn = document.getElementById("return-walk");
 
 function showFlat(message) {
   document.documentElement.classList.add("sala-flat");
   if (enterBtn) {
-    enterBtn.textContent = "Ver las obras";
+    enterBtn.textContent = window.ui ? window.ui("flatNow") : "Ver las obras";
     enterBtn.addEventListener("click", function () {
       var muro = document.getElementById("muro");
       if (muro) muro.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
@@ -62,7 +60,7 @@ function boot() {
   var started = false;
   var running = false;
   var raf = 0;
-  var hold = 0;
+  var stick = { x: 0, y: 0, id: null };
   var keys = new Set();
   var yaw = 0;
   var pitch = -0.04;
@@ -83,6 +81,12 @@ function boot() {
     s: ["mi-lugar-feliz", "urban-city", "abstracto-azul"]
   };
 
+  function asset(path) {
+    var root = (window.SITE && window.SITE.root) || "";
+    if (!path || /^(https?:|\.\.)/.test(path)) return path;
+    return root + path;
+  }
+
   function texUrl(work) {
     var list = work.widths || [];
     var chosen = null;
@@ -93,8 +97,8 @@ function boot() {
       }
     }
     if (!chosen) chosen = list[0];
-    if (!chosen || chosen >= work.w - 1) return work.image;
-    return "assets/media/works/" + work.id + "-" + chosen + ".jpg";
+    if (!chosen || chosen >= work.w - 1) return asset(work.image);
+    return asset("assets/media/works/" + work.id + "-" + chosen + ".jpg");
   }
 
   function place(wall, ids, maxH) {
@@ -232,7 +236,7 @@ function boot() {
       loadOne(queue.shift());
     }
     if (note) {
-      note.textContent = loaded && loaded < total ? "Colgando " + loaded + " / " + total : (loaded >= total && total ? "" : note.textContent);
+      note.textContent = loaded && loaded < total ? (window.ui ? window.ui("hanging") : "") + loaded + " / " + total : (loaded >= total && total ? "" : note.textContent);
     }
   }
 
@@ -246,7 +250,7 @@ function boot() {
       item.mat.needsUpdate = true;
       loaded += 1;
       inflight -= 1;
-      if (note) note.textContent = loaded < total ? "Colgando " + loaded + " / " + total : "";
+      if (note) note.textContent = loaded < total ? (window.ui ? window.ui("hanging") : "") + loaded + " / " + total : "";
       pump();
     }, undefined, function () {
       loaded += 1;
@@ -297,27 +301,28 @@ function boot() {
   function update(dt) {
     var forward = 0;
     var strafe = 0;
-    var turn = 0;
     if (keys.has("w") || keys.has("arrowup")) forward += 1;
     if (keys.has("s") || keys.has("arrowdown")) forward -= 1;
-    if (keys.has("a")) strafe -= 1;
-    if (keys.has("d")) strafe += 1;
-    if (keys.has("arrowleft") || keys.has("q")) turn += 1;
-    if (keys.has("arrowright") || keys.has("e")) turn -= 1;
-    forward = clamp(forward + hold, -1, 1);
+    if (keys.has("a") || keys.has("arrowleft")) strafe -= 1;
+    if (keys.has("d") || keys.has("arrowright")) strafe += 1;
+    if (keys.has("q")) yaw += 1.15 * dt;
+    if (keys.has("e")) yaw -= 1.15 * dt;
+    forward = clamp(forward + (-stick.y), -1, 1);
+    strafe = clamp(strafe + stick.x, -1, 1);
     var speed = 2.05;
-    yaw += turn * 1.15 * dt;
+    var turn = 0;
     if (forward || strafe) {
       var nx = pos.x + (Math.sin(yaw) * forward + Math.cos(yaw) * strafe) * speed * dt;
       var nz = pos.z + (-Math.cos(yaw) * forward + Math.sin(yaw) * strafe) * speed * dt;
-      nx = clamp(nx, -W / 2 + 0.62, W / 2 - 0.62);
-      nz = clamp(nz, -D / 2 + 0.72, D / 2 - 0.72);
+      nx = clamp(nx, -W / 2 + 0.9, W / 2 - 0.9);
+      nz = clamp(nz, -D / 2 + 0.95, D / 2 - 0.95);
       move(nx, nz);
     }
     applyLook();
     if (!document.body.dataset.sheet) aimCenter();
     canvas.dataset.pos = pos.x.toFixed(2) + "," + pos.z.toFixed(2);
     canvas.dataset.yaw = yaw.toFixed(3);
+    canvas.dataset.pitch = pitch.toFixed(3);
     return !!(forward || strafe || turn || look);
   }
 
@@ -402,7 +407,7 @@ function boot() {
       } catch (err) {
         stopLoop();
         document.body.classList.remove("is-walking");
-        showFlat("La sala en tres dimensiones no está disponible en este navegador.");
+        showFlat(window.ui ? window.ui("noWebgl") : "");
       }
     });
   }
@@ -420,28 +425,61 @@ function boot() {
     });
   }
 
-  function bindHold(btn, dir) {
-    if (!btn) return;
-    function down(event) {
-      event.preventDefault();
-      try { btn.setPointerCapture(event.pointerId); } catch (err) { /* ya capturado */ }
-      hold = dir;
-      btn.classList.add("is-on");
-    }
-    function up() {
-      if (hold === dir) hold = 0;
-      btn.classList.remove("is-on");
-    }
-    btn.addEventListener("pointerdown", down);
-    btn.addEventListener("pointerup", up);
-    btn.addEventListener("pointercancel", up);
+  var joy = document.getElementById("joystick");
+  var knob = joy && joy.querySelector(".joystick-knob");
+
+  function resetStick() {
+    stick.x = 0;
+    stick.y = 0;
+    stick.id = null;
+    if (knob) knob.style.transform = "translate(0px, 0px)";
   }
-  bindHold(goBtn, 1);
-  bindHold(backBtn, -1);
+
+  function moveStick(clientX, clientY) {
+    var rect = joy.getBoundingClientRect();
+    var max = rect.width * 0.32;
+    var dx = clientX - (rect.left + rect.width / 2);
+    var dy = clientY - (rect.top + rect.height / 2);
+    var nx = dx / max;
+    var ny = dy / max;
+    var mag = Math.hypot(nx, ny);
+    if (mag > 1) { nx /= mag; ny /= mag; }
+    stick.x = nx;
+    stick.y = ny;
+    if (knob) knob.style.transform = "translate(" + (nx * max) + "px," + (ny * max) + "px)";
+  }
+
+  if (joy) {
+    joy.addEventListener("pointerdown", function (event) {
+      event.preventDefault();
+      stick.id = event.pointerId;
+      try { joy.setPointerCapture(event.pointerId); } catch (err) {}
+      moveStick(event.clientX, event.clientY);
+    });
+    joy.addEventListener("pointermove", function (event) {
+      if (stick.id !== event.pointerId) return;
+      event.preventDefault();
+      moveStick(event.clientX, event.clientY);
+    });
+    function endStick(event) {
+      if (stick.id !== event.pointerId) return;
+      resetStick();
+    }
+    joy.addEventListener("pointerup", endStick);
+    joy.addEventListener("pointercancel", endStick);
+    joy.addEventListener("touchmove", function (event) { event.preventDefault(); }, { passive: false });
+  }
+
+  function stopGesture(event) { event.preventDefault(); }
+  canvas.addEventListener("touchmove", stopGesture, { passive: false });
+  var stage = document.getElementById("stage");
+  if (stage) stage.addEventListener("gesturestart", stopGesture);
 
   canvas.addEventListener("pointerdown", function (event) {
+    if (stick.id === event.pointerId) return;
     if (event.button !== undefined && event.button !== 0) return;
-    try { canvas.setPointerCapture(event.pointerId); } catch (err) { /* ignore */ }
+    if (look && look.id !== event.pointerId) return;
+    try { canvas.setPointerCapture(event.pointerId); } catch (err) {}
     look = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
   });
   canvas.addEventListener("pointermove", function (event) {
@@ -450,7 +488,7 @@ function boot() {
     var dy = event.clientY - look.y;
     if (Math.abs(dx) + Math.abs(dy) > 3) look.moved = true;
     var sens = coarse ? 0.0072 : 0.0052;
-    yaw -= dx * sens;
+    yaw += dx * sens;
     pitch -= dy * sens;
     look.x = event.clientX;
     look.y = event.clientY;
@@ -483,7 +521,7 @@ function boot() {
   window.addEventListener("keyup", function (event) {
     keys.delete(event.key.toLowerCase());
   });
-  window.addEventListener("blur", function () { keys.clear(); hold = 0; });
+  window.addEventListener("blur", function () { keys.clear(); resetStick(); });
 
   window.addEventListener("resize", resize);
   document.addEventListener("visibilitychange", function () {
@@ -495,7 +533,7 @@ function boot() {
     event.preventDefault();
     stopLoop();
     document.body.classList.remove("is-walking");
-    showFlat("La sala se detuvo. Puedes ver las obras en plano.");
+    showFlat(window.ui ? window.ui("lost") : "");
   }, false);
 
   var params = new URLSearchParams(location.search);

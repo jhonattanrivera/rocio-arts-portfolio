@@ -1,9 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://rocioarts.com/</loc></url>
-  <url><loc>https://rocioarts.com/obras.html</loc></url>
-  <url><loc>https://rocioarts.com/disponible.html</loc></url>
-  <url><loc>https://rocioarts.com/encargos.html</loc></url>
-  <url><loc>https://rocioarts.com/la-artista.html</loc></url>
-  <url><loc>https://rocioarts.com/galeria.html</loc></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://jhonattanrivera.github.io/rocio-arts-portfolio/</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/"/>
+  </url>
+  <url>
+    <loc>https://jhonattanrivera.github.io/rocio-arts-portfolio/en/</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/"/>
+  </url>
+  <url>
+    <loc>https://jhonattanrivera.github.io/rocio-arts-portfolio/obras.html</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/obras.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/obras.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/obras.html"/>
+  </url>
+  <url>
+    <loc>https://jhonattanrivera.github.io/rocio-arts-portfolio/en/obras.html</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/obras.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/obras.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/obras.html"/>
+  </url>
+  <url>
+    <loc>https://jhonattanrivera.github.io/rocio-arts-portfolio/galeria.html</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/galeria.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/galeria.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/galeria.html"/>
+  </url>
+  <url>
+    <loc>https://jhonattanrivera.github.io/rocio-arts-portfolio/en/galeria.html</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/galeria.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/galeria.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/galeria.html"/>
+  </url>
+  <url>
+    <loc>https://jhonattanrivera.github.io/rocio-arts-portfolio/disponible.html</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/disponible.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/disponible.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/disponible.html"/>
+  </url>
+  <url>
+    <loc>https://jhonattanrivera.github.io/rocio-arts-portfolio/en/disponible.html</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/disponible.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/disponible.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/disponible.html"/>
+  </url>
+  <url>
+    <loc>https://jhonattanrivera.github.io/rocio-arts-portfolio/encargos.html</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/encargos.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/encargos.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/encargos.html"/>
+  </url>
+  <url>
+    <loc>https://jhonattanrivera.github.io/rocio-arts-portfolio/en/encargos.html</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/encargos.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/encargos.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/encargos.html"/>
+  </url>
+  <url>
+    <loc>https://jhonattanrivera.github.io/rocio-arts-portfolio/la-artista.html</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/la-artista.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/la-artista.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/la-artista.html"/>
+  </url>
+  <url>
+    <loc>https://jhonattanrivera.github.io/rocio-arts-portfolio/en/la-artista.html</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/la-artista.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/la-artista.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/la-artista.html"/>
+  </url>
 </urlset>

@@ -33,7 +33,7 @@
       link.style.setProperty("--tone", work.tone || "#e7e1d8");
       link.append(window.artPicture(work, {
         sizes: "(min-width: 900px) 30vw, 46vw",
-        alt: work.title + ", pintura de Rocío Villamizar"
+        alt: window.artAlt ? window.artAlt(work) : work.title
       }));
       var cap = document.createElement("span");
       cap.textContent = work.title;
@@ -53,11 +53,11 @@
     var bits = window.artFacts(work);
     facts.textContent = bits.join(" · ");
     facts.hidden = !bits.length;
-    desc.textContent = work.description;
+    desc.textContent = window.workText ? window.workText(work) : work.description;
     status.hidden = !work.available;
-    status.textContent = work.available ? "Disponible" : "";
+    status.textContent = work.available ? (window.ui ? window.ui("available") : "Disponible") : "";
     ask.href = window.artWa(window.artAsk(work));
-    ask.textContent = "Consultar esta obra";
+    ask.textContent = window.ui ? window.ui("consult") : "Consultar esta obra";
     more.href = "obras.html#" + work.id;
   }
 

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://rocioarts.com/sitemap.xml
+Sitemap: https://jhonattanrivera.github.io/rocio-arts-portfolio/sitemap.xml

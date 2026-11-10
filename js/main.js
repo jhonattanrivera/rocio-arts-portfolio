@@ -11,7 +11,10 @@
 
   function wa(text) { return window.artWa ? window.artWa(text) : "https://wa.me/50689877207?text=" + encodeURIComponent(text); }
   function facts(work) { return window.artFacts ? window.artFacts(work) : []; }
-  function askText(work) { return window.artAsk ? window.artAsk(work) : "Hola Rocío, me interesa la obra " + work.title + "."; }
+  function askText(work) { return window.artAsk ? window.artAsk(work) : "Hola Rocio, me interesa la obra " + work.title + "."; }
+  function textOf(work) { return window.workText ? window.workText(work) : work.description; }
+  function altOf(work) { return window.artAlt ? window.artAlt(work) : work.title; }
+  function label(key) { return window.ui ? window.ui(key) : key; }
 
   function availableList() {
     return WORKS.filter(function (work) { return work.available; })
@@ -124,10 +127,10 @@
       link.className = "rail-card";
       link.href = "obras.html#" + work.id;
       link.dataset.open = work.id;
-      link.setAttribute("aria-label", "Abrir " + work.title);
+      link.setAttribute("aria-label", label("open") + work.title);
       link.append(window.artPicture(work, {
-        sizes: "(min-width: 900px) 34vw, 78vw",
-        alt: work.title + ", pintura de Rocío Villamizar"
+        sizes: "(min-width: 980px) 52vw, 82vw",
+        alt: altOf(work)
       }));
       var title = document.createElement("span");
       title.className = "rail-title";
@@ -139,63 +142,52 @@
     var countEl = document.querySelector("[data-rail-count]");
     var cards = Array.prototype.slice.call(track.children);
     var railTick = false;
-    var drag = null;
-    var dragged = false;
-
-    function placeRail() {
-      railTick = false;
-      if (!cards.length) return;
-      var view = railMount.getBoundingClientRect();
-      var focus = view.left + Math.min(view.width * 0.34, 320);
+    function railPad() {
+      var style = getComputedStyle(railMount);
+      return parseFloat(style.scrollPaddingLeft) || parseFloat(style.paddingLeft) || 0;
+    }
+    function railIndex() {
+      var origin = railMount.getBoundingClientRect().left + railPad();
       var best = 0;
       var bestDist = Infinity;
       cards.forEach(function (card, i) {
-        var rect = card.getBoundingClientRect();
-        var dist = Math.abs(rect.left + rect.width * 0.5 - focus);
-        var near = reduce ? 1 : Math.max(0, 1 - dist / (view.width * 0.85));
-        card.style.setProperty("--near", near.toFixed(3));
+        var dist = Math.abs(card.getBoundingClientRect().left - origin);
         if (dist < bestDist) {
           bestDist = dist;
           best = i;
         }
       });
-      if (countEl) countEl.textContent = String(best + 1).padStart(2, "0");
-      var max = railMount.scrollWidth - railMount.clientWidth;
-      var bar = document.querySelector("[data-rail-bar]");
-      if (bar) bar.style.transform = "scaleX(" + (max > 0 ? railMount.scrollLeft / max : 1).toFixed(4) + ")";
+      return best;
+    }
+    function paintRail() {
+      railTick = false;
+      if (!cards.length || !countEl) return;
+      var i = railIndex();
+      countEl.textContent = String(i + 1).padStart(2, "0") + " / " + String(cards.length).padStart(2, "0");
+      railMount.dataset.index = String(i);
     }
     function requestRail() {
       if (railTick) return;
       railTick = true;
-      requestAnimationFrame(placeRail);
+      requestAnimationFrame(paintRail);
+    }
+    function goRail(dir) {
+      if (!cards.length) return;
+      var i = Math.max(0, Math.min(cards.length - 1, railIndex() + dir));
+      var delta = cards[i].getBoundingClientRect().left - railMount.getBoundingClientRect().left - railPad();
+      railMount.scrollTo({ left: railMount.scrollLeft + delta, behavior: reduce ? "auto" : "smooth" });
     }
     railMount.addEventListener("scroll", requestRail, { passive: true });
+    railMount.addEventListener("scrollend", paintRail);
     window.addEventListener("resize", requestRail);
-    railMount.addEventListener("pointerdown", function (event) {
-      if (event.pointerType !== "mouse" || event.button !== 0) return;
-      drag = { x: event.clientX, left: railMount.scrollLeft };
-      dragged = false;
-      railMount.classList.add("is-dragging");
-      railMount.setPointerCapture(event.pointerId);
+    railMount.addEventListener("keydown", function (event) {
+      if (event.key === "ArrowRight") { event.preventDefault(); goRail(1); }
+      if (event.key === "ArrowLeft") { event.preventDefault(); goRail(-1); }
     });
-    railMount.addEventListener("pointermove", function (event) {
-      if (!drag) return;
-      var dx = event.clientX - drag.x;
-      if (Math.abs(dx) > 4) dragged = true;
-      railMount.scrollLeft = drag.left - dx;
-    });
-    function endDrag() {
-      drag = null;
-      railMount.classList.remove("is-dragging");
-    }
-    railMount.addEventListener("pointerup", endDrag);
-    railMount.addEventListener("pointercancel", endDrag);
-    railMount.addEventListener("click", function (event) {
-      if (!dragged) return;
-      event.preventDefault();
-      event.stopPropagation();
-      dragged = false;
-    }, true);
+    var prevBtn = document.querySelector("[data-rail-prev]");
+    var nextBtn = document.querySelector("[data-rail-next]");
+    if (prevBtn) prevBtn.addEventListener("click", function () { goRail(-1); });
+    if (nextBtn) nextBtn.addEventListener("click", function () { goRail(1); });
     requestRail();
   }
 
@@ -264,7 +256,7 @@
       clip.append(window.artPicture(work, {
         sizes: opts.sizes,
         eager: opts.eager,
-        alt: work.title + ", pintura de Rocío Villamizar"
+        alt: altOf(work)
       }));
     }
     frame.append(clip);
@@ -290,7 +282,7 @@
       if (work.available) {
         var note = document.createElement("span");
         note.className = "card-note";
-        note.textContent = "Disponible";
+        note.textContent = label("available");
         link.append(note);
       }
       masonry.append(link);
@@ -317,7 +309,7 @@
       var heading = document.createElement("h2");
       heading.textContent = work.title;
       var text = document.createElement("p");
-      text.textContent = work.description;
+      text.textContent = textOf(work);
       var meta = document.createElement("p");
       meta.className = "catalog-facts";
       var bits = facts(work);
@@ -328,7 +320,7 @@
       ask.href = wa(askText(work));
       ask.target = "_blank";
       ask.rel = "noopener noreferrer";
-      ask.textContent = "Consultar esta obra";
+      ask.textContent = label("consult");
       copy.append(heading, meta, text, ask);
       item.append(link, copy);
       catalog.append(item);
@@ -399,15 +391,15 @@
   viewer.setAttribute("aria-labelledby", "viewer-title");
   viewer.innerHTML =
     '<div class="viewer-bar">' +
-      '<button type="button" class="viewer-prev" aria-label="Anterior"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>' +
-      '<button type="button" class="viewer-zoom" aria-pressed="false">Pincelada</button>' +
+      '<button type="button" class="viewer-prev" aria-label="' + label("prev") + '"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>' +
+      '<button type="button" class="viewer-zoom" aria-pressed="false">' + label("brush") + '</button>' +
       '<p class="viewer-count"></p>' +
-      '<button type="button" class="viewer-next" aria-label="Siguiente"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9.5 5 16.5 12l-7 7" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>' +
-      '<button type="button" class="viewer-close" data-close>Cerrar</button>' +
+      '<button type="button" class="viewer-next" aria-label="' + label("next") + '"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9.5 5 16.5 12l-7 7" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>' +
+      '<button type="button" class="viewer-close" data-close>' + label("close") + '</button>' +
     "</div>" +
     '<div class="viewer-stage"><div class="viewer-photo"><div class="pinch"><picture><source class="src-avif" type="image/avif"><source class="src-webp" type="image/webp"><img alt=""></picture></div></div></div>' +
     '<div class="viewer-copy"><p class="viewer-status" hidden></p><h2 id="viewer-title"></h2><p class="viewer-facts"></p><p class="viewer-desc"></p></div>' +
-    '<a class="dock viewer-dock" target="_blank" rel="noopener noreferrer"><span><small>WhatsApp</small><strong class="dock-name"></strong></span><em>Consultar esta obra</em></a>';
+    '<a class="dock viewer-dock" target="_blank" rel="noopener noreferrer"><span><small>' + label("whatsapp") + '</small><strong class="dock-name"></strong></span><em>' + label("consult") + '</em></a>';
   document.body.append(viewer);
 
   var viewerImg = viewer.querySelector("img");
@@ -480,26 +472,27 @@
     }
     var list = work.widths || [];
     var mid = list.filter(function (w) { return w < work.w - 1; }).pop();
-    viewerImg.src = mid ? "assets/media/works/" + work.id + "-" + mid + ".jpg" : work.image;
+    var root = (window.SITE && window.SITE.root) || "";
+    viewerImg.src = root + (mid ? "assets/media/works/" + work.id + "-" + mid + ".jpg" : work.image);
     viewerImg.width = work.w;
     viewerImg.height = work.h;
-    viewerImg.alt = work.title + ", pintura de Rocío Villamizar";
+    viewerImg.alt = altOf(work);
     photo.style.background = work.tone || "transparent";
     viewerCount.textContent = String(index + 1).padStart(2, "0") + "  /  " + String(cycle.length).padStart(2, "0");
     viewerTitle.textContent = work.title;
-    viewerDesc.textContent = work.description;
+    viewerDesc.textContent = textOf(work);
     var bits = facts(work);
     viewerFacts.textContent = bits.join(" · ");
     viewerFacts.hidden = !bits.length;
     viewerStatus.hidden = !work.available;
-    viewerStatus.textContent = work.available ? "Disponible" : "";
+    viewerStatus.textContent = work.available ? label("available") : "";
     viewerName.textContent = work.title;
     viewerAsk.href = wa(askText(work));
     [-1, 1].forEach(function (dir) {
       var neighbor = cycle[(index + dir + cycle.length) % cycle.length];
       if (!neighbor) return;
       var pre = new Image();
-      pre.src = neighbor.image;
+      pre.src = ((window.SITE && window.SITE.root) || "") + neighbor.image;
     });
   }
 
