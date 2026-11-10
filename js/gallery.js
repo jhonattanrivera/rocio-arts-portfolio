@@ -1,4 +1,4 @@
-import * as THREE from "./vendor/three.module.js";
+import * as THREE from "./vendor/three.module.js?v=20261110d";
 
 var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 var coarse = window.matchMedia("(pointer: coarse)").matches;
