@@ -569,16 +569,22 @@
   var toolNote = q(".tool-note");
   var side = q(".viewer-side");
   var sideTick = 0;
+  var compact = false;
+  var compactLock = 0;
+  function setCompact(on) {
+    if (on === compact) return;
+    compact = on;
+    viewer.classList.toggle("is-compact", on);
+    compactLock = performance.now() + 560;
+    window.setTimeout(paintSide, 600);
+  }
   function paintSide() {
     sideTick = 0;
-    if (window.innerWidth >= 980) {
-      viewer.style.removeProperty("--shrink");
-      viewer.classList.remove("is-compact");
-      return;
-    }
+    if (window.innerWidth >= 980) { setCompact(false); return; }
+    if (performance.now() < compactLock) return;
     var y = side.scrollTop;
-    viewer.style.setProperty("--shrink", Math.min(1, y / 240).toFixed(3));
-    viewer.classList.toggle("is-compact", y > 28);
+    if (!compact && y > 56) setCompact(true);
+    else if (compact && y < 6) setCompact(false);
   }
   side.addEventListener("scroll", function () {
     if (!sideTick) sideTick = requestAnimationFrame(paintSide);
@@ -707,7 +713,8 @@
 
   function show() {
     side.scrollTop = 0;
-    paintSide();
+    compactLock = 0;
+    setCompact(false);
     viewer.classList.add("is-open");
     viewer.setAttribute("aria-hidden", "false");
     setPageHidden(true);

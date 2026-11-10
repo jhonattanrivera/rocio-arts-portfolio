@@ -810,10 +810,10 @@ main { display: block; padding-top: var(--nav-h); }
 .picks { display: flex; gap: .55rem; overflow-x: auto; scrollbar-width: none; margin-inline: calc(var(--pad) * -1); padding: 7px var(--pad) 8px; }
 .picks::-webkit-scrollbar { display: none; }
 .pick { flex: none; display: grid; gap: .35rem; width: 88px; text-align: left; font-size: .78rem; color: var(--ink-2); }
-.pick img { width: 88px; height: 60px; object-fit: cover; border-radius: 4px; background: var(--paper-3); box-shadow: 0 0 0 1px var(--line); transition: box-shadow .3s ease, transform .4s var(--ease); }
-.pick[aria-pressed="true"] { color: var(--ink); }
-.pick[aria-pressed="true"] img { box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--rose); }
-.pick:hover img { transform: translateY(-2px); }
+.pick img { width: 88px; height: 60px; object-fit: cover; border-radius: 4px; background: var(--paper-3); box-shadow: 0 0 0 1px var(--line); outline: 2px solid transparent; outline-offset: 2px; transition: outline-color .25s ease; }
+.pick[aria-pressed="true"] { color: var(--ink); font-weight: 500; }
+.pick[aria-pressed="true"] img { outline-color: var(--rose); }
+@media (hover: hover) and (pointer: fine) { .pick:hover img { outline-color: rgba(200, 69, 111, .35); } .pick[aria-pressed="true"]:hover img { outline-color: var(--rose); } }
 .seg { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--paper-2); }
 .seg button { min-height: 38px; padding: 0 .95rem; border-radius: 999px; font-size: .9rem; color: var(--ink-2); }
 .seg button[aria-pressed="true"] { background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgba(26, 22, 20, .12), 0 4px 12px -6px rgba(26, 22, 20, .3); }
@@ -1320,13 +1320,17 @@ html:not(.vt) body { animation: page-in .7s var(--ease) both; }
 }
 .viewer:focus, .sheet-card:focus { outline: none; }
 
-/* Visor en el teléfono: al bajar, la escena cede espacio y la barra se vuelve un botón */
+/* Visor en el teléfono: dos estados claros. La escena no se recalcula,
+   solo se recorta la ventana, así la obra y sus sombras quedan quietas. */
 @media (max-width: 979px) {
-  .viewer-stage { height: calc(58svh - var(--shrink, 0) * 20svh); min-height: 250px; }
-  .viewer-dock { transition: left .45s var(--ease), padding .45s var(--ease), box-shadow .3s ease; }
-  .viewer-dock > span { transition: opacity .25s ease; }
+  .viewer { --stage-h: max(58svh, 300px); --stage-c: max(40svh, 230px); }
+  .viewer-stage { height: var(--stage-h); min-height: 0; transition: height .5s var(--ease); }
+  .viewer.is-compact .viewer-stage { height: var(--stage-c); }
+  .viewer-room { bottom: auto; height: var(--stage-h); transition: transform .5s var(--ease), opacity .45s ease; }
+  .viewer.is-compact .viewer-room { transform: translate3d(0, calc((var(--stage-c) - var(--stage-h)) * .35), 0); }
+  .viewer-dock { transition: left .5s var(--ease), padding .5s var(--ease), background .3s ease, box-shadow .3s ease; }
+  .viewer-dock > span { transition: opacity .2s ease; }
   .viewer.is-compact .viewer-dock { left: calc(100% - var(--pad) - 11.5rem); padding: 0; background: transparent; box-shadow: none; }
-  .viewer.is-compact .viewer-dock em { padding: .85rem 1.1rem; box-shadow: 0 14px 30px -12px rgba(26, 22, 20, .55); }
   .viewer.is-compact .viewer-dock > span { opacity: 0; pointer-events: none; position: absolute; }
-  .viewer.is-compact .viewer-dock em { flex: 1; text-align: center; }
+  .viewer.is-compact .viewer-dock em { flex: 1; text-align: center; padding: .85rem 1.1rem; box-shadow: 0 14px 30px -12px rgba(26, 22, 20, .55); }
 }
