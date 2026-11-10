@@ -2,47 +2,56 @@
   var WORKS = window.WORKS || [];
   var byId = {};
   WORKS.forEach(function (work) { byId[work.id] = work; });
+  var html = document.documentElement;
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  var viewTimeline = !reduce && window.CSS && CSS.supports("animation-timeline: view()");
-  if (viewTimeline) document.documentElement.classList.add("view-ok");
+  var ROOT = (window.SITE && window.SITE.root) || "";
 
-  var RAIL = ["marilyn", "ocean-eyes", "junto-a-ti", "flores", "cidade-maravilhosa", "abbey-road", "el-camino", "summer", "forever"];
+  var RAIL = ["marilyn", "ocean-eyes", "el-camino", "flores", "cidade-maravilhosa", "junto-a-ti", "abbey-road", "summer", "forever"];
+  var DEMO = [["el-camino", "tarde"], ["ocean-eyes", "sala"], ["flores", "molduras"], ["mi-lugar-feliz", "entrada"], ["urban-city", "concreto"]];
 
+  function t(key) { return window.ui ? window.ui(key) : key; }
   function wa(text) { return window.artWa ? window.artWa(text) : "https://wa.me/50689877207?text=" + encodeURIComponent(text); }
   function facts(work) { return window.artFacts ? window.artFacts(work) : []; }
   function askText(work) { return window.artAsk ? window.artAsk(work) : "Hola Rocio, me interesa la obra " + work.title + "."; }
   function textOf(work) { return window.workText ? window.workText(work) : work.description; }
   function altOf(work) { return window.artAlt ? window.artAlt(work) : work.title; }
-  function label(key) { return window.ui ? window.ui(key) : key; }
-
+  function store(key, value) {
+    try {
+      if (value === undefined) return localStorage.getItem(key);
+      localStorage.setItem(key, value);
+    } catch (err) { return null; }
+    return value;
+  }
   function availableList() {
     return WORKS.filter(function (work) { return work.available; })
       .sort(function (a, b) { return a.available - b.available; });
   }
+  function pad2(n) { return String(n).padStart(2, "0"); }
 
   document.querySelectorAll("[data-year]").forEach(function (node) {
     node.textContent = String(new Date().getFullYear());
   });
 
+  /* Navegación */
   var nav = document.querySelector(".nav");
   var toggle = document.querySelector(".nav-toggle");
   var menuOpen = false;
   var viewerOpen = false;
-  var scrollY = 0;
+  var lockY = 0;
 
   function syncLock() {
     var on = menuOpen || viewerOpen;
     if (on) {
       if (!document.body.classList.contains("is-locked")) {
-        scrollY = window.scrollY;
-        document.body.style.top = "-" + scrollY + "px";
+        lockY = window.scrollY;
+        document.body.style.top = "-" + lockY + "px";
         document.body.classList.add("is-locked");
       }
     } else if (document.body.classList.contains("is-locked")) {
       document.body.classList.remove("is-locked");
       document.body.style.top = "";
-      window.scrollTo(0, scrollY);
+      window.scrollTo(0, lockY);
     }
   }
 
@@ -50,8 +59,9 @@
     menuOpen = open;
     if (!nav || !toggle) return;
     nav.classList.toggle("is-open", open);
+    nav.classList.remove("is-tucked");
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
-    toggle.textContent = open ? "Cerrar" : "Menú";
+    toggle.textContent = open ? t("close") : t("menu");
     document.querySelectorAll("main, .footer").forEach(function (node) {
       if (open) node.setAttribute("inert", "");
       else if (!viewerOpen) node.removeAttribute("inert");
@@ -64,201 +74,292 @@
     nav.querySelectorAll("a").forEach(function (link) {
       link.addEventListener("click", function () { setMenu(false); });
     });
-    var solidTick = false;
-    function solidNav() {
-      solidTick = false;
-      nav.classList.toggle("is-solid", window.scrollY > 8);
+    var navTick = false;
+    var navY = window.scrollY;
+    function paintNav() {
+      navTick = false;
+      var y = window.scrollY;
+      nav.classList.toggle("is-solid", y > 12);
+      if (!menuOpen && y > navY + 4 && y > 240) nav.classList.add("is-tucked");
+      if (y < navY - 4 || y < 120) nav.classList.remove("is-tucked");
+      navY = y;
     }
     window.addEventListener("scroll", function () {
-      if (solidTick) return;
-      solidTick = true;
-      requestAnimationFrame(solidNav);
+      if (navTick) return;
+      navTick = true;
+      requestAnimationFrame(paintNav);
     }, { passive: true });
-    solidNav();
+    paintNav();
   }
 
+  /* Aparición al hacer scroll */
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
       if (!entry.isIntersecting) return;
       entry.target.classList.add("is-in");
       io.unobserve(entry.target);
     });
-  }, { threshold: 0.16, rootMargin: "0px 0px -8% 0px" });
-
+  }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
   function watch(node) {
     if (!node) return;
-    if (reduce) {
-      node.classList.add("is-in");
-      return;
-    }
+    if (reduce) { node.classList.add("is-in"); return; }
     io.observe(node);
   }
-  document.querySelectorAll(".reveal").forEach(watch);
+  document.querySelectorAll(".reveal, .rise, .eyebrow").forEach(watch);
 
-  function bindBar(scroller) {
-    if (!scroller) return;
-    var block = scroller.closest(".scroller-block") || scroller.parentElement;
-    var bar = block && block.querySelector("[data-progress]");
-    if (!bar) return;
-    var tick = false;
-    function place() {
-      tick = false;
-      var max = scroller.scrollWidth - scroller.clientWidth;
-      var p = max > 0 ? scroller.scrollLeft / max : 1;
-      bar.style.transform = "scaleX(" + p.toFixed(4) + ")";
+  /* Frases que se encienden palabra por palabra con el scroll */
+  var glowing = [];
+  document.querySelectorAll("[data-words]").forEach(function (node) {
+    var words = [];
+    function split(parent) {
+      Array.prototype.slice.call(parent.childNodes).forEach(function (child) {
+        if (child.nodeType === 1) { split(child); return; }
+        if (child.nodeType !== 3) return;
+        var holder = document.createDocumentFragment();
+        child.textContent.split(/(\s+)/).forEach(function (part) {
+          if (!part) return;
+          if (/^\s+$/.test(part)) { holder.append(part); return; }
+          var span = document.createElement("span");
+          span.className = "w";
+          span.textContent = part;
+          words.push(span);
+          holder.append(span);
+        });
+        parent.replaceChild(holder, child);
+      });
     }
-    scroller.addEventListener("scroll", function () {
-      if (tick) return;
-      tick = true;
-      requestAnimationFrame(place);
-    }, { passive: true });
-    window.addEventListener("resize", place);
-    place();
+    split(node);
+    glowing.push({ node: node, words: words });
+  });
+  function paintWords() {
+    var vh = window.innerHeight;
+    glowing.forEach(function (item) {
+      var r = item.node.getBoundingClientRect();
+      if (r.bottom < -vh || r.top > vh * 1.5) return;
+      var p = reduce ? 1 : Math.max(0, Math.min(1, (vh * 0.86 - r.top) / (vh * 0.55)));
+      var lit = p * (item.words.length + 1);
+      item.words.forEach(function (w, i) {
+        w.style.opacity = String(0.16 + 0.84 * Math.max(0, Math.min(1, lit - i)));
+      });
+    });
   }
 
-  var railMount = document.querySelector("[data-mount='rail']");
-  if (railMount && window.artPicture) {
-    var track = document.createElement("div");
-    track.className = "rail-track";
-    RAIL.forEach(function (id) {
+  /* Hero: la pintura se queda atrás al bajar */
+  var heroPic = document.querySelector(".hero-media picture");
+  function paintHero() {
+    if (!heroPic || reduce) return;
+    var y = window.scrollY;
+    if (y > window.innerHeight * 1.2) return;
+    heroPic.style.transform = "translate3d(0," + (y * 0.2).toFixed(1) + "px,0)";
+  }
+
+  /* Riel de selección: el scroll vertical lo mueve de lado */
+  var rail = document.querySelector("[data-rail]");
+  var railTrack = rail && rail.querySelector("[data-mount='rail']");
+  var railCount = rail && rail.querySelector("[data-rail-count]");
+  var railBar = rail && rail.querySelector("[data-rail-bar]");
+  var railCards = [];
+  var railPinned = false;
+  var railExtra = 0;
+  if (railTrack && window.artPicture) {
+    RAIL.forEach(function (id, i) {
       var work = byId[id];
       if (!work) return;
       var link = document.createElement("a");
       link.className = "rail-card";
       link.href = "obras.html#" + work.id;
       link.dataset.open = work.id;
-      link.setAttribute("aria-label", label("open") + work.title);
-      link.append(window.artPicture(work, {
-        sizes: "(min-width: 980px) 52vw, 82vw",
-        alt: altOf(work)
-      }));
+      link.dataset.cursor = t("seeRoomShort");
+      link.style.setProperty("--ratio", (work.w / work.h).toFixed(4));
+      link.setAttribute("aria-label", t("open") + work.title);
+      var frame = document.createElement("span");
+      frame.className = "rail-frame";
+      frame.append(window.artPicture(work, { sizes: "(min-width: 980px) 40vw, 80vw", alt: altOf(work) }));
+      var cap = document.createElement("span");
+      cap.className = "rail-cap";
+      var n = document.createElement("span");
+      n.className = "rail-n";
+      n.textContent = pad2(i + 1);
       var title = document.createElement("span");
       title.className = "rail-title";
       title.textContent = work.title;
-      link.append(title);
-      track.append(link);
+      cap.append(n, title);
+      link.append(frame, cap);
+      railTrack.append(link);
+      railCards.push(link);
     });
-    railMount.append(track);
-    var countEl = document.querySelector("[data-rail-count]");
-    var cards = Array.prototype.slice.call(track.children);
-    var railTick = false;
-    function railPad() {
-      var style = getComputedStyle(railMount);
-      return parseFloat(style.scrollPaddingLeft) || parseFloat(style.paddingLeft) || 0;
+    railPinned = !reduce;
+    rail.classList.toggle("is-pinned", railPinned);
+  }
+  function sizeRail() {
+    if (!railPinned || !railTrack) return;
+    railExtra = Math.max(0, railTrack.scrollWidth - railTrack.clientWidth);
+    rail.style.height = (window.innerHeight + railExtra) + "px";
+  }
+  function paintRail() {
+    if (!railPinned || !railTrack) return;
+    var r = rail.getBoundingClientRect();
+    var p = railExtra ? Math.max(0, Math.min(1, -r.top / railExtra)) : 0;
+    railTrack.style.transform = "translate3d(" + (-p * railExtra).toFixed(1) + "px,0,0)";
+    if (railBar) railBar.style.transform = "scaleX(" + p.toFixed(4) + ")";
+    if (railCount && railCards.length) {
+      var i = Math.min(railCards.length - 1, Math.round(p * (railCards.length - 1)));
+      railCount.textContent = pad2(i + 1) + " / " + pad2(railCards.length);
     }
-    function railIndex() {
-      var origin = railMount.getBoundingClientRect().left + railPad();
-      var best = 0;
-      var bestDist = Infinity;
-      cards.forEach(function (card, i) {
-        var dist = Math.abs(card.getBoundingClientRect().left - origin);
-        if (dist < bestDist) {
-          bestDist = dist;
-          best = i;
-        }
-      });
-      return best;
-    }
-    function paintRail() {
-      railTick = false;
-      if (!cards.length || !countEl) return;
-      var i = railIndex();
-      countEl.textContent = String(i + 1).padStart(2, "0") + " / " + String(cards.length).padStart(2, "0");
-      railMount.dataset.index = String(i);
-    }
-    function requestRail() {
-      if (railTick) return;
-      railTick = true;
-      requestAnimationFrame(paintRail);
-    }
-    function goRail(dir) {
-      if (!cards.length) return;
-      var i = Math.max(0, Math.min(cards.length - 1, railIndex() + dir));
-      var delta = cards[i].getBoundingClientRect().left - railMount.getBoundingClientRect().left - railPad();
-      railMount.scrollTo({ left: railMount.scrollLeft + delta, behavior: reduce ? "auto" : "smooth" });
-    }
-    railMount.addEventListener("scroll", requestRail, { passive: true });
-    railMount.addEventListener("scrollend", paintRail);
-    window.addEventListener("resize", requestRail);
-    railMount.addEventListener("keydown", function (event) {
-      if (event.key === "ArrowRight") { event.preventDefault(); goRail(1); }
-      if (event.key === "ArrowLeft") { event.preventDefault(); goRail(-1); }
-    });
-    var prevBtn = document.querySelector("[data-rail-prev]");
-    var nextBtn = document.querySelector("[data-rail-next]");
-    if (prevBtn) prevBtn.addEventListener("click", function () { goRail(-1); });
-    if (nextBtn) nextBtn.addEventListener("click", function () { goRail(1); });
-    requestRail();
   }
 
-  document.querySelectorAll("[data-scroller]").forEach(bindBar);
+  var scrollTick = false;
+  function onScroll() {
+    scrollTick = false;
+    paintWords();
+    paintHero();
+    paintRail();
+  }
+  window.addEventListener("scroll", function () {
+    if (scrollTick) return;
+    scrollTick = true;
+    requestAnimationFrame(onScroll);
+  }, { passive: true });
+  window.addEventListener("resize", function () { sizeRail(); onScroll(); });
+  window.addEventListener("load", function () { sizeRail(); onScroll(); });
+  if (railTrack) railTrack.querySelectorAll("img").forEach(function (img) {
+    img.addEventListener("load", sizeRail, { once: true });
+  });
+  sizeRail();
+  onScroll();
 
-  var pull = document.querySelector(".pull");
-  if (pull) pull.classList.add("is-in");
-
+  /* Intro: el brochazo, la firma, y la firma que vuela al menú */
   var intro = document.getElementById("intro");
-  if (intro && document.documentElement.classList.contains("show-intro")) {
+  function heroGo() { html.classList.add("hero-go"); }
+  if (intro && html.classList.contains("show-intro")) {
     var introDone = false;
-    function finishIntro() {
+    var logo = intro.querySelector(".intro-logo");
+    var brand = document.querySelector(".nav .brand svg");
+    var leaveTimer = window.setTimeout(leave, 2050);
+    function leave() {
       if (introDone) return;
       introDone = true;
+      window.clearTimeout(leaveTimer);
       try { sessionStorage.setItem("rocio-intro", "1"); } catch (err) { /* privado */ }
+      if (logo && brand) {
+        var a = logo.getBoundingClientRect();
+        var b = brand.getBoundingClientRect();
+        if (a.width && b.width) {
+          logo.style.transformOrigin = "0 0";
+          logo.style.transform = "translate(" + (b.left - a.left) + "px," + (b.top - a.top) + "px) scale(" + (b.width / a.width) + ")";
+        }
+      }
       intro.classList.add("is-leaving");
+      heroGo();
       window.setTimeout(function () {
-        document.documentElement.classList.remove("show-intro");
+        html.classList.remove("show-intro");
         intro.remove();
-      }, 460);
+      }, 1050);
     }
-    intro.addEventListener("pointerdown", function (event) {
-      if (event.target.closest && event.target.closest("a")) return;
-      finishIntro();
+    intro.addEventListener("pointerdown", leave);
+    document.addEventListener("keydown", function (event) {
+      if (!introDone && (event.key === "Escape" || event.key === "Enter" || event.key === " ")) leave();
     });
-    window.setTimeout(finishIntro, 2300);
+  } else {
+    if (intro) intro.remove();
+    requestAnimationFrame(heroGo);
   }
 
+  /* Cursor con palabra, solo con mouse */
   if (fine && !reduce) {
     var cursor = document.createElement("div");
     cursor.className = "cursor";
     cursor.setAttribute("aria-hidden", "true");
     document.body.append(cursor);
-    var label = "";
+    var cursorWord = "";
     window.addEventListener("pointermove", function (event) {
-      cursor.style.transform = "translate(" + event.clientX + "px," + event.clientY + "px)";
+      cursor.style.transform = "translate3d(" + event.clientX + "px," + event.clientY + "px,0)";
       var target = event.target.closest ? event.target.closest("[data-open], [data-cursor]") : null;
-      var next = target ? (target.dataset.cursor || "Ver") : "";
-      if (next !== label) {
-        label = next;
+      if (target && target.closest(".viewer")) target = null;
+      var next = target ? (target.dataset.cursor || t("view")) : "";
+      if (next !== cursorWord) {
+        cursorWord = next;
         cursor.textContent = next;
         cursor.classList.toggle("is-on", !!next);
       }
     }, { passive: true });
+    document.addEventListener("pointerleave", function () { cursor.classList.remove("is-on"); });
   }
 
+  /* Caminos: la imagen sigue al mouse */
+  var paths = document.querySelector(".paths");
+  if (paths && fine && !reduce) {
+    var float = document.createElement("div");
+    float.className = "path-float";
+    float.setAttribute("aria-hidden", "true");
+    document.body.append(float);
+    paths.querySelectorAll("a").forEach(function (link) {
+      var img = link.querySelector("img");
+      link.addEventListener("pointerenter", function () {
+        if (!img) return;
+        float.style.backgroundImage = "url(\"" + (img.currentSrc || img.src) + "\")";
+        float.classList.add("is-on");
+      });
+      link.addEventListener("pointerleave", function () { float.classList.remove("is-on"); });
+      link.addEventListener("pointermove", function (event) {
+        float.style.transform = "translate3d(" + (event.clientX + 28) + "px," + (event.clientY - 130) + "px,0) rotate(-2.5deg)";
+      });
+    });
+  }
+
+  /* Demostración de la sala en el inicio */
+  var demoHost = document.querySelector("[data-mount='room-demo']");
+  if (demoHost && window.Room) {
+    var demo = window.Room.create(demoHost, { room: DEMO[0][1] });
+    var demoI = 0;
+    var demoLabel = document.querySelector("[data-demo-label]");
+    var demoTimer = null;
+    function demoShow(i) {
+      var pair = DEMO[i % DEMO.length];
+      var work = byId[pair[0]];
+      if (!work) return;
+      demo.setRoom(pair[1]);
+      demo.setWork(work);
+      demoHost.dataset.open = work.id;
+      demoHost.dataset.mode = "room";
+      demoHost.dataset.room = pair[1];
+      if (demoLabel) demoLabel.textContent = work.title + " · " + window.Room.name(demo.room);
+    }
+    function demoTick() {
+      demoI++;
+      demoHost.classList.add("is-fading");
+      window.setTimeout(function () {
+        demoShow(demoI);
+        window.setTimeout(function () { demoHost.classList.remove("is-fading"); }, 160);
+      }, 450);
+    }
+    demoShow(0);
+    new IntersectionObserver(function (entries) {
+      window.clearInterval(demoTimer);
+      if (entries[0].isIntersecting && !reduce) demoTimer = window.setInterval(demoTick, 4600);
+    }, { threshold: 0.3 }).observe(demoHost);
+  }
+
+  /* Galería y catálogo */
   var masonry = document.querySelector("[data-mount='masonry']");
   var catalog = document.querySelector("[data-mount='catalog']");
   var countNode = document.querySelector("[data-count]");
   var visible = WORKS.slice();
-  var lastOpener = null;
 
   function card(work, opts) {
     var link = document.createElement("a");
     link.className = opts.className;
     link.href = opts.href || ("#" + work.id);
     link.dataset.open = work.id;
+    if (opts.cursor) link.dataset.cursor = opts.cursor;
     link.style.setProperty("--tone", work.tone || "#e7e1d8");
-    link.setAttribute("aria-label", "Abrir " + work.title);
+    link.style.setProperty("--ratio", (work.w / work.h).toFixed(4));
+    link.setAttribute("aria-label", t("open") + work.title);
     var frame = document.createElement("span");
     frame.className = "frame";
-    var clip = document.createElement("span");
-    clip.className = "clip";
     if (window.artPicture) {
-      clip.append(window.artPicture(work, {
-        sizes: opts.sizes,
-        eager: opts.eager,
-        alt: altOf(work)
-      }));
+      frame.append(window.artPicture(work, { sizes: opts.sizes, eager: opts.eager, alt: altOf(work) }));
     }
-    frame.append(clip);
     link.append(frame);
     return link;
   }
@@ -271,19 +372,24 @@
       var link = card(work, {
         className: "card reveal",
         href: "#" + work.id,
-        eager: i < 2,
-        sizes: "(min-width: 1100px) 30vw, (min-width: 720px) 46vw, 92vw"
+        eager: i < 4,
+        cursor: t("seeRoomShort"),
+        sizes: "(min-width: 1280px) 23vw, (min-width: 900px) 30vw, (min-width: 560px) 45vw, 47vw"
       });
+      link.style.setProperty("--d", ((i % 4) * 70) + "ms");
+      var cap = document.createElement("span");
+      cap.className = "card-cap";
       var title = document.createElement("span");
       title.className = "card-title";
       title.textContent = work.title;
-      link.append(title);
+      cap.append(title);
       if (work.available) {
         var note = document.createElement("span");
         note.className = "card-note";
-        note.textContent = label("available");
-        link.append(note);
+        note.textContent = t("available");
+        cap.append(note);
       }
+      link.append(cap);
       masonry.append(link);
       watch(link);
     });
@@ -293,55 +399,64 @@
   function renderCatalog(list) {
     if (!catalog || !window.artPicture) return;
     catalog.replaceChildren();
-    list.forEach(function (work) {
+    list.forEach(function (work, i) {
       var item = document.createElement("article");
       item.className = "catalog-item reveal";
       item.dataset.work = work.id;
       var link = card(work, {
         className: "catalog-frame",
         href: "obras.html#" + work.id,
-        sizes: "(min-width: 900px) 46vw, 92vw",
-        eager: false
+        cursor: t("seeRoomShort"),
+        sizes: "(min-width: 980px) 50vw, 92vw"
       });
+      link.dataset.mode = "room";
       var copy = document.createElement("div");
       copy.className = "catalog-copy";
+      var n = document.createElement("p");
+      n.className = "catalog-n";
+      n.textContent = pad2(i + 1);
       var heading = document.createElement("h2");
       heading.textContent = work.title;
-      var text = document.createElement("p");
-      text.textContent = textOf(work);
       var meta = document.createElement("p");
       meta.className = "catalog-facts";
       var bits = facts(work);
       meta.textContent = bits.join(" · ");
       meta.hidden = !bits.length;
+      var text = document.createElement("p");
+      text.className = "catalog-text";
+      text.textContent = textOf(work);
+      var row = document.createElement("p");
+      row.className = "catalog-actions";
+      var roomBtn = document.createElement("button");
+      roomBtn.type = "button";
+      roomBtn.className = "button";
+      roomBtn.dataset.open = work.id;
+      roomBtn.dataset.mode = "room";
+      roomBtn.textContent = t("seeRoom");
       var ask = document.createElement("a");
       ask.className = "text-link";
       ask.href = wa(askText(work));
       ask.target = "_blank";
       ask.rel = "noopener noreferrer";
-      ask.textContent = label("consult");
-      copy.append(heading, meta, text, ask);
+      ask.textContent = t("consult");
+      row.append(roomBtn, ask);
+      copy.append(n, heading, meta, text, row);
       item.append(link, copy);
       catalog.append(item);
       watch(item);
     });
   }
 
-  if (masonry) {
-    masonry.dataset.cycle = "visible";
-    renderMasonry(WORKS);
-  }
-  if (catalog) {
-    catalog.dataset.cycle = "available";
-    renderCatalog(availableList());
-  }
+  if (masonry) { masonry.dataset.cycle = "visible"; renderMasonry(WORKS); }
+  if (catalog) { catalog.dataset.cycle = "available"; renderCatalog(availableList()); }
 
   document.querySelectorAll("[data-filter]").forEach(function (button) {
     button.addEventListener("click", function () {
       document.querySelectorAll("[data-filter]").forEach(function (other) {
         other.setAttribute("aria-pressed", other === button ? "true" : "false");
       });
-      renderMasonry(button.dataset.filter === "available" ? availableList() : WORKS.slice());
+      var list = button.dataset.filter === "available" ? availableList() : WORKS.slice();
+      renderMasonry(list);
     });
   });
 
@@ -350,10 +465,10 @@
     var dockTitle = pageDock.querySelector("[data-dock-title]");
     var currentDock = "";
     var dockObserver = new IntersectionObserver(function (entries) {
-      var visibleOnes = entries.filter(function (entry) { return entry.isIntersecting; })
+      var on = entries.filter(function (entry) { return entry.isIntersecting; })
         .sort(function (a, b) { return b.intersectionRatio - a.intersectionRatio; });
-      if (!visibleOnes.length) return;
-      var id = visibleOnes[0].target.dataset.work;
+      if (!on.length) return;
+      var id = on[0].target.dataset.work;
       var work = byId[id];
       if (!work || id === currentDock) return;
       currentDock = id;
@@ -362,13 +477,13 @@
       if (dockTitle) dockTitle.textContent = work.title;
     }, { threshold: [0.35, 0.6], rootMargin: "-20% 0px -30% 0px" });
     catalog.querySelectorAll(".catalog-item").forEach(function (item) { dockObserver.observe(item); });
-    var lastY = window.scrollY;
+    var dockY = window.scrollY;
     window.addEventListener("scroll", function () {
       var y = window.scrollY;
       if (viewerOpen) pageDock.classList.add("is-away");
-      else if (y > lastY + 8 && y > 80) pageDock.classList.add("is-away");
-      else if (y < lastY - 8) pageDock.classList.remove("is-away");
-      lastY = y;
+      else if (y > dockY + 8 && y > 80) pageDock.classList.add("is-away");
+      else if (y < dockY - 8) pageDock.classList.remove("is-away");
+      dockY = y;
     }, { passive: true });
   }
 
@@ -382,39 +497,75 @@
     return;
   }
 
+  /* Visor: la obra sola, o colgada en una sala */
+  var arrowL = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
+  var arrowR = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9.5 5 16.5 12l-7 7" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
   var viewer = document.createElement("div");
   viewer.className = "viewer";
   viewer.setAttribute("role", "dialog");
   viewer.setAttribute("aria-modal", "true");
   viewer.setAttribute("aria-hidden", "true");
   viewer.setAttribute("aria-labelledby", "viewer-title");
+  var roomButtons = (window.Room ? window.Room.ROOMS : []).map(function (r) {
+    return '<button type="button" class="pick" data-room="' + r.id + '" aria-pressed="false"><img alt="" width="96" height="64" data-src="' + window.Room.thumbJpg(r) + '"><span>' + window.Room.name(r) + "</span></button>";
+  }).join("");
   viewer.innerHTML =
-    '<div class="viewer-bar">' +
-      '<button type="button" class="viewer-prev" aria-label="' + label("prev") + '"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>' +
-      '<button type="button" class="viewer-zoom" aria-pressed="false">' + label("brush") + '</button>' +
+    '<div class="viewer-top">' +
       '<p class="viewer-count"></p>' +
-      '<button type="button" class="viewer-next" aria-label="' + label("next") + '"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9.5 5 16.5 12l-7 7" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>' +
-      '<button type="button" class="viewer-close" data-close>' + label("close") + '</button>' +
+      '<div class="modes" role="group" aria-label="' + t("viewMode") + '">' +
+        '<button type="button" data-mode="room" aria-pressed="false">' + t("inRoom") + "</button>" +
+        '<button type="button" data-mode="art" aria-pressed="false">' + t("artOnly") + "</button>" +
+      "</div>" +
+      '<button type="button" class="viewer-close" data-close>' + t("close") + "</button>" +
     "</div>" +
-    '<div class="viewer-stage"><div class="viewer-photo"><div class="pinch"><picture><source class="src-avif" type="image/avif"><source class="src-webp" type="image/webp"><img alt=""></picture></div></div></div>' +
-    '<div class="viewer-copy"><p class="viewer-status" hidden></p><h2 id="viewer-title"></h2><p class="viewer-facts"></p><p class="viewer-desc"></p></div>' +
-    '<a class="dock viewer-dock" target="_blank" rel="noopener noreferrer"><span><small>' + label("whatsapp") + '</small><strong class="dock-name"></strong></span><em>' + label("consult") + '</em></a>';
+    '<div class="viewer-body">' +
+      '<div class="viewer-stage">' +
+        '<div class="viewer-photo"><div class="pinch"><picture><source class="src-avif" type="image/avif"><source class="src-webp" type="image/webp"><img alt=""></picture></div></div>' +
+        '<div class="viewer-room"></div>' +
+        '<button type="button" class="viewer-nav viewer-prev" aria-label="' + t("prev") + '">' + arrowL + "</button>" +
+        '<button type="button" class="viewer-nav viewer-next" aria-label="' + t("next") + '">' + arrowR + "</button>" +
+        '<p class="viewer-hint" aria-hidden="true"></p>' +
+      "</div>" +
+      '<aside class="viewer-side">' +
+        '<p class="viewer-status" hidden></p>' +
+        '<h2 id="viewer-title"></h2>' +
+        '<p class="viewer-facts"></p>' +
+        '<p class="viewer-desc"></p>' +
+        '<div class="viewer-tools">' +
+          '<div class="tool"><p class="tool-label">' + t("roomLabel") + '</p><div class="picks">' + roomButtons + "</div></div>" +
+          '<div class="tool tool-size"><p class="tool-label"><label for="viewer-size">' + t("size") + '</label> <output for="viewer-size"></output></p><input id="viewer-size" type="range" min="40" max="180" step="5" value="100"></div>' +
+          '<div class="tool"><p class="tool-label">' + t("frame") + '</p><div class="seg" role="group" aria-label="' + t("frame") + '">' +
+            '<button type="button" data-frame="none" aria-pressed="true">' + t("frameNone") + "</button>" +
+            '<button type="button" data-frame="black" aria-pressed="false">' + t("frameBlack") + "</button>" +
+            '<button type="button" data-frame="oak" aria-pressed="false">' + t("frameOak") + "</button>" +
+          "</div></div>" +
+          '<p class="tool-note"></p>' +
+        "</div>" +
+        '<a class="dock viewer-dock" target="_blank" rel="noopener noreferrer"><span><small>' + t("whatsapp") + '</small><strong class="dock-name"></strong></span><em>' + t("consult") + "</em></a>" +
+        '<p class="viewer-credit"></p>' +
+      "</aside>" +
+    "</div>";
   document.body.append(viewer);
 
-  var viewerImg = viewer.querySelector("img");
-  var srcAvif = viewer.querySelector(".src-avif");
-  var srcWebp = viewer.querySelector(".src-webp");
-  var pinch = viewer.querySelector(".pinch");
-  var photo = viewer.querySelector(".viewer-photo");
-  var viewerCount = viewer.querySelector(".viewer-count");
-  var viewerTitle = viewer.querySelector("#viewer-title");
-  var viewerDesc = viewer.querySelector(".viewer-desc");
-  var viewerFacts = viewer.querySelector(".viewer-facts");
-  var viewerStatus = viewer.querySelector(".viewer-status");
-  var viewerAsk = viewer.querySelector(".viewer-dock");
-  var viewerName = viewer.querySelector(".dock-name");
-  var zoomBtn = viewer.querySelector(".viewer-zoom");
-  var zoomOn = false;
+  function q(sel) { return viewer.querySelector(sel); }
+  var viewerImg = q(".viewer-photo img");
+  var srcAvif = q(".src-avif");
+  var srcWebp = q(".src-webp");
+  var pinch = q(".pinch");
+  var photo = q(".viewer-photo");
+  var roomHost = q(".viewer-room");
+  var viewerCount = q(".viewer-count");
+  var viewerTitle = q("#viewer-title");
+  var viewerDesc = q(".viewer-desc");
+  var viewerFacts = q(".viewer-facts");
+  var viewerStatus = q(".viewer-status");
+  var viewerAsk = q(".viewer-dock");
+  var viewerName = q(".dock-name");
+  var viewerHint = q(".viewer-hint");
+  var viewerCredit = q(".viewer-credit");
+  var sizeInput = q("#viewer-size");
+  var sizeOut = q(".tool-size output");
+  var toolNote = q(".tool-note");
   var view = { s: 1, x: 0, y: 0 };
   var pointers = new Map();
   var pinchStart = null;
@@ -425,6 +576,63 @@
   var touchY = 0;
   var moved = false;
   var lastTap = 0;
+  var lastOpener = null;
+  var mode = store("rocio-view") === "art" ? "art" : "room";
+  var room = null;
+  var roomId = store("rocio-room") || "sala";
+  var frameKind = store("rocio-frame") || "none";
+
+  function ensureRoom() {
+    if (room || !window.Room) return room;
+    room = window.Room.create(roomHost, {
+      interactive: true,
+      room: roomId,
+      frame: frameKind,
+      size: Number(sizeInput.value),
+      onChange: function (info) {
+        sizeOut.textContent = "≈ " + info.cm + " cm";
+        sizeInput.disabled = info.real;
+        q(".tool-size").classList.toggle("is-real", info.real);
+        toolNote.textContent = info.real ? t("realSize") : t("simNote");
+        viewerCredit.textContent = t("photoBy") + " " + info.room.credit + " · Unsplash";
+      },
+      onMove: function () { viewer.classList.add("hint-done"); }
+    });
+    viewer.querySelectorAll(".pick img[data-src]").forEach(function (img) { img.src = img.dataset.src; });
+    return room;
+  }
+
+  function syncPicks() {
+    viewer.querySelectorAll(".pick").forEach(function (b) {
+      b.setAttribute("aria-pressed", room && b.dataset.room === room.room.id ? "true" : "false");
+    });
+    viewer.querySelectorAll(".seg [data-frame]").forEach(function (b) {
+      b.setAttribute("aria-pressed", b.dataset.frame === frameKind ? "true" : "false");
+    });
+  }
+
+  function setMode(next, quiet) {
+    mode = next === "art" || !window.Room ? "art" : "room";
+    if (!quiet) store("rocio-view", mode);
+    viewer.dataset.mode = mode;
+    viewer.querySelectorAll(".modes [data-mode]").forEach(function (b) {
+      b.setAttribute("aria-pressed", b.dataset.mode === mode ? "true" : "false");
+    });
+    viewerHint.textContent = mode === "room" ? t("dragHint") : (fine ? t("loupeHint") : t("pinchHint"));
+    if (mode === "room") {
+      ensureRoom();
+      if (room && cycle[index] && room.work !== cycle[index]) room.setWork(cycle[index]);
+      if (room) room.layout();
+      syncPicks();
+    }
+  }
+
+  function setPageHidden(on) {
+    document.querySelectorAll(".nav, main, .footer, .dock:not(.viewer-dock)").forEach(function (node) {
+      if (on) { node.setAttribute("inert", ""); node.setAttribute("aria-hidden", "true"); }
+      else { node.removeAttribute("inert"); node.removeAttribute("aria-hidden"); }
+    });
+  }
 
   function listFor(node) {
     var mount = node && node.closest ? node.closest("[data-cycle]") : null;
@@ -435,27 +643,13 @@
     return WORKS;
   }
 
-  function setPageHidden(on) {
-    document.querySelectorAll(".nav, main, .footer, .dock:not(.viewer-dock)").forEach(function (node) {
-      if (on) {
-        node.setAttribute("inert", "");
-        node.setAttribute("aria-hidden", "true");
-      } else {
-        node.removeAttribute("inert");
-        node.removeAttribute("aria-hidden");
-      }
-    });
-  }
-
   function renderPinch() {
     pinch.style.transform = "translate3d(" + view.x + "px," + view.y + "px,0) scale(" + view.s + ")";
   }
-
   function resetZoom() {
     view = { s: 1, x: 0, y: 0 };
     renderPinch();
-    viewerImg.style.transform = "";
-    viewerImg.style.transformOrigin = "";
+    photo.classList.remove("is-loupe");
   }
 
   function paint() {
@@ -465,33 +659,31 @@
     if (window.artSrcset) {
       srcAvif.srcset = window.artSrcset(work, "avif");
       srcWebp.srcset = window.artSrcset(work, "webp");
-      srcAvif.sizes = "100vw";
-      srcWebp.sizes = "100vw";
+      srcAvif.sizes = srcWebp.sizes = viewerImg.sizes = "(min-width: 980px) 66vw, 100vw";
       viewerImg.srcset = window.artSrcset(work, "jpg");
     }
     var list = work.widths || [];
     var mid = list.filter(function (w) { return w < work.w - 1; }).pop();
-    var root = (window.SITE && window.SITE.root) || "";
-    viewerImg.src = root + (mid ? "assets/media/works/" + work.id + "-" + mid + ".jpg" : work.image);
+    viewerImg.src = ROOT + (mid ? "assets/media/works/" + work.id + "-" + mid + ".jpg" : work.image);
     viewerImg.width = work.w;
     viewerImg.height = work.h;
     viewerImg.alt = altOf(work);
-    photo.style.background = work.tone || "transparent";
-    viewerCount.textContent = String(index + 1).padStart(2, "0") + "  /  " + String(cycle.length).padStart(2, "0");
+    viewerCount.textContent = pad2(index + 1) + " / " + pad2(cycle.length);
     viewerTitle.textContent = work.title;
     viewerDesc.textContent = textOf(work);
     var bits = facts(work);
     viewerFacts.textContent = bits.join(" · ");
     viewerFacts.hidden = !bits.length;
     viewerStatus.hidden = !work.available;
-    viewerStatus.textContent = work.available ? label("available") : "";
+    viewerStatus.textContent = work.available ? t("available") : "";
     viewerName.textContent = work.title;
     viewerAsk.href = wa(askText(work));
+    if (mode === "room" && room) room.setWork(work);
     [-1, 1].forEach(function (dir) {
       var neighbor = cycle[(index + dir + cycle.length) % cycle.length];
-      if (!neighbor) return;
+      if (!neighbor || !neighbor.widths) return;
       var pre = new Image();
-      pre.src = ((window.SITE && window.SITE.root) || "") + neighbor.image;
+      pre.src = ROOT + "assets/media/works/" + neighbor.id + "-" + (neighbor.widths[0] || 640) + ".jpg";
     });
   }
 
@@ -501,10 +693,11 @@
     setPageHidden(true);
     syncLock();
     if (pageDock) pageDock.classList.add("is-away");
-    viewer.querySelector(".viewer-close").focus();
+    q(".viewer-close").focus({ preventScroll: true });
   }
 
-  function openWork(id, list, push) {
+  function openWork(id, list, push, opts) {
+    opts = opts || {};
     var nextList = list && list.length ? list : WORKS;
     var nextIndex = nextList.findIndex(function (work) { return work.id === id; });
     cycle = nextIndex >= 0 ? nextList : WORKS;
@@ -512,25 +705,30 @@
     if (nextIndex < 0) return;
     index = nextIndex;
     lastFocus = document.activeElement;
-    var fromImg = lastOpener && lastOpener.querySelector("img");
-    var run = function () {
+    if (opts.mode) mode = opts.mode;
+    var fromImg = lastOpener && lastOpener.querySelector ? lastOpener.querySelector(".frame img, .rail-frame img, picture img") : null;
+    function run() {
       viewerOpen = true;
-      paint();
       show();
+      setMode(mode, true);
+      if (opts.room && room) { room.setRoom(opts.room); syncPicks(); }
+      paint();
       var hash = "#" + id;
       if (push) history.pushState({ work: id }, "", hash);
       else if (location.hash !== hash) history.replaceState({ work: id }, "", hash);
-    };
+    }
     if (!reduce && document.startViewTransition && fromImg) {
       try {
         fromImg.style.viewTransitionName = "obra";
         var transition = document.startViewTransition(function () {
           fromImg.style.viewTransitionName = "";
           run();
-          viewerImg.style.viewTransitionName = "obra";
+          var target = mode === "room" && room ? room.art : viewerImg;
+          target.style.viewTransitionName = "obra";
         });
         transition.finished.finally(function () {
           viewerImg.style.viewTransitionName = "";
+          if (room) room.art.style.viewTransitionName = "";
         }).catch(function () {});
         return;
       } catch (err) {
@@ -549,48 +747,57 @@
     syncLock();
     resetZoom();
     if (pageDock) pageDock.classList.remove("is-away");
-    if (lastFocus && lastFocus.focus) lastFocus.focus();
+    if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
   }
-
   function requestClose() {
     actuallyClose();
     if (location.hash) history.replaceState(null, "", location.pathname + location.search);
   }
-
   function step(dir) {
     if (!cycle.length) return;
     index = (index + dir + cycle.length) % cycle.length;
-    var work = cycle[index];
-    history.replaceState({ work: work.id }, "", "#" + work.id);
+    history.replaceState({ work: cycle[index].id }, "", "#" + cycle[index].id);
+    viewer.classList.remove("is-step");
+    void viewer.offsetWidth;
+    viewer.classList.add("is-step");
     paint();
   }
 
   document.addEventListener("click", function (event) {
     var opener = event.target.closest("[data-open]");
-    if (!opener) return;
+    if (!opener || viewer.contains(opener)) return;
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button) return;
     event.preventDefault();
-    lastOpener = opener;
-    openWork(opener.dataset.open, listFor(opener), true);
+    lastOpener = opener.querySelector("img") ? opener : (opener.closest(".catalog-item") || opener);
+    openWork(opener.dataset.open, listFor(opener), true, { mode: opener.dataset.mode, room: opener.dataset.room });
   });
 
   viewer.addEventListener("click", function (event) {
-    if (event.target.closest("[data-close]")) requestClose();
-  });
-  viewer.querySelector(".viewer-prev").addEventListener("click", function () { step(-1); });
-  viewer.querySelector(".viewer-next").addEventListener("click", function () { step(1); });
-  zoomBtn.addEventListener("click", function () {
-    zoomOn = !zoomOn;
-    zoomBtn.setAttribute("aria-pressed", zoomOn ? "true" : "false");
-    photo.classList.toggle("is-loupe", zoomOn);
-    if (!zoomOn) {
-      viewerImg.style.transform = "";
-      viewerImg.style.transformOrigin = "";
+    if (event.target.closest("[data-close]")) { requestClose(); return; }
+    var m = event.target.closest(".modes [data-mode]");
+    if (m) { setMode(m.dataset.mode); return; }
+    var pick = event.target.closest(".pick");
+    if (pick && room) {
+      room.setRoom(pick.dataset.room);
+      store("rocio-room", pick.dataset.room);
+      syncPicks();
+      return;
+    }
+    var fr = event.target.closest(".seg [data-frame]");
+    if (fr && room) {
+      frameKind = fr.dataset.frame;
+      store("rocio-frame", frameKind);
+      room.setFrame(frameKind);
+      syncPicks();
     }
   });
+  sizeInput.addEventListener("input", function () { if (room) room.setSize(Number(sizeInput.value)); });
+  q(".viewer-prev").addEventListener("click", function () { step(-1); });
+  q(".viewer-next").addEventListener("click", function () { step(1); });
 
+  /* Lupa con mouse; pellizco y doble toque en el teléfono */
   photo.addEventListener("pointerdown", function (event) {
-    if (event.pointerType === "mouse" && zoomOn) return;
+    if (event.pointerType === "mouse") return;
     photo.setPointerCapture(event.pointerId);
     pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     touchX = event.clientX;
@@ -598,19 +805,13 @@
     moved = false;
     if (pointers.size === 2) {
       var pts = Array.from(pointers.values());
-      pinchStart = {
-        dist: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1,
-        s: view.s
-      };
+      pinchStart = { dist: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1, s: view.s };
     }
   });
   photo.addEventListener("pointermove", function (event) {
-    if (zoomOn && event.pointerType === "mouse" && view.s === 1) {
-      var rect = photo.getBoundingClientRect();
-      var ox = ((event.clientX - rect.left) / rect.width) * 100;
-      var oy = ((event.clientY - rect.top) / rect.height) * 100;
-      viewerImg.style.transformOrigin = ox + "% " + oy + "%";
-      viewerImg.style.transform = "scale(2.45)";
+    if (event.pointerType === "mouse") {
+      var rect = viewerImg.getBoundingClientRect();
+      viewerImg.style.transformOrigin = ((event.clientX - rect.left) / rect.width * 100) + "% " + ((event.clientY - rect.top) / rect.height * 100) + "%";
       return;
     }
     if (!pointers.has(event.pointerId)) return;
@@ -631,19 +832,21 @@
       renderPinch();
     }
   });
+  photo.addEventListener("click", function () {
+    if (fine) photo.classList.toggle("is-loupe");
+  });
+  photo.addEventListener("pointerleave", function () { photo.classList.remove("is-loupe"); });
   function endPointer(event) {
     pointers.delete(event.pointerId);
     if (pointers.size < 2) pinchStart = null;
-    if (event.type !== "pointerup") return;
+    if (event.type !== "pointerup" || event.pointerType === "mouse") return;
     var dx = event.clientX - touchX;
     var dy = event.clientY - touchY;
     if (view.s > 1) return;
     if (!moved) {
       var now = performance.now();
       if (now - lastTap < 280) {
-        view.s = 2.5;
-        view.x = 0;
-        view.y = 0;
+        view = { s: 2.5, x: 0, y: 0 };
         renderPinch();
         lastTap = 0;
       } else lastTap = now;
@@ -653,28 +856,41 @@
   }
   photo.addEventListener("pointerup", endPointer);
   photo.addEventListener("pointercancel", endPointer);
-  photo.addEventListener("pointerleave", function () {
-    if (zoomOn && view.s === 1) {
-      viewerImg.style.transform = "";
-    }
+
+  /* En la sala: deslizar fuera de la obra pasa de obra; doble clic acerca */
+  var roomSwipe = null;
+  var roomZoom = 1;
+  roomHost.addEventListener("pointerdown", function (event) {
+    if (event.target.closest(".room-art")) return;
+    roomSwipe = { x: event.clientX, y: event.clientY, t: performance.now() };
+  });
+  roomHost.addEventListener("pointerup", function (event) {
+    if (!roomSwipe) return;
+    var dx = event.clientX - roomSwipe.x;
+    var dy = event.clientY - roomSwipe.y;
+    var quick = performance.now() - roomSwipe.t < 600;
+    roomSwipe = null;
+    if (quick && Math.abs(dx) > 56 && Math.abs(dx) > Math.abs(dy) * 1.2) step(dx < 0 ? 1 : -1);
+  });
+  roomHost.addEventListener("dblclick", function () {
+    if (!room) return;
+    roomZoom = roomZoom > 1 ? 1 : 1.75;
+    room.setZoom(roomZoom);
   });
 
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape") {
-      if (intro && document.documentElement.classList.contains("show-intro") && !intro.classList.contains("is-leaving")) {
-        var skipBtn = intro.querySelector(".intro-skip");
-        if (skipBtn) skipBtn.click();
-        return;
-      }
       if (viewerOpen) requestClose();
       else if (menuOpen) setMenu(false);
       return;
     }
     if (!viewerOpen) return;
+    var tag = event.target && event.target.matches ? event.target : null;
+    if (tag && (tag.matches("input[type=range]") || tag.matches(".room-art"))) return;
     if (event.key === "ArrowRight") { event.preventDefault(); step(1); }
     if (event.key === "ArrowLeft") { event.preventDefault(); step(-1); }
     if (event.key !== "Tab") return;
-    var items = Array.prototype.slice.call(viewer.querySelectorAll("button, a"));
+    var items = Array.prototype.slice.call(viewer.querySelectorAll("button:not([disabled]), a, input:not([disabled]), [tabindex='0']")).filter(function (n) { return n.offsetParent !== null; });
     if (!items.length) return;
     var first = items[0];
     var last = items[items.length - 1];

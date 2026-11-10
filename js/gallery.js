@@ -562,7 +562,7 @@ function boot() {
     if (id === aimed) return;
     aimed = id || "";
     frames.forEach(function (frame) {
-      frame.material.color.set(frame.userData.id === aimed ? 0x2a6480 : 0x241e1a);
+      frame.material.color.set(frame.userData.id === aimed ? 0xc8456f : 0x241e1a);
     });
     var work = aimed && window.SALA.byId[aimed];
     if (aim) aim.textContent = work ? work.title : "";

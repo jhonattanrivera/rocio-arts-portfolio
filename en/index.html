@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f4f1eb">
+  <meta name="theme-color" content="#f6f2ec">
   <meta name="description" content="Contemporary painting by Rocio Villamizar. Works, the room, available pieces and commissions. Colombia and Costa Rica.">
   <title>Rocio Villamizar — Contemporary painting</title>
   <link rel="alternate" hreflang="es" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/">
@@ -14,15 +14,19 @@
   <meta property="og:locale" content="en_US">
   <meta property="og:site_name" content="Rocio Villamizar">
   <meta property="og:title" content="Rocio Villamizar — Contemporary painting">
-  <meta property="og:description" content="Figures, cities and everyday life, with color in front.">
+  <meta property="og:description" content="Paintings that bring nature, color and emotion together.">
   <meta property="og:url" content="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/">
   <meta property="og:image" content="https://jhonattanrivera.github.io/rocio-arts-portfolio/assets/works/serenidad.jpg">
   <link rel="icon" href="../assets/brand/icon.png" type="image/png">
   <link rel="apple-touch-icon" href="../assets/brand/icon.png">
   <link rel="preload" as="image" type="image/avif" imagesrcset="../assets/media/works/serenidad-640.avif 640w, ../assets/media/works/serenidad-1280.avif 1280w, ../assets/media/works/serenidad-1666.avif 1666w" imagesizes="100vw" fetchpriority="high">
-  <link rel="stylesheet" href="../css/styles.css?v=20261110d">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Instrument+Sans:wght@400..600&family=Sedgwick+Ave&display=swap">
+  <link rel="stylesheet" href="../css/styles.css?v=20261110r">
   <script>
     document.documentElement.classList.add("js");
+    if ("onpagereveal" in window) document.documentElement.classList.add("vt");
     try {
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches && !sessionStorage.getItem("rocio-intro") && !location.hash) {
         document.documentElement.classList.add("show-intro");
@@ -47,17 +51,13 @@
 </head>
 <body class="page-home">
   <a class="skip" href="#contenido">Skip to content</a>
-  <div class="intro" id="intro">
-    <div class="intro-stage">
-      <svg class="intro-sign" viewBox="0 0 680 220" aria-hidden="true">
-        <path d="M48 168 C 150 210, 360 200, 640 150" />
-      </svg>
-      <img class="intro-mark" src="../assets/brand/logo.webp" alt="" width="960" height="330">
-    </div>
-    <button type="button" class="intro-skip" onclick="try{sessionStorage.setItem('rocio-intro','1')}catch(e){}document.documentElement.classList.remove('show-intro');this.closest('.intro').remove()">Enter</button>
+  <div class="intro" id="intro" aria-hidden="true">
+    <div class="intro-curtain"></div>
+    <svg class="intro-logo" viewBox="0 0 9600 3300"><use class="intro-wash" href="../assets/brand/logo.svg#wash"/><use class="intro-ink" href="../assets/brand/logo.svg#ink"/></svg>
+    <p class="intro-skip">Tap to enter</p>
   </div>
   <header class="nav">
-    <a class="brand" href="index.html"><picture><source srcset="../assets/brand/logo.webp" type="image/webp"><img src="../assets/brand/logo.png" alt="Rocio Villamizar" width="960" height="330"></picture></a>
+    <a class="brand" href="index.html" aria-label="Rocio Villamizar"><svg viewBox="0 0 9600 3300" aria-hidden="true"><use class="logo-wash" href="../assets/brand/logo.svg#wash"/><use class="logo-ink" href="../assets/brand/logo.svg#ink"/></svg></a>
     <div class="nav-side">
       <p class="langs" aria-label="Language">
         <a class="lang-es" href="../index.html" hreflang="es" lang="es" data-set-lang="es">ES</a>
@@ -76,71 +76,93 @@
   </header>
   <main id="contenido">
     <section class="hero">
-      <div class="hero-shutter" aria-hidden="true"></div>
-      <div class="grain" aria-hidden="true"></div>
-      <a class="hero-media" href="obras.html#serenidad" data-open="serenidad" data-cursor="View">
+      <a class="hero-media" href="obras.html#serenidad" data-open="serenidad" data-mode="art" data-cursor="View" tabindex="-1" aria-hidden="true">
         <picture>
           <source type="image/avif" srcset="../assets/media/works/serenidad-640.avif 640w, ../assets/media/works/serenidad-1280.avif 1280w, ../assets/media/works/serenidad-1666.avif 1666w" sizes="100vw">
           <source type="image/webp" srcset="../assets/media/works/serenidad-640.webp 640w, ../assets/media/works/serenidad-1280.webp 1280w, ../assets/media/works/serenidad-1666.webp 1666w" sizes="100vw">
           <img src="../assets/media/works/serenidad-1280.jpg" srcset="../assets/media/works/serenidad-640.jpg 640w, ../assets/media/works/serenidad-1280.jpg 1280w, ../assets/works/serenidad.jpg 1667w" sizes="100vw" width="1667" height="2000" alt="Serenidad, painting by Rocio Villamizar" fetchpriority="high">
         </picture>
       </a>
+      <div class="grain" aria-hidden="true"></div>
       <div class="hero-copy">
-        <p class="hero-index"><span>01</span> Serenidad</p>
-        <p class="eyebrow">Contemporary painting</p>
-        <h1>
-          <span class="mask"><span class="hero-line">Rocio</span></span>
-          <span class="mask"><span class="hero-line hero-line-soft">Villamizar</span></span>
-        </h1>
-        <p class="lede">Figures, cities and everyday life, with color in front.</p>
-        <p class="hero-links">
-          <a class="text-link" href="obras.html">See the works</a>
-          <a class="text-link" href="galeria.html">Enter the room</a>
+        <p class="eyebrow">Colombia · Costa Rica</p>
+        <h1><span class="line"><span>Paintings that bring</span></span> <span class="line"><span>nature, color</span></span> <span class="line"><span>and <em>emotion</em> together.</span></span></h1>
+        <p class="hero-actions">
+          <a class="button light" href="obras.html">See the works</a>
+          <a class="text-link light" href="obras.html#serenidad" data-open="serenidad" data-mode="room">See it in a room</a>
         </p>
       </div>
+      <p class="hero-tag"><span>Serenidad</span>Rocio Villamizar</p>
     </section>
 
-    <section class="now wrap">
-      <p class="eyebrow">Now</p>
-      <ul>
-        <li><a href="la-artista.html#ahora">VIP lounge · Juan Santamaría Airport</a></li>
-        <li><a href="la-artista.html#ahora">FN ART Gallery</a></li>
-      </ul>
-    </section>
-
-    <section class="pull">
-      <p>The white figure is people. Everything else is the place where they live.</p>
-    </section>
-
-    <section class="rail">
-      <div class="rail-top">
-        <p class="eyebrow">Selection</p>
-        <div class="rail-tools">
-          <button type="button" class="rail-arrow" data-rail-prev aria-label="Previous work">
-            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
-          </button>
-          <p class="rail-count" data-rail-count aria-live="polite">01 / 09</p>
-          <button type="button" class="rail-arrow" data-rail-next aria-label="Next work">
-            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9.5 5 16.5 12l-7 7" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
-          </button>
+    <section class="now" id="ahora">
+      <div class="wrap now-grid">
+        <div class="now-feature reveal">
+          <p class="eyebrow">Next exhibition</p>
+          <h2><em>Fragmentos</em> de un jardín</h2>
+          <blockquote>“Memory does not come back whole: it blooms in fragments.”</blockquote>
+          <dl class="now-facts">
+            <div><dt>When</dt><dd>Thursday, December 3 · 6:00 to 9:00 p.m.</dd></div>
+            <div><dt>Where</dt><dd>Galería Nacional, Museo de los Niños · San José, Costa Rica</dd></div>
+          </dl>
+          <a class="text-link" href="https://wa.me/50689877207?text=Hello%20Rocio%2C%20I%20would%20like%20to%20come%20to%20the%20exhibition%20Fragmentos%20de%20un%20jard%C3%ADn." target="_blank" rel="noopener noreferrer">I want to go</a>
+        </div>
+        <div class="now-also reveal">
+          <p class="eyebrow">Also now</p>
+          <ul>
+            <li>VIP lounge<span>Juan Santamaría Airport</span></li>
+            <li>FN ART Gallery<span>Costa Rica</span></li>
+          </ul>
         </div>
       </div>
-      <div class="rail-viewport" data-mount="rail" data-cycle="rail" tabindex="0" aria-label="A selection of works"></div>
-      <p class="rail-hint">Swipe sideways</p>
     </section>
 
-    <section class="statement">
+    <section class="quote">
+      <div class="wrap">
+        <p data-words>It is not what you see. <em>It is what you feel.</em></p>
+        <cite>Rocio Villamizar</cite>
+      </div>
+    </section>
+
+    <section class="rail" data-rail>
+      <div class="rail-sticky">
+        <div class="rail-head">
+          <p class="eyebrow">Selection</p>
+          <h2>Nine works, <em>one by one.</em></h2>
+          <p class="rail-count" data-rail-count aria-hidden="true">01 / 09</p>
+        </div>
+        <div class="rail-track" data-mount="rail" data-cycle="rail" aria-label="A selection of works"></div>
+        <div class="rail-foot">
+          <span class="rail-bar" aria-hidden="true"><span data-rail-bar></span></span>
+          <a class="text-link" href="obras.html">See all 48 works</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="walltest wrap">
+      <div class="walltest-copy reveal">
+        <p class="eyebrow">In your space</p>
+        <h2>See it on the wall <em>before it arrives.</em></h2>
+        <p>Every work can be seen in a room. Change the setting, the size and the frame, and move it along the wall until it finds its place.</p>
+        <a class="button" href="obras.html">Choose a work</a>
+      </div>
+      <div class="walltest-stage reveal" data-mount="room-demo" data-cursor="Try it" role="button" tabindex="0" aria-label="See it in a room">
+        <p class="walltest-label" data-demo-label></p>
+      </div>
+    </section>
+
+    <section class="statement wrap">
       <figure class="statement-photo reveal">
         <picture>
-          <source type="image/avif" srcset="../assets/media/studio/estudio-640.avif 640w, ../assets/media/studio/estudio-1280.avif 1280w, ../assets/media/studio/estudio-1800.avif 1800w" sizes="(min-width: 980px) 52vw, 100vw">
-          <source type="image/webp" srcset="../assets/media/studio/estudio-640.webp 640w, ../assets/media/studio/estudio-1280.webp 1280w, ../assets/media/studio/estudio-1800.webp 1800w" sizes="(min-width: 980px) 52vw, 100vw">
-          <img src="../assets/media/studio/estudio-1280.jpg" srcset="../assets/media/studio/estudio-640.jpg 640w, ../assets/media/studio/estudio-1280.jpg 1280w, ../assets/studio/estudio.jpg 1800w" sizes="(min-width: 980px) 52vw, 100vw" width="1800" height="1061" alt="Rocio Villamizar in the studio, among her paintings" loading="lazy">
+          <source type="image/avif" srcset="../assets/media/studio/estudio-640.avif 640w, ../assets/media/studio/estudio-1280.avif 1280w, ../assets/media/studio/estudio-1800.avif 1800w" sizes="(min-width: 980px) 58vw, 100vw">
+          <source type="image/webp" srcset="../assets/media/studio/estudio-640.webp 640w, ../assets/media/studio/estudio-1280.webp 1280w, ../assets/media/studio/estudio-1800.webp 1800w" sizes="(min-width: 980px) 58vw, 100vw">
+          <img src="../assets/media/studio/estudio-1280.jpg" srcset="../assets/media/studio/estudio-640.jpg 640w, ../assets/media/studio/estudio-1280.jpg 1280w, ../assets/studio/estudio.jpg 1800w" sizes="(min-width: 980px) 58vw, 100vw" width="1800" height="1061" alt="Rocio Villamizar in the studio, among her paintings" loading="lazy">
         </picture>
         <figcaption>In the studio</figcaption>
       </figure>
       <div class="statement-copy reveal">
         <p class="eyebrow">The artist</p>
-        <h2>Colombian and Costa Rican.</h2>
+        <h2>Colombian and <em>Costa Rican.</em></h2>
         <p>For more than eighteen years I have painted emotion onto canvas. I studied in England, Brazil, Colombia and Costa Rica, and that path is in the work.</p>
         <p>Nature, people and what we feel as we live are the material. The figures are that feeling, set down in color.</p>
         <a class="text-link" href="la-artista.html">Her story</a>
@@ -149,42 +171,48 @@
 
     <a class="portal" href="galeria.html" data-cursor="Enter">
       <div class="portal-stage" aria-hidden="true">
-        <img src="../assets/media/works/marilyn-640.jpg" alt="" width="640" height="626">
-        <img src="../assets/media/works/serenidad-640.jpg" alt="" width="640" height="768">
-        <img src="../assets/media/works/ocean-eyes-640.jpg" alt="" width="640" height="756">
+        <img src="../assets/media/works/marilyn-640.jpg" alt="" width="640" height="626" loading="lazy">
+        <img src="../assets/media/works/serenidad-640.jpg" alt="" width="640" height="768" loading="lazy">
+        <img src="../assets/media/works/ocean-eyes-640.jpg" alt="" width="640" height="756" loading="lazy">
       </div>
       <div class="portal-copy">
         <p class="eyebrow">The room</p>
-        <h2>Step in and walk among the works.</h2>
-        <span class="text-link">Walk the room</span>
+        <h2>Step in and walk <em>among the works.</em></h2>
+        <span class="text-link light">Walk the room</span>
       </div>
     </a>
 
-    <nav class="paths" aria-label="Enter">
-      <a href="obras.html"><em>Works</em><span>The full gallery</span></a>
-      <a class="is-sala" href="galeria.html"><em>The room</em><span>The works, hanging</span></a>
-      <a href="disponible.html"><em>Available</em><span>Pieces to enquire about now</span></a>
-      <a href="encargos.html"><em>Commissions</em><span>A painting, or an object, for your home</span></a>
+    <nav class="paths wrap" aria-label="Enter">
+      <a href="obras.html"><img src="../assets/media/works/marilyn-640.jpg" alt="" width="640" height="626" loading="lazy"><em>Works</em><span>The full gallery</span></a>
+      <a href="galeria.html"><img src="../assets/media/works/serenidad-640.jpg" alt="" width="640" height="768" loading="lazy"><em>The room</em><span>Walk among the works</span></a>
+      <a href="disponible.html"><img src="../assets/media/works/el-camino-640.jpg" alt="" width="640" height="555" loading="lazy"><em>Available</em><span>Pieces to ask about now</span></a>
+      <a href="encargos.html"><img src="../assets/media/works/forever-640.jpg" alt="" width="640" height="534" loading="lazy"><em>Commissions</em><span>A work made for your home</span></a>
     </nav>
   </main>
   <footer class="footer">
-    <picture><source srcset="../assets/brand/logo.webp" type="image/webp"><img class="footer-logo" src="../assets/brand/logo.png" alt="Rocio Villamizar" width="960" height="330"></picture>
-    <div>
-      <div class="footer-links">
-        <a href="https://instagram.com/rocioarts" target="_blank" rel="noopener noreferrer">Instagram</a>
-        <a href="https://wa.me/50689877207?text=Hello%20Rocio%2C%20I%20saw%20your%20work%20and%20would%20like%20to%20write%20to%20you." target="_blank" rel="noopener noreferrer">WhatsApp</a>
-        <a href="https://www.facebook.com/profile.php?id=100063446032519" target="_blank" rel="noopener noreferrer">Facebook</a>
+    <div class="wrap">
+      <div class="footer-cta">
+        <p class="eyebrow">Let’s talk</p>
+        <a class="footer-big" href="https://wa.me/50689877207?text=Hello%20Rocio%2C%20I%20saw%20your%20work%20and%20would%20like%20to%20write%20to%20you." target="_blank" rel="noopener noreferrer">Write to me <em>on WhatsApp</em></a>
       </div>
-      <p class="footer-meta">Contemporary painting · Colombia and Costa Rica</p>
+      <div class="footer-row">
+        <a class="footer-logo" href="index.html" aria-label="Rocio Villamizar, home"><svg viewBox="0 0 9600 3300" aria-hidden="true"><use class="logo-wash" href="../assets/brand/logo.svg#wash"/><use class="logo-ink" href="../assets/brand/logo.svg#ink"/></svg></a>
+        <div class="footer-links">
+          <a href="https://instagram.com/rocioarts" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a href="https://wa.me/50689877207?text=Hello%20Rocio%2C%20I%20saw%20your%20work%20and%20would%20like%20to%20write%20to%20you." target="_blank" rel="noopener noreferrer">WhatsApp</a>
+          <a href="https://www.facebook.com/profile.php?id=100063446032519" target="_blank" rel="noopener noreferrer">Facebook</a>
+        </div>
+        <div>
+          <p class="footer-meta">Contemporary painting · Colombia and Costa Rica</p>
+          <p class="footer-copy">© <span data-year>2026</span> Rocio Villamizar</p>
+        </div>
+      </div>
     </div>
-    <p class="footer-copy">© <span data-year>2026</span> Rocio Villamizar</p>
   </footer>
-  <script src="../js/i18n.js?v=20261110d"></script>
-  <script src="../js/media.js?v=20261110d"></script>
-  <script src="../js/works.js?v=20261110d"></script>
-  <script src="../js/vendor/gsap.min.js?v=20261110d"></script>
-  <script src="../js/vendor/ScrollTrigger.min.js?v=20261110d"></script>
-  <script src="../js/motion.js?v=20261110d"></script>
-  <script src="../js/main.js?v=20261110d"></script>
+  <script src="../js/i18n.js?v=20261110r"></script>
+  <script src="../js/media.js?v=20261110r"></script>
+  <script src="../js/works.js?v=20261110r"></script>
+  <script src="../js/room.js?v=20261110r"></script>
+  <script src="../js/main.js?v=20261110r"></script>
 </body>
 </html>
