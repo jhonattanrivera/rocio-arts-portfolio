@@ -340,9 +340,9 @@ main { display: block; padding-top: var(--nav-h); }
   font-weight: 340;
   max-width: 11.5em;
 }
-.hero h1 .line { display: block; overflow: hidden; padding-bottom: .06em; margin-bottom: -.06em; }
+.hero h1 .line { display: block; overflow: hidden; padding: .04em .1em .24em 0; margin: -.04em -.1em -.24em 0; }
 .hero h1 .line > span { display: inline-block; }
-.js .hero h1 .line > span { transform: translateY(105%); transition: transform 1.3s var(--ease); }
+.js .hero h1 .line > span { transform: translateY(140%); transition: transform 1.3s var(--ease); }
 .hero-go .hero h1 .line > span { transform: none; }
 .hero-go .hero h1 .line:nth-child(2) > span { transition-delay: .09s; }
 .hero-go .hero h1 .line:nth-child(3) > span { transition-delay: .18s; }
@@ -1239,3 +1239,86 @@ body.is-locked { position: fixed; inset: 0; width: 100%; overflow: hidden; }
 @keyframes vt-in { from { opacity: 0; transform: translateY(14px); } }
 html:not(.vt) body { animation: page-in .7s var(--ease) both; }
 @keyframes page-in { from { opacity: 0; } }
+
+/* El jardín */
+.stage { background: #dfe5d8; }
+.stage::before,
+.stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.stage::after { background: radial-gradient(130% 95% at 50% 42%, rgba(0, 0, 0, 0) 60%, rgba(22, 28, 14, .26) 100%); }
+.stage::before { z-index: 2; background: var(--paper); opacity: 0; }
+.is-walking .stage::before { animation: garden-in 1.6s var(--ease) both; }
+@keyframes garden-in { from { opacity: 1; } to { opacity: 0; } }
+.reticle, .aim, .load-note, .keys, .joystick, .hud { z-index: 3; }
+.reticle { border-color: rgba(255, 255, 255, .85); box-shadow: 0 0 0 1px rgba(0, 0, 0, .18); }
+.aim { color: #fff; text-shadow: 0 1px 12px rgba(0, 0, 0, .45), 0 1px 2px rgba(0, 0, 0, .4); }
+.load-note, .keys { color: rgba(255, 255, 255, .9); text-shadow: 0 1px 6px rgba(0, 0, 0, .4); }
+.sun-btn { display: inline-flex; align-items: center; gap: .5rem; }
+.sun-btn svg { color: #e0a43a; flex: none; }
+.sun-btn[aria-pressed="true"] svg { animation: sun-turn 8s linear infinite; }
+@keyframes sun-turn { to { transform: rotate(360deg); } }
+.joystick { background: rgba(246, 242, 236, .42); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-color: rgba(255, 255, 255, .5); }
+.portal p { margin: 0 0 1.3rem; max-width: 28rem; color: rgba(243, 237, 228, .82); }
+
+/* Aire para las letras que bajan (p, g, j, y) bajo los títulos apretados */
+.page-head h1 { margin-bottom: calc(.2em + .6rem); }
+.cover h1 { margin-bottom: calc(.16em + .6rem); }
+.now h2, .walltest-copy h2, .statement h2, .portal h2, .catalog-copy h2 { margin-bottom: calc(.14em + .5rem); }
+.rail-head h2 { padding-bottom: .12em; }
+.paths em { padding-bottom: .1em; }
+.footer-big { padding-bottom: .12em; }
+
+/* Portada del jardín: el jardín en vivo de fondo */
+.is-preview .stage {
+  display: block;
+  position: absolute;
+  top: var(--nav-h);
+  left: 0;
+  right: 0;
+  bottom: auto;
+  height: calc(100svh - var(--nav-h));
+  z-index: 0;
+  pointer-events: none;
+  touch-action: auto;
+}
+.is-preview .stage > :not(canvas) { display: none; }
+.is-preview .stage::after {
+  background:
+    linear-gradient(to top, rgba(10, 20, 14, .78) 0%, rgba(10, 20, 14, .34) 42%, rgba(10, 20, 14, 0) 70%),
+    linear-gradient(to right, rgba(10, 20, 14, .45) 0%, rgba(10, 20, 14, 0) 62%);
+}
+.is-preview .stage::before { animation: garden-in 2.2s var(--ease) both; transition: opacity .9s ease; }
+.is-preview .stage.is-blink::before { animation: none; opacity: 1; }
+.is-preview .cover { position: relative; z-index: 1; color: var(--on-night); }
+.is-preview .cover .eyebrow { color: #f6c9d6; }
+.is-preview .cover h1 em { color: #f9d3de; }
+.is-preview .cover .lede { color: rgba(243, 237, 228, .9); }
+.is-preview .cover-help { color: rgba(243, 237, 228, .72); }
+.is-preview .cover .text-link { color: var(--on-night); box-shadow: inset 0 -1px 0 rgba(243, 237, 228, .55); }
+.is-preview .enter { background: var(--paper); color: var(--ink); }
+.is-preview .enter:hover { background: var(--rose-soft); }
+.is-preview .cover { align-items: flex-end; }
+.is-preview .cover-inner { padding-bottom: 1rem; }
+.no-flash .stage::before { animation: none; }
+@media (pointer: coarse), (max-width: 800px) {
+  .hud { flex-direction: column; align-items: flex-start; gap: .5rem; padding-right: 150px; }
+}
+@media (max-width: 600px) {
+  .cover h1 { font-size: clamp(2.6rem, 10.4vw, 4rem); }
+}
+
+/* El jardín, en la portada del inicio */
+.portal { position: relative; isolation: isolate; align-content: end; }
+.portal-media { position: absolute; inset: 0; z-index: -1; display: block; overflow: hidden; }
+.portal-media img { display: block; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 50% 45%; transform: scale(1.04); transition: transform 2.4s var(--ease); }
+.portal:hover .portal-media img { transform: scale(1.09); }
+.portal::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to top, rgba(10, 20, 14, .82) 0%, rgba(10, 20, 14, .35) 46%, rgba(10, 20, 14, .05) 75%), linear-gradient(to right, rgba(10, 20, 14, .4), rgba(10, 20, 14, 0) 60%);
+}
+@media (min-width: 980px) {
+  .portal { grid-template-columns: 1fr; min-height: 92svh; }
+  .portal-copy { max-width: 40rem; }
+}

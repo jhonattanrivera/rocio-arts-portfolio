@@ -19,8 +19,8 @@
       open: "Abrir ",
       hanging: "Colgando ",
       flatNow: "Ver las obras",
-      noWebgl: "La sala en tres dimensiones no está disponible en este navegador.",
-      lost: "La sala se detuvo. Puedes ver las obras en plano.",
+      noWebgl: "El jardín en tres dimensiones no está disponible en este navegador.",
+      lost: "El jardín se detuvo. Puedes ver las obras en plano.",
       suggest: "También puedes leer este sitio en inglés.",
       suggestGo: "Leer en inglés",
       suggestHide: "Ahora no",
@@ -42,7 +42,12 @@
       photoBy: "Foto de la sala:",
       dragHint: "Arrastra la obra para moverla",
       loupeHint: "Toca la obra para ver la pincelada",
-      pinchHint: "Pellizca para ver la pincelada"
+      pinchHint: "Pellizca para ver la pincelada",
+      sun_auto: "Sol en movimiento",
+      sun_morning: "Mañana",
+      sun_noon: "Mediodía",
+      sun_afternoon: "Tarde",
+      sun_sunset: "Atardecer"
     },
     en: {
       available: "Available",
@@ -58,8 +63,8 @@
       open: "Open ",
       hanging: "Hanging ",
       flatNow: "See the works",
-      noWebgl: "The three-dimensional room is not available in this browser.",
-      lost: "The room has stopped. You can see the works as a list.",
+      noWebgl: "The three-dimensional garden is not available in this browser.",
+      lost: "The garden has stopped. You can see the works as a list.",
       suggest: "You can also read this site in Spanish.",
       suggestGo: "Leer en español",
       suggestHide: "Not now",
@@ -81,7 +86,12 @@
       photoBy: "Room photo:",
       dragHint: "Drag the work to move it",
       loupeHint: "Click the work to see the brushwork",
-      pinchHint: "Pinch to see the brushwork"
+      pinchHint: "Pinch to see the brushwork",
+      sun_auto: "Moving sun",
+      sun_morning: "Morning",
+      sun_noon: "Noon",
+      sun_afternoon: "Afternoon",
+      sun_sunset: "Sunset"
     }
   };
 
