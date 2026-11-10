@@ -198,7 +198,6 @@
 
   var intro = document.getElementById("intro");
   if (intro && document.documentElement.classList.contains("show-intro")) {
-    var skip = intro.querySelector(".intro-skip");
     var introDone = false;
     function finishIntro() {
       if (introDone) return;
@@ -208,13 +207,13 @@
       window.setTimeout(function () {
         document.documentElement.classList.remove("show-intro");
         intro.remove();
-      }, 720);
+      }, 460);
     }
-    if (skip) {
-      skip.addEventListener("click", finishIntro);
-      window.setTimeout(function () { skip.focus(); }, 30);
-    }
-    window.setTimeout(finishIntro, 2900);
+    intro.addEventListener("pointerdown", function (event) {
+      if (event.target.closest && event.target.closest("a")) return;
+      finishIntro();
+    });
+    window.setTimeout(finishIntro, 2300);
   }
 
   if (fine && !reduce) {

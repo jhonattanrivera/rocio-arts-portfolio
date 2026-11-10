@@ -48,10 +48,11 @@
 <body class="page-home">
   <a class="skip" href="#contenido">Saltar al contenido</a>
   <div class="intro" id="intro">
-    <div>
+    <div class="intro-stage">
+      <svg class="intro-sign" viewBox="0 0 680 220" aria-hidden="true">
+        <path d="M48 168 C 150 210, 360 200, 640 150" />
+      </svg>
       <img class="intro-mark" src="assets/brand/logo.webp" alt="" width="960" height="330">
-      <span class="intro-line" aria-hidden="true"></span>
-      <p class="intro-kicker">Pintura contemporánea</p>
     </div>
     <button type="button" class="intro-skip" onclick="try{sessionStorage.setItem('rocio-intro','1')}catch(e){}document.documentElement.classList.remove('show-intro');this.closest('.intro').remove()">Entrar</button>
   </div>
@@ -181,6 +182,9 @@
   <script src="js/i18n.js"></script>
   <script src="js/media.js"></script>
   <script src="js/works.js"></script>
+  <script src="js/vendor/gsap.min.js"></script>
+  <script src="js/vendor/ScrollTrigger.min.js"></script>
+  <script src="js/motion.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
