@@ -42,12 +42,7 @@
       photoBy: "Foto de la sala:",
       dragHint: "Arrastra la obra para moverla",
       loupeHint: "Toca la obra para ver la pincelada",
-      pinchHint: "Pellizca para ver la pincelada",
-      sun_auto: "Sol en movimiento",
-      sun_morning: "Mañana",
-      sun_noon: "Mediodía",
-      sun_afternoon: "Tarde",
-      sun_sunset: "Atardecer"
+      pinchHint: "Pellizca para ver la pincelada"
     },
     en: {
       available: "Available",
@@ -86,12 +81,7 @@
       photoBy: "Room photo:",
       dragHint: "Drag the work to move it",
       loupeHint: "Click the work to see the brushwork",
-      pinchHint: "Pinch to see the brushwork",
-      sun_auto: "Moving sun",
-      sun_morning: "Morning",
-      sun_noon: "Noon",
-      sun_afternoon: "Afternoon",
-      sun_sunset: "Sunset"
+      pinchHint: "Pinch to see the brushwork"
     }
   };
 

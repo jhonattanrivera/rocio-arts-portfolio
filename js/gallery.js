@@ -29,8 +29,6 @@ var note = document.getElementById("load-note");
 var reticle = document.querySelector(".reticle");
 var listBtn = document.getElementById("to-list");
 var returnBtn = document.getElementById("return-walk");
-var sunBtn = document.getElementById("sun-time");
-var sunLabel = sunBtn && sunBtn.querySelector("span");
 
 function ui(key, fallback) { return window.ui ? window.ui(key) : fallback; }
 
@@ -105,22 +103,9 @@ function boot() {
       Math.sin(x * 6.3 + z * 5.1 + y * 4.7) * 0.22;
   }
 
-  /* Luz del día. az se mide desde el fondo del jardín hacia la derecha. */
-  var MOMENTS = [
-    { key: "morning", az: -66, el: 21, sun: 0xffe2bd, i: 4.6, zen: 0x86b2de, hor: 0xf1e4cf, hemi: 0.85, ground: 0x6b6a3f },
-    { key: "noon", az: -18, el: 48, sun: 0xfff5e6, i: 5.2, zen: 0x6fa3d8, hor: 0xe9ece6, hemi: 0.95, ground: 0x707446 },
-    { key: "afternoon", az: 52, el: 27, sun: 0xffdcae, i: 4.8, zen: 0x80acd9, hor: 0xf4e1c4, hemi: 0.85, ground: 0x6f6a3e },
-    { key: "sunset", az: 74, el: 9, sun: 0xffa865, i: 3.4, zen: 0x7f93bd, hor: 0xf6c495, hemi: 0.75, ground: 0x5e5236 }
-  ];
-  var tod = 2;
-  var todTarget = 2;
-  var auto = !reduce;
-  var autoDir = 1;
-  var pick = -1;
-  var envTimer = 0;
+  /* Un sol de mañana, constante: lo que se mueve son las hojas. */
+  var MORNING = { az: -10, el: 42, sun: 0xfff1da, i: 5.4, zen: 0x5a97d6, hor: 0xe4eef2, hemi: 0.95, ground: 0x6f7448 };
   var sunDir = new THREE.Vector3();
-  var tmpA = new THREE.Color();
-  var tmpB = new THREE.Color();
 
   function asset(path) {
     var root = (window.SITE && window.SITE.root) || "";
@@ -287,12 +272,99 @@ function boot() {
     });
   }
 
+  function blossomCard() {
+    return paint(256, 256, function (g, w, h) {
+      g.clearRect(0, 0, w, h);
+      var pinks = [[240, 150, 186], [228, 112, 156], [250, 196, 214], [214, 92, 140], [255, 222, 232]];
+      for (var i = 0; i < 40; i++) {
+        var a = rand() * Math.PI * 2, r = Math.pow(rand(), 0.7) * w * 0.4;
+        g.fillStyle = hex(between(70, 100), between(110, 140), between(50, 66), 1);
+        g.beginPath();
+        g.ellipse(w / 2 + Math.cos(a) * r, h / 2 + Math.sin(a) * r, between(5, 9), between(2.5, 4), rand() * 3, 0, Math.PI * 2);
+        g.fill();
+      }
+      for (var j = 0; j < 190; j++) {
+        var a2 = rand() * Math.PI * 2, r2 = Math.pow(rand(), 0.65) * w * 0.43;
+        var c = pinks[(rand() * pinks.length) | 0];
+        var x = w / 2 + Math.cos(a2) * r2, y = h / 2 + Math.sin(a2) * r2;
+        g.fillStyle = hex(c[0], c[1], c[2], 1);
+        for (var p = 0; p < 5; p++) {
+          var pa = p / 5 * Math.PI * 2 + rand();
+          g.beginPath();
+          g.ellipse(x + Math.cos(pa) * 3, y + Math.sin(pa) * 3, 3.4, 2, pa, 0, Math.PI * 2);
+          g.fill();
+        }
+        g.fillStyle = "rgba(250,220,120,.9)";
+        g.beginPath();
+        g.arc(x, y, 1.2, 0, Math.PI * 2);
+        g.fill();
+      }
+    });
+  }
+
+  function mountainStrip() {
+    return paint(2048, 512, function (g, w, h) {
+      g.clearRect(0, 0, w, h);
+      var layers = [
+        { base: 290, amp: 110, col: [178, 196, 212], fade: 0.7 },
+        { base: 350, amp: 80, col: [160, 182, 192], fade: 0.8 },
+        { base: 410, amp: 50, col: [146, 170, 170], fade: 0.9 }
+      ];
+      layers.forEach(function (L, li) {
+        var ph = [rand() * 6, rand() * 6, rand() * 6, rand() * 6];
+        g.beginPath();
+        g.moveTo(0, h);
+        for (var x = 0; x <= w; x += 4) {
+          var t = x / w * Math.PI * 2;
+          var y = L.base - L.amp * (0.55 * Math.sin(t * 2 + ph[0]) + 0.3 * Math.sin(t * 5 + ph[1]) + 0.15 * Math.sin(t * 11 + ph[2]) + 0.06 * Math.sin(t * 29 + ph[3]));
+          g.lineTo(x, y);
+        }
+        g.lineTo(w, h);
+        g.closePath();
+        var grd = g.createLinearGradient(0, L.base - L.amp, 0, h);
+        grd.addColorStop(0, hex(L.col[0], L.col[1], L.col[2], L.fade));
+        grd.addColorStop(1, hex(L.col[0] + 30, L.col[1] + 30, L.col[2] + 28, L.fade));
+        g.fillStyle = grd;
+        g.fill();
+        void li;
+      });
+      var haze = g.createLinearGradient(0, h * 0.62, 0, h);
+      haze.addColorStop(0, "rgba(228,238,242,0)");
+      haze.addColorStop(1, "rgba(228,238,242,1)");
+      g.fillStyle = haze;
+      g.fillRect(0, h * 0.62, w, h * 0.38);
+    });
+  }
+
+  /* Sombra moteada de una copa, para los árboles lejanos */
+  function blobTex() {
+    return paint(256, 256, function (g, w, h) {
+      g.clearRect(0, 0, w, h);
+      for (var i = 0; i < 260; i++) {
+        var a = rand() * Math.PI * 2, r = Math.pow(rand(), 0.6) * w * 0.44;
+        var x = w / 2 + Math.cos(a) * r, y = h / 2 + Math.sin(a) * r;
+        var rr = between(6, 18) * (1 - r / (w * 0.6));
+        var grd = g.createRadialGradient(x, y, 0, x, y, rr);
+        grd.addColorStop(0, "rgba(255,255,255,.5)");
+        grd.addColorStop(1, "rgba(255,255,255,0)");
+        g.fillStyle = grd;
+        g.fillRect(x - rr, y - rr, rr * 2, rr * 2);
+      }
+      var core = g.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w * 0.46);
+      core.addColorStop(0, "rgba(255,255,255,.5)");
+      core.addColorStop(0.7, "rgba(255,255,255,.22)");
+      core.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = core;
+      g.fillRect(0, 0, w, h);
+    }, false);
+  }
+
   function barkTex() {
     return paint(128, 256, function (g, w, h) {
-      g.fillStyle = "#5b4a3b";
+      g.fillStyle = "#7d6e60";
       g.fillRect(0, 0, w, h);
-      for (var i = 0; i < 120; i++) {
-        g.strokeStyle = hex(between(60, 110), between(50, 90), between(40, 70), between(0.3, 0.7));
+      for (var i = 0; i < 140; i++) {
+        g.strokeStyle = hex(between(70, 140), between(62, 122), between(52, 104), between(0.3, 0.7));
         g.lineWidth = between(1, 4);
         var x = rand() * w;
         g.beginPath();
@@ -388,14 +460,22 @@ function boot() {
         uZen: { value: new THREE.Color() },
         uHor: { value: new THREE.Color() },
         uSunDir: { value: new THREE.Vector3(0, 1, 0) },
-        uSun: { value: new THREE.Color() }
+        uSun: { value: new THREE.Color() },
+        uTime: wind
       },
       vertexShader: "varying vec3 vDir; void main(){ vDir = normalize(position); vec4 p = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * p; }",
       fragmentShader:
-        "uniform vec3 uZen; uniform vec3 uHor; uniform vec3 uSunDir; uniform vec3 uSun; varying vec3 vDir;" +
+        "uniform vec3 uZen; uniform vec3 uHor; uniform vec3 uSunDir; uniform vec3 uSun; uniform float uTime; varying vec3 vDir;" +
+        "float hsh(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }" +
+        "float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(hsh(i), hsh(i + vec2(1.0, 0.0)), f.x), mix(hsh(i + vec2(0.0, 1.0)), hsh(i + vec2(1.0, 1.0)), f.x), f.y); }" +
+        "float fbm(vec2 p){ float v = 0.0, a = 0.5; for (int i = 0; i < 5; i++) { v += a * vnoise(p); p = p * 2.03 + 7.1; a *= 0.5; } return v; }" +
         "void main(){ float h = clamp(vDir.y, -0.2, 1.0); vec3 col = mix(uHor, uZen, pow(max(h, 0.0), 0.6));" +
         " col = mix(col, uHor * 0.92, smoothstep(0.0, -0.2, h));" +
         " float s = max(dot(normalize(vDir), normalize(uSunDir)), 0.0);" +
+        " if (vDir.y > 0.0) { vec2 cp = vDir.xz / (vDir.y + 0.14) * 0.85 + vec2(uTime * 0.008, uTime * 0.003);" +
+        "  float c = smoothstep(0.5, 0.8, fbm(cp * 1.3)) * smoothstep(0.02, 0.22, vDir.y);" +
+        "  vec3 cc = mix(vec3(1.0), uHor, 0.2) * (0.9 + 0.1 * fbm(cp * 3.7));" +
+        "  col = mix(col, cc, c * 0.85); }" +
         " col += uSun * (pow(s, 900.0) * 3.0 + pow(s, 18.0) * 0.32 + pow(s, 3.0) * 0.08);" +
         " gl_FragColor = vec4(col, 1.0);\n#include <colorspace_fragment>\n}"
     });
@@ -421,46 +501,35 @@ function boot() {
     ground.geometry.dispose();
   }
 
-  function applyMoment(f) {
-    var i = Math.min(MOMENTS.length - 2, Math.max(0, Math.floor(f)));
-    var t = Math.max(0, Math.min(1, f - i));
-    var a = MOMENTS[i], b = MOMENTS[i + 1];
-    var az = THREE.MathUtils.degToRad(a.az + (b.az - a.az) * t);
-    var el = THREE.MathUtils.degToRad(a.el + (b.el - a.el) * t);
+  function applyLight() {
+    var L = MORNING;
+    var az = THREE.MathUtils.degToRad(L.az), el = THREE.MathUtils.degToRad(L.el);
     sunDir.set(Math.cos(el) * Math.sin(az), Math.sin(el), Math.cos(el) * Math.cos(az)).normalize();
-    sun.color.copy(tmpA.set(a.sun)).lerp(tmpB.set(b.sun), t);
-    sun.intensity = a.i + (b.i - a.i) * t;
-    hemi.intensity = a.hemi + (b.hemi - a.hemi) * t;
-    hemi.color.copy(tmpA.set(a.zen)).lerp(tmpB.set(b.zen), t).lerp(new THREE.Color(0xffffff), 0.35);
-    hemi.groundColor.copy(tmpA.set(a.ground)).lerp(tmpB.set(b.ground), t);
-    skyMat.uniforms.uZen.value.copy(tmpA.set(a.zen)).lerp(tmpB.set(b.zen), t);
-    skyMat.uniforms.uHor.value.copy(tmpA.set(a.hor)).lerp(tmpB.set(b.hor), t);
+    sun.color.set(L.sun);
+    sun.intensity = L.i;
+    hemi.intensity = L.hemi;
+    hemi.color.set(L.zen).lerp(new THREE.Color(0xffffff), 0.45);
+    hemi.groundColor.set(L.ground);
+    skyMat.uniforms.uZen.value.set(L.zen);
+    skyMat.uniforms.uHor.value.set(L.hor);
     skyMat.uniforms.uSun.value.copy(sun.color);
     skyMat.uniforms.uSunDir.value.copy(sunDir);
-    scene.fog.color.copy(skyMat.uniforms.uHor.value);
-    renderer.toneMappingExposure = 0.82 + (1 - Math.min(1, el / 0.6)) * 0.14;
+    scene.fog.color.set(L.hor);
+    renderer.toneMappingExposure = 0.86;
   }
 
   function placeSun() {
-    var cx = pos.x, cz = pos.z - 5;
+    var cx = pos.x, cz = pos.z - 7;
     sun.target.position.set(cx, 0, cz);
-    sun.position.set(cx + sunDir.x * 40, sunDir.y * 40, cz + sunDir.z * 40);
+    sun.position.set(cx + sunDir.x * 50, sunDir.y * 50, cz + sunDir.z * 50);
     sun.target.updateMatrixWorld();
   }
 
-  function momentName(key) {
-    return ui("sun_" + key, key);
-  }
-  function syncSunButton() {
-    if (!sunLabel) return;
-    sunLabel.textContent = auto ? ui("sun_auto", "Sol en movimiento") : momentName(MOMENTS[todTarget].key);
-    sunBtn.setAttribute("aria-pressed", auto ? "true" : "false");
-  }
 
   /* El jardín */
   function buildGarden() {
     scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0xf1e4cf, 24, 96);
+    scene.fog = new THREE.FogExp2(0xe4eef2, low ? 0.024 : 0.021);
     camera = new THREE.PerspectiveCamera(mobile ? 66 : 52, 1, 0.08, 120);
     camera.position.copy(pos);
 
@@ -471,7 +540,7 @@ function boot() {
     sun.castShadow = true;
     sun.shadow.mapSize.set(low ? 1024 : 2048, low ? 1024 : 2048);
     var sc = sun.shadow.camera;
-    sc.left = -15; sc.right = 15; sc.top = 15; sc.bottom = -15; sc.near = 2; sc.far = 95;
+    sc.left = -21; sc.right = 21; sc.top = 21; sc.bottom = -21; sc.near = 2; sc.far = 110;
     sun.shadow.bias = -0.0004;
     sun.shadow.normalBias = 0.04;
     sun.shadow.radius = 3;
@@ -797,84 +866,182 @@ function boot() {
     tufts.receiveShadow = true;
     scene.add(tufts);
 
-    /* Árboles: hojas sueltas para que el sol pase en manchas */
-    var card = leafCard();
-    var cardMat = new THREE.MeshStandardMaterial({ map: card, alphaTest: 0.42, side: THREE.DoubleSide, roughness: 0.85, metalness: 0, color: 0xffffff });
-    var trunkMat = new THREE.MeshStandardMaterial({ map: barkTex(), roughness: 0.95 });
-    var cardGeo = new THREE.PlaneGeometry(1.15, 1.15);
-    var treeSpots = [];
-    for (var tz2 = START_Z - 1; tz2 > END_Z - 2; tz2 -= 6.4) {
-      treeSpots.push([-between(4.9, 5.5), tz2 + between(-1.2, 1.2)]);
-      treeSpots.push([between(4.9, 5.5), tz2 - 3.2 + between(-1.2, 1.2)]);
+    /* Árboles con ramas: el follaje se agrupa en copas sobre cada rama,
+       y las hojas tiemblan con el viento (también en la sombra). */
+    function flutter(mat, amp) {
+      mat.onBeforeCompile = function (shader) {
+        shader.uniforms.uTime = wind;
+        shader.vertexShader = "uniform float uTime;\n" + shader.vertexShader.replace(
+          "#include <begin_vertex>",
+          "#include <begin_vertex>\n vec3 lp = instanceMatrix[3].xyz;\n float ph = lp.x * 1.7 + lp.y * 2.3 + lp.z * 1.1;\n" +
+          " float gs = 0.65 + 0.35 * sin(uTime * 0.23) * sin(uTime * 0.11 + 1.3);\n" +
+          " transformed += vec3(sin(uTime * 2.2 + ph), sin(uTime * 2.9 + ph * 1.3) * 0.5, cos(uTime * 1.8 + ph)) * " + amp.toFixed(3) + " * gs;"
+        );
+      };
+      return mat;
     }
-    treeSpots.push([-2.6, END_Z - 3.6], [3.4, END_Z - 4.2], [-5.5, START_Z + 5], [4.8, START_Z + 8.5], [-1.5, START_Z + 13], [9.5, START_Z + 2], [-10, -9], [10.5, -17]);
-    treeSpots.forEach(function (spot) {
+    function foliage(tex) {
+      var mat = flutter(new THREE.MeshStandardMaterial({ map: tex, alphaTest: 0.42, side: THREE.DoubleSide, roughness: 0.82, metalness: 0, color: 0xffffff }), 0.06);
+      var depth = flutter(new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: tex, alphaTest: 0.42, side: THREE.DoubleSide }), 0.06);
+      return { mat: mat, depth: depth };
+    }
+    var card = leafCard();
+    var green = foliage(card);
+    var pink = foliage(blossomCard());
+    var cardMat = green.mat;
+    var bark = barkTex();
+    bark.repeat.set(1, 2);
+    var trunkMat = new THREE.MeshStandardMaterial({ map: bark, roughness: 0.95, color: 0xcfc6bc });
+    var cardGeo = new THREE.PlaneGeometry(0.95, 0.95);
+    var upV = new THREE.Vector3(0, 1, 0);
+
+    function limb(group, from, dir, len, r0, r1) {
+      var geo = new THREE.CylinderGeometry(r1, r0, len, 7, 1);
+      geo.translate(0, len / 2, 0);
+      var mesh = new THREE.Mesh(geo, trunkMat);
+      mesh.position.copy(from);
+      mesh.quaternion.setFromUnitVectors(upV, dir);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      group.add(mesh);
+      return from.clone().addScaledVector(dir, len);
+    }
+
+    var blobs = [];
+    function makeTree(x, z, o) {
       var group = new THREE.Group();
-      var th = between(3.4, 4.6);
-      var trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.24, th, 9), trunkMat);
-      trunk.position.y = th / 2;
-      trunk.castShadow = true;
-      group.add(trunk);
-      var n2 = low ? 110 : 230;
-      var leaves = new THREE.InstancedMesh(cardGeo, cardMat, n2);
-      var rx = between(2.3, 3.0), ry = between(1.6, 2.1);
-      var lc = new THREE.Color();
-      for (var i2 = 0; i2 < n2; i2++) {
-        var u = rand() * Math.PI * 2, w = Math.acos(between(-1, 1)), rr2 = Math.cbrt(rand());
-        v.set(Math.sin(w) * Math.cos(u) * rx * rr2, th + 0.9 + Math.cos(w) * ry * rr2, Math.sin(w) * Math.sin(u) * rx * rr2);
-        q.setFromEuler(e.set(rand() * 6.28, rand() * 6.28, rand() * 6.28));
-        var ls = between(0.75, 1.3);
-        s.set(ls, ls, ls);
-        m.compose(v, q, s);
-        leaves.setMatrixAt(i2, m);
-        lc.setHSL(between(0.22, 0.3), between(0.3, 0.5), between(0.55, 0.78));
-        leaves.setColorAt(i2, lc);
+      var th = o.h || between(2.5, 3.3);
+      var tilt = new THREE.Vector3(between(-0.08, 0.08), 1, between(-0.08, 0.08)).normalize();
+      var r0 = (o.r || 0.2) * 0.85;
+      var top = limb(group, new THREE.Vector3(0, -0.1, 0), tilt, th, r0, r0 * 0.5);
+      var foot = new THREE.Mesh(new THREE.CylinderGeometry(r0 * 1.05, r0 * 1.9, 0.45, 9, 1), trunkMat);
+      foot.position.y = 0.12;
+      foot.castShadow = !!o.shadow;
+      group.add(foot);
+      var tips = [top.clone().add(new THREE.Vector3(0, 0.75, 0))];
+      var nb = o.branches || (4 + ((rand() * 3) | 0));
+      for (var b = 0; b < nb; b++) {
+        var az = (b / nb) * Math.PI * 2 + between(-0.45, 0.45);
+        var el = between(0.5, 1.05);
+        var dir = new THREE.Vector3(Math.cos(az) * Math.cos(el), Math.sin(el), Math.sin(az) * Math.cos(el));
+        var start = new THREE.Vector3(0, th * between(0.72, 0.95), 0).addScaledVector(tilt, 0);
+        start.x += tilt.x * th * 0.8;
+        start.z += tilt.z * th * 0.8;
+        var len = between(1.2, 2.1) * (o.spread || 1);
+        var tip = limb(group, start, dir, len, 0.085, 0.03);
+        tips.push(tip);
+        if (rand() > 0.35) {
+          var mid = start.clone().addScaledVector(dir, len * between(0.45, 0.65));
+          var d2 = dir.clone().applyAxisAngle(upV, between(-0.9, 0.9));
+          d2.y += 0.35;
+          d2.normalize();
+          tips.push(limb(group, mid, d2, len * between(0.4, 0.6), 0.045, 0.018));
+        }
       }
-      leaves.castShadow = true;
-      leaves.receiveShadow = !low;
+      var per = o.cards;
+      var leaves = new THREE.InstancedMesh(cardGeo, o.kind.mat, tips.length * per);
+      var tint = new THREE.Color();
+      var k = 0;
+      tips.forEach(function (tp, ti) {
+        var rc = between(0.75, 1.15) * (o.spread || 1) * (ti === 0 ? 1.25 : 1);
+        for (var c = 0; c < per; c++) {
+          var u = rand() * Math.PI * 2, w = Math.acos(between(-1, 1)), rr = Math.cbrt(rand());
+          v.set(tp.x + Math.sin(w) * Math.cos(u) * rc * rr, tp.y + 0.15 + Math.cos(w) * rc * 0.72 * rr, tp.z + Math.sin(w) * Math.sin(u) * rc * rr);
+          q.setFromEuler(e.set(rand() * 6.28, rand() * 6.28, rand() * 6.28));
+          var ls = between(0.7, 1.2);
+          s.set(ls, ls, ls);
+          m.compose(v, q, s);
+          leaves.setMatrixAt(k, m);
+          if (o.pinkTree) tint.setHSL(between(0.92, 0.98), between(0.1, 0.3), between(0.8, 0.95));
+          else tint.setHSL(between(0.2, 0.3), between(0.28, 0.5), between(0.52, 0.8));
+          leaves.setColorAt(k, tint);
+          k++;
+        }
+      });
+      leaves.castShadow = !!o.shadow;
+      leaves.receiveShadow = !low && !!o.shadow;
+      if (o.shadow) leaves.customDepthMaterial = o.kind.depth;
       group.add(leaves);
-      group.position.set(spot[0], 0, spot[1]);
+      group.position.set(x, 0, z);
+      if (!o.shadow) blobs.push({ x: x, z: z, h: th + 1.2 * (o.spread || 1), r: 1.9 * (o.spread || 1) });
+      group.rotation.y = rand() * 6.28;
       group.userData.phase = rand() * 6.28;
       scene.add(group);
       trees.push(group);
+      return group;
+    }
+
+    var treeSpots = [];
+    for (var tz2 = START_Z - 1; tz2 > END_Z - 2; tz2 -= 6.4) {
+      treeSpots.push([-between(4.8, 5.4), tz2 + between(-1.2, 1.2)]);
+      treeSpots.push([between(4.8, 5.4), tz2 - 3.2 + between(-1.2, 1.2)]);
+    }
+    treeSpots.push([-2.6, END_Z - 3.6], [3.4, END_Z - 4.4], [-5.5, START_Z + 5], [4.8, START_Z + 8.5], [-1.5, START_Z + 13], [9.5, START_Z + 2], [-10, -9], [10.5, -17], [-9, -24], [8.5, -3]);
+    treeSpots.forEach(function (spot, ti) {
+      var isPink = ti % 3 === 1;
+      makeTree(spot[0], spot[1], { kind: isPink ? pink : green, pinkTree: isPink, cards: low ? 20 : 36, shadow: true, spread: between(0.95, 1.2) });
     });
 
-    /* Bosque a lo lejos, en la bruma: árboles de hojas sueltas, sin sombras */
-    var farN = low ? 26 : 46;
-    var farCards = low ? 46 : 70;
-    var farGeo = new THREE.PlaneGeometry(2.3, 2.3);
-    var far = new THREE.InstancedMesh(farGeo, cardMat, farN * farCards);
-    var farTrunk = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.2, 0.34, 1, 7), trunkMat, farN);
-    var farTint = new THREE.Color();
-    var fi = 0;
-    for (var f2 = 0; f2 < farN; f2++) {
-      var fx, fz, tries = 0;
+    /* Árboles sueltos en los prados, más allá del jardín */
+    var meadowN = low ? 12 : 26;
+    for (var mt = 0; mt < meadowN; mt++) {
+      var mx, mz, tries = 0;
       do {
-        var ang = rand() * Math.PI * 2, rad = between(20, 52);
-        fx = Math.cos(ang) * rad;
-        fz = midZ + Math.sin(ang) * rad;
+        var ang = rand() * Math.PI * 2, rad = between(13, 34);
+        mx = Math.cos(ang) * rad;
+        mz = midZ + Math.sin(ang) * rad;
         tries++;
-      } while (tries < 20 && Math.abs(fx) < 12 && fz > END_Z - 12 && fz < START_Z + 12);
-      var th2 = between(4, 6.5), crx = between(3, 4.6), cry = between(2.6, 3.6);
-      v.set(fx, th2 / 2, fz);
-      q.identity();
-      s.set(1, th2, 1);
-      m.compose(v, q, s);
-      farTrunk.setMatrixAt(f2, m);
-      for (var c2 = 0; c2 < farCards; c2++) {
-        var u3 = rand() * Math.PI * 2, w3 = Math.acos(between(-1, 1)), r3 = Math.cbrt(rand());
-        v.set(fx + Math.sin(w3) * Math.cos(u3) * crx * r3, th2 + 1.4 + Math.cos(w3) * cry * r3, fz + Math.sin(w3) * Math.sin(u3) * crx * r3);
-        q.setFromEuler(e.set(rand() * 6.28, rand() * 6.28, rand() * 6.28));
-        var cs = between(0.8, 1.4);
-        s.set(cs, cs, cs);
-        m.compose(v, q, s);
-        far.setMatrixAt(fi, m);
-        farTint.setHSL(between(0.22, 0.3), between(0.25, 0.42), between(0.5, 0.7));
-        far.setColorAt(fi, farTint);
-        fi++;
-      }
+      } while (tries < 30 && Math.abs(mx) < 9 && mz > END_Z - 8 && mz < START_Z + 9);
+      var mp = rand() > 0.72;
+      makeTree(mx, mz, { kind: mp ? pink : green, pinkTree: mp, cards: low ? 12 : 22, shadow: false, h: between(2.8, 4.2), r: 0.26, spread: between(1.1, 1.5) });
     }
-    scene.add(far, farTrunk);
+
+    /* Fondo: un anillo de árboles de verdad que se pierde en la bruma,
+       y montañas muy suaves detrás, sin bordes. */
+    var ringN = low ? 34 : 70;
+    for (var rt = 0; rt < ringN; rt++) {
+      var row = rt % 2;
+      var ra = (rt / ringN) * Math.PI * 2 + between(-0.05, 0.05);
+      var rr2 = (row ? between(38, 46) : between(27, 34));
+      var rx2 = Math.cos(ra) * rr2 * 0.9, rz2 = midZ + Math.sin(ra) * rr2;
+      var rp = rand() > 0.8;
+      makeTree(rx2, rz2, { kind: rp ? pink : green, pinkTree: rp, cards: low ? 14 : 26, shadow: false, h: between(3.4, 5.2), r: 0.3, spread: between(1.5, 1.9), branches: 6 });
+    }
+    var ridgeTex = mountainStrip();
+    ridgeTex.repeat.set(3, 1);
+    ridgeTex.wrapT = THREE.ClampToEdgeWrapping;
+    ridgeTex.generateMipmaps = false;
+    ridgeTex.minFilter = THREE.LinearFilter;
+    var ridge = new THREE.Mesh(
+      new THREE.CylinderGeometry(86, 86, 40, 128, 1, true),
+      new THREE.MeshBasicMaterial({ map: ridgeTex, transparent: true, depthWrite: false, side: THREE.BackSide, fog: false, opacity: 0.85 })
+    );
+    ridge.position.set(0, 15, midZ);
+    ridge.renderOrder = -1;
+    scene.add(ridge);
+
+    var farN = low ? 30 : 64;
+    for (var ft = 0; ft < farN; ft++) {
+      var fa = (ft / farN) * Math.PI * 2 + between(-0.04, 0.04);
+      var fr = between(52, 74);
+      var fpk = rand() > 0.82;
+      makeTree(Math.cos(fa) * fr, midZ + Math.sin(fa) * fr, { kind: fpk ? pink : green, pinkTree: fpk, cards: low ? 6 : 9, shadow: false, h: between(4, 6), r: 0.34, spread: between(2.1, 2.7), branches: 4 });
+    }
+
+    var blobGeo = new THREE.PlaneGeometry(1, 1);
+    blobGeo.rotateX(-Math.PI / 2);
+    var blobMat = new THREE.MeshBasicMaterial({ color: 0x14220f, alphaMap: blobTex(), transparent: true, opacity: 0.55, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 });
+    var blobMesh = new THREE.InstancedMesh(blobGeo, blobMat, blobs.length);
+    var off = new THREE.Vector2(-sunDir.x / sunDir.y, -sunDir.z / sunDir.y);
+    blobs.forEach(function (b, bi) {
+      v.set(b.x + off.x * b.h * 0.8, 0.02, b.z + off.y * b.h * 0.8);
+      q.setFromEuler(e.set(0, rand() * 6.28, 0));
+      s.set(b.r * 2.2, 1, b.r * 2.2 * (1 + Math.abs(off.y) * 0.35));
+      m.compose(v, q, s);
+      blobMesh.setMatrixAt(bi, m);
+    });
+    blobMesh.renderOrder = 1;
+    scene.add(blobMesh);
     buildArch();
 
     /* Las obras, en atriles de roble */
@@ -950,7 +1117,7 @@ function boot() {
     scene.add(pollen);
 
     pmrem = new THREE.PMREMGenerator(renderer);
-    applyMoment(tod);
+    applyLight();
     refreshEnv();
     placeSun();
 
@@ -971,7 +1138,7 @@ function boot() {
       if (w > maxW) { w = maxW; h = w / ratio; }
       return { w: w, h: h };
     }
-    var turn = THREE.MathUtils.degToRad(64);
+    var turn = THREE.MathUtils.degToRad(52);
     left.forEach(function (id, i) {
       var work = by[id];
       if (!work) return;
@@ -1048,23 +1215,11 @@ function boot() {
       pitch = 0.12 - ease * 0.15;
       if (!keys.size && !stick.x && !stick.y) pos.z = 4.4 - ease * 1.2;
     }
-    if (auto) {
-      todTarget = tod;
-      tod += dt / 38 * autoDir;
-      if (tod >= 3) { tod = 3; autoDir = -1; }
-      if (tod <= 0) { tod = 0; autoDir = 1; }
-      applyMoment(tod);
-      envTimer += dt;
-      if (envTimer > 4) { envTimer = 0; refreshEnv(); }
-    } else if (Math.abs(tod - todTarget) > 0.002) {
-      tod += (todTarget - tod) * Math.min(1, dt * 1.6);
-      applyMoment(tod);
-      envTimer += dt;
-      if (envTimer > 0.7 || Math.abs(tod - todTarget) < 0.01) { envTimer = 0; refreshEnv(); }
-    }
+    var gust = 0.65 + 0.35 * Math.sin(now * 0.23) * Math.sin(now * 0.11 + 1.3);
     trees.forEach(function (tree) {
-      tree.rotation.z = Math.sin(now * 0.8 + tree.userData.phase) * 0.012;
-      tree.rotation.x = Math.sin(now * 0.6 + tree.userData.phase * 1.3) * 0.008;
+      var ph = tree.userData.phase;
+      tree.rotation.z = (Math.sin(now * 0.9 + ph) * 0.014 + Math.sin(now * 2.1 + ph * 2) * 0.004) * gust;
+      tree.rotation.x = (Math.sin(now * 0.7 + ph * 1.3) * 0.01 + Math.sin(now * 1.7 + ph) * 0.003) * gust;
     });
     if (pollen) {
       var arr = pollen.geometry.attributes.position.array;
@@ -1119,7 +1274,6 @@ function boot() {
     if (!document.body.dataset.sheet) aimCenter();
     canvas.dataset.pos = pos.x.toFixed(2) + "," + pos.z.toFixed(2);
     canvas.dataset.yaw = yaw.toFixed(3);
-    canvas.dataset.tod = tod.toFixed(2);
   }
 
   function setHot(id) {
@@ -1196,7 +1350,6 @@ function boot() {
     started = true;
     canvas.dataset.ready = "1";
     if (returnBtn) returnBtn.hidden = false;
-    syncSunButton();
   }
 
   function enterSala() {
@@ -1229,21 +1382,6 @@ function boot() {
   enterBtn.addEventListener("click", enterSala);
   if (returnBtn) returnBtn.addEventListener("click", enterSala);
 
-  if (sunBtn) {
-    sunBtn.addEventListener("click", function () {
-      if (auto) {
-        auto = false;
-        todTarget = Math.min(3, Math.round(tod) + (autoDir > 0 ? 1 : 0));
-        if (todTarget > 3) todTarget = 0;
-      } else if (todTarget >= 3) {
-        auto = true;
-        autoDir = -1;
-      } else {
-        todTarget += 1;
-      }
-      syncSunButton();
-    });
-  }
 
   if (listBtn) {
     listBtn.addEventListener("click", function () {
@@ -1387,13 +1525,9 @@ function boot() {
     if (document.readyState === "complete") startPreview();
     else window.addEventListener("load", startPreview, { once: true });
   }
-  if (params.get("hora")) {
-    var hk = MOMENTS.findIndex(function (mo) { return mo.key === params.get("hora"); });
-    if (hk >= 0) { auto = false; tod = todTarget = hk; }
-  }
   window.JARDIN = {
     goto: function (x, z, y, p) { pos.x = x; pos.z = z; if (y != null) yaw = y; if (p != null) pitch = p; introT = 99; },
-    shot: function (type, q) { renderer.render(scene, camera); return canvas.toDataURL(type || "image/jpeg", q || 0.88); },
-    moment: function (i) { auto = false; tod = todTarget = i; if (sun) { applyMoment(tod); refreshEnv(); } syncSunButton(); }
+    shot: function (type, q) { placeSun(); applyLook(); renderer.render(scene, camera); return canvas.toDataURL(type || "image/jpeg", q || 0.88); },
+    light: function () { return MORNING; }
   };
 }

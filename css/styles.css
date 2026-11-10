@@ -1252,10 +1252,6 @@ html:not(.vt) body { animation: page-in .7s var(--ease) both; }
 .reticle { border-color: rgba(255, 255, 255, .85); box-shadow: 0 0 0 1px rgba(0, 0, 0, .18); }
 .aim { color: #fff; text-shadow: 0 1px 12px rgba(0, 0, 0, .45), 0 1px 2px rgba(0, 0, 0, .4); }
 .load-note, .keys { color: rgba(255, 255, 255, .9); text-shadow: 0 1px 6px rgba(0, 0, 0, .4); }
-.sun-btn { display: inline-flex; align-items: center; gap: .5rem; }
-.sun-btn svg { color: #e0a43a; flex: none; }
-.sun-btn[aria-pressed="true"] svg { animation: sun-turn 8s linear infinite; }
-@keyframes sun-turn { to { transform: rotate(360deg); } }
 .joystick { background: rgba(246, 242, 236, .42); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-color: rgba(255, 255, 255, .5); }
 .portal p { margin: 0 0 1.3rem; max-width: 28rem; color: rgba(243, 237, 228, .82); }
 
@@ -1322,3 +1318,4 @@ html:not(.vt) body { animation: page-in .7s var(--ease) both; }
   .portal { grid-template-columns: 1fr; min-height: 92svh; }
   .portal-copy { max-width: 40rem; }
 }
+.viewer:focus, .sheet-card:focus { outline: none; }

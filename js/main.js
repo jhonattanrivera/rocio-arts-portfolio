@@ -506,6 +506,7 @@
   viewer.setAttribute("aria-modal", "true");
   viewer.setAttribute("aria-hidden", "true");
   viewer.setAttribute("aria-labelledby", "viewer-title");
+  viewer.tabIndex = -1;
   var roomButtons = (window.Room ? window.Room.ROOMS : []).map(function (r) {
     return '<button type="button" class="pick" data-room="' + r.id + '" aria-pressed="false"><img alt="" width="96" height="64" data-src="' + window.Room.thumbJpg(r) + '"><span>' + window.Room.name(r) + "</span></button>";
   }).join("");
@@ -693,7 +694,7 @@
     setPageHidden(true);
     syncLock();
     if (pageDock) pageDock.classList.add("is-away");
-    q(".viewer-close").focus({ preventScroll: true });
+    viewer.focus({ preventScroll: true });
   }
 
   function openWork(id, list, push, opts) {

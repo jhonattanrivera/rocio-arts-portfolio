@@ -70,8 +70,8 @@
     sheet.hidden = false;
     document.body.dataset.sheet = "open";
     requestAnimationFrame(function () { sheet.classList.add("is-in"); });
-    var closeBtn = sheet.querySelector("[data-sheet-close]");
-    if (closeBtn) closeBtn.focus();
+    var card = sheet.querySelector(".sheet-card");
+    if (card) card.focus({ preventScroll: true });
     if (location.hash !== "#" + id) history.replaceState({ sheet: id }, "", "#" + id);
     return true;
   }
