@@ -567,6 +567,23 @@
   var sizeInput = q("#viewer-size");
   var sizeOut = q(".tool-size output");
   var toolNote = q(".tool-note");
+  var side = q(".viewer-side");
+  var sideTick = 0;
+  function paintSide() {
+    sideTick = 0;
+    if (window.innerWidth >= 980) {
+      viewer.style.removeProperty("--shrink");
+      viewer.classList.remove("is-compact");
+      return;
+    }
+    var y = side.scrollTop;
+    viewer.style.setProperty("--shrink", Math.min(1, y / 240).toFixed(3));
+    viewer.classList.toggle("is-compact", y > 28);
+  }
+  side.addEventListener("scroll", function () {
+    if (!sideTick) sideTick = requestAnimationFrame(paintSide);
+  }, { passive: true });
+  window.addEventListener("resize", paintSide);
   var view = { s: 1, x: 0, y: 0 };
   var pointers = new Map();
   var pinchStart = null;
@@ -689,6 +706,8 @@
   }
 
   function show() {
+    side.scrollTop = 0;
+    paintSide();
     viewer.classList.add("is-open");
     viewer.setAttribute("aria-hidden", "false");
     setPageHidden(true);

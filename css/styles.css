@@ -807,7 +807,7 @@ main { display: block; padding-top: var(--nav-h); }
 .viewer-tools { display: grid; gap: 1.2rem; margin: 0 0 1.4rem; }
 .tool-label { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 .5rem; font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
 .tool-label output { letter-spacing: 0; text-transform: none; font-size: .95rem; color: var(--ink); font-variant-numeric: tabular-nums; }
-.picks { display: flex; gap: .55rem; overflow-x: auto; scrollbar-width: none; margin-inline: calc(var(--pad) * -1); padding: 2px var(--pad) 4px; }
+.picks { display: flex; gap: .55rem; overflow-x: auto; scrollbar-width: none; margin-inline: calc(var(--pad) * -1); padding: 7px var(--pad) 8px; }
 .picks::-webkit-scrollbar { display: none; }
 .pick { flex: none; display: grid; gap: .35rem; width: 88px; text-align: left; font-size: .78rem; color: var(--ink-2); }
 .pick img { width: 88px; height: 60px; object-fit: cover; border-radius: 4px; background: var(--paper-3); box-shadow: 0 0 0 1px var(--line); transition: box-shadow .3s ease, transform .4s var(--ease); }
@@ -1319,3 +1319,14 @@ html:not(.vt) body { animation: page-in .7s var(--ease) both; }
   .portal-copy { max-width: 40rem; }
 }
 .viewer:focus, .sheet-card:focus { outline: none; }
+
+/* Visor en el teléfono: al bajar, la escena cede espacio y la barra se vuelve un botón */
+@media (max-width: 979px) {
+  .viewer-stage { height: calc(58svh - var(--shrink, 0) * 20svh); min-height: 250px; }
+  .viewer-dock { transition: left .45s var(--ease), padding .45s var(--ease), box-shadow .3s ease; }
+  .viewer-dock > span { transition: opacity .25s ease; }
+  .viewer.is-compact .viewer-dock { left: calc(100% - var(--pad) - 11.5rem); padding: 0; background: transparent; box-shadow: none; }
+  .viewer.is-compact .viewer-dock em { padding: .85rem 1.1rem; box-shadow: 0 14px 30px -12px rgba(26, 22, 20, .55); }
+  .viewer.is-compact .viewer-dock > span { opacity: 0; pointer-events: none; position: absolute; }
+  .viewer.is-compact .viewer-dock em { flex: 1; text-align: center; }
+}
