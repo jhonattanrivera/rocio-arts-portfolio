@@ -9,6 +9,9 @@
    tone es un color derivado de la propia imagen, para el fondo de la ficha.
    widths son los anchos reales de assets/media/works/{id}-{ancho}.webp|avif
    (el JPG de respaldo está en image, y en los anchos menores). */
+/* showAvailable: true vuelve a marcar las obras disponibles, el filtro y la página Disponible. */
+window.SITE_FLAGS = { showAvailable: false };
+
 window.WORKS = [
   {
     "id": "serenidad",
@@ -25,6 +28,583 @@ window.WORKS = [
       1280,
       1666
     ],
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "colibries",
+    "title": "Colibríes",
+    "description": "Rosas, tulipanes amarillos y flores violeta en un jardín verde. Dos colibríes cruzan el cielo.",
+    "image": "assets/works/colibries.jpg",
+    "thumb": "assets/works/thumbs/colibries.jpg",
+    "w": 2000,
+    "h": 1734,
+    "available": 0,
+    "tone": "#b0beb8",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "amanecer-en-el-jardin",
+    "title": "Amanecer en el jardín",
+    "description": "Un jardín largo y denso bajo un cielo rosa pálido. Hortensias, margaritas, lirios y flores fucsia, todo a la vez.",
+    "image": "assets/works/amanecer-en-el-jardin.jpg",
+    "thumb": "assets/works/thumbs/amanecer-en-el-jardin.jpg",
+    "w": 2000,
+    "h": 1210,
+    "available": 0,
+    "tone": "#bebaae",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "hacia-el-cielo",
+    "title": "Hacia el cielo",
+    "description": "Un camino de colores cruza un campo de flores hacia un cielo turquesa con nubes violeta. Una niña de blanco lo recorre.",
+    "image": "assets/works/hacia-el-cielo.jpg",
+    "thumb": "assets/works/thumbs/hacia-el-cielo.jpg",
+    "w": 2000,
+    "h": 1702,
+    "available": 0,
+    "tone": "#b7c4be",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "entre-mujeres",
+    "title": "Entre mujeres",
+    "description": "Una niña, una joven y una mujer van de la mano. Detrás, un tapiz de retazos turquesa y rosa, con flores que cuelgan.",
+    "image": "assets/works/entre-mujeres.jpg",
+    "thumb": "assets/works/thumbs/entre-mujeres.jpg",
+    "w": 2000,
+    "h": 1325,
+    "available": 0,
+    "tone": "#b3c2c1",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "hortensias",
+    "title": "Hortensias",
+    "description": "Hortensias lilas y azules que se abren hacia los lados y dejan arriba un cielo claro, casi blanco.",
+    "image": "assets/works/hortensias.jpg",
+    "thumb": "assets/works/thumbs/hortensias.jpg",
+    "w": 764,
+    "h": 511,
+    "available": 0,
+    "tone": "#bfc2bf",
+    "widths": [
+      640
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "camino-rosa",
+    "title": "Camino rosa",
+    "description": "Un sendero dorado sube entre flores hacia un cielo fucsia. Abajo, una niña pequeña empieza a caminar.",
+    "image": "assets/works/camino-rosa.jpg",
+    "thumb": "assets/works/thumbs/camino-rosa.jpg",
+    "w": 962,
+    "h": 1101,
+    "available": 0,
+    "tone": "#b4a8a3",
+    "widths": [
+      640
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "ramo-de-color",
+    "title": "Ramo de color",
+    "description": "Una mujer sostiene un ramo entre retazos verdes y fucsia. Abajo, un arco rojo y turquesa.",
+    "image": "assets/works/ramo-de-color.jpg",
+    "thumb": "assets/works/thumbs/ramo-de-color.jpg",
+    "w": 2000,
+    "h": 1727,
+    "available": 0,
+    "tone": "#b7b3b0",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "bruma-floral",
+    "title": "Bruma floral",
+    "description": "Flores suaves, rosas, amarillas y celestes, que se disuelven en una bruma gris perla.",
+    "image": "assets/works/bruma-floral.jpg",
+    "thumb": "assets/works/thumbs/bruma-floral.jpg",
+    "w": 2000,
+    "h": 1180,
+    "available": 0,
+    "tone": "#cdc9c2",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "leer-contigo",
+    "title": "Leer contigo",
+    "description": "Dos figuras leen juntas en una banca del jardín. Arriba caen gotas de color y cuelgan enredaderas.",
+    "image": "assets/works/leer-contigo.jpg",
+    "thumb": "assets/works/thumbs/leer-contigo.jpg",
+    "w": 2000,
+    "h": 1783,
+    "available": 0,
+    "tone": "#a8baba",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "pradera",
+    "title": "Pradera",
+    "description": "Una pradera de flores moradas, rosas y amarillas bajo una franja de cielo turquesa.",
+    "image": "assets/works/pradera.jpg",
+    "thumb": "assets/works/thumbs/pradera.jpg",
+    "w": 2000,
+    "h": 959,
+    "available": 0,
+    "tone": "#babdb7",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "hermanas",
+    "title": "Hermanas",
+    "description": "Tres niñas caminan de la mano entre muros de retazos, lunares y un arcoíris gris.",
+    "image": "assets/works/hermanas.jpg",
+    "thumb": "assets/works/thumbs/hermanas.jpg",
+    "w": 2000,
+    "h": 1545,
+    "available": 0,
+    "tone": "#b2b4b3",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "campo-rosa",
+    "title": "Campo rosa",
+    "description": "Un campo extenso de flores rosas y magenta bajo un cielo claro que gotea.",
+    "image": "assets/works/campo-rosa.jpg",
+    "thumb": "assets/works/thumbs/campo-rosa.jpg",
+    "w": 1664,
+    "h": 1118,
+    "available": 0,
+    "tone": "#cac3bd",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "ella-florece",
+    "title": "Ella florece",
+    "description": "Una mujer de perfil, trazada en blanco, sostiene un ramo. A su alrededor cuelgan rosas, lunares y franjas de color.",
+    "image": "assets/works/ella-florece.jpg",
+    "thumb": "assets/works/thumbs/ella-florece.jpg",
+    "w": 1479,
+    "h": 2000,
+    "available": 0,
+    "tone": "#b1b8b8",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "rosas-sobre-turquesa",
+    "title": "Rosas sobre turquesa",
+    "description": "Rosas rojas y flores silvestres crecen sobre un fondo turquesa, entre tallos oscuros.",
+    "image": "assets/works/rosas-sobre-turquesa.jpg",
+    "thumb": "assets/works/thumbs/rosas-sobre-turquesa.jpg",
+    "w": 2000,
+    "h": 1745,
+    "available": 0,
+    "tone": "#a5b8b4",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "de-paseo",
+    "title": "De paseo",
+    "description": "Dos figuras y un perro pequeño pasean frente a un tapiz de flores y franjas turquesa.",
+    "image": "assets/works/de-paseo.jpg",
+    "thumb": "assets/works/thumbs/de-paseo.jpg",
+    "w": 2000,
+    "h": 1091,
+    "available": 0,
+    "tone": "#b1bbbb",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "nina-de-las-rosas",
+    "title": "Niña de las rosas",
+    "description": "Una niña con un ramo camina entre rosas rojas bajo un cielo turquesa.",
+    "image": "assets/works/nina-de-las-rosas.jpg",
+    "thumb": "assets/works/thumbs/nina-de-las-rosas.jpg",
+    "w": 1582,
+    "h": 1335,
+    "available": 0,
+    "tone": "#b6c8c5",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "la-puerta",
+    "title": "La puerta",
+    "description": "Unos niños suben una escalera blanca hacia una puerta abierta en el jardín. A un lado, un arcoíris.",
+    "image": "assets/works/la-puerta.jpg",
+    "thumb": "assets/works/thumbs/la-puerta.jpg",
+    "w": 1386,
+    "h": 1163,
+    "available": 0,
+    "tone": "#b2b7a9",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "primavera",
+    "title": "Primavera",
+    "description": "Un prado verde y amarillo con flores sueltas en rosa, rojo y azul.",
+    "image": "assets/works/primavera.jpg",
+    "thumb": "assets/works/thumbs/primavera.jpg",
+    "w": 2000,
+    "h": 1413,
+    "available": 0,
+    "tone": "#bdc8b3",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "nosotros",
+    "title": "Nosotros",
+    "description": "Una familia de cuatro, en blanco, se toma de la mano sobre retazos azules, rojos y dorados.",
+    "image": "assets/works/nosotros.jpg",
+    "thumb": "assets/works/thumbs/nosotros.jpg",
+    "w": 2000,
+    "h": 1738,
+    "available": 0,
+    "tone": "#a9b5b6",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "jardin-secreto",
+    "title": "Jardín secreto",
+    "description": "Un jardín vertical de puntos de color, rosas grandes y tallos que se cruzan.",
+    "image": "assets/works/jardin-secreto.jpg",
+    "thumb": "assets/works/thumbs/jardin-secreto.jpg",
+    "w": 1613,
+    "h": 2000,
+    "available": 0,
+    "tone": "#bdbbb3",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "hogar",
+    "title": "Hogar",
+    "description": "Padres, dos niñas y un perro, trazados en blanco, frente a un muro verde de flores y retazos.",
+    "image": "assets/works/hogar.jpg",
+    "thumb": "assets/works/thumbs/hogar.jpg",
+    "w": 1582,
+    "h": 975,
+    "available": 0,
+    "tone": "#aabbbd",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "luz-de-mayo",
+    "title": "Luz de mayo",
+    "description": "Pinceladas amplias de amarillo, rosa y azul, como un ramo visto muy de cerca.",
+    "image": "assets/works/luz-de-mayo.jpg",
+    "thumb": "assets/works/thumbs/luz-de-mayo.jpg",
+    "w": 1521,
+    "h": 2000,
+    "available": 0,
+    "tone": "#cbd1bf",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "retazos",
+    "title": "Retazos",
+    "description": "Un muro de retazos con lunares, arcos y arcoíris pequeños. Entre ellos asoman tallos y hojas.",
+    "image": "assets/works/retazos.jpg",
+    "thumb": "assets/works/thumbs/retazos.jpg",
+    "w": 1305,
+    "h": 609,
+    "available": 0,
+    "tone": "#b9bab6",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "prado",
+    "title": "Prado",
+    "description": "Un tapiz de florecitas amarillas, rosas y celestes entre hojas verdes, sin cielo.",
+    "image": "assets/works/prado.jpg",
+    "thumb": "assets/works/thumbs/prado.jpg",
+    "w": 2000,
+    "h": 1378,
+    "available": 0,
+    "tone": "#c0c0aa",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "encuentro",
+    "title": "Encuentro",
+    "description": "Varias figuras blancas se reúnen frente a un muro de retazos, lunares y lluvia de color.",
+    "image": "assets/works/encuentro.jpg",
+    "thumb": "assets/works/thumbs/encuentro.jpg",
+    "w": 1265,
+    "h": 699,
+    "available": 0,
+    "tone": "#b7c1c5",
+    "widths": [
+      640
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "rosal",
+    "title": "Rosal",
+    "description": "Un rosal de flores rosa pálido en un verde profundo, de trazo grueso.",
+    "image": "assets/works/rosal.jpg",
+    "thumb": "assets/works/thumbs/rosal.jpg",
+    "w": 2000,
+    "h": 1783,
+    "available": 0,
+    "tone": "#b7bd99",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "selva-azul",
+    "title": "Selva azul",
+    "description": "Una selva de azules, hojas y gotas. Entre la vegetación asoma, apenas, un rostro.",
+    "image": "assets/works/selva-azul.jpg",
+    "thumb": "assets/works/thumbs/selva-azul.jpg",
+    "w": 2000,
+    "h": 1090,
+    "available": 0,
+    "tone": "#a5b5b9",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "floracion",
+    "title": "Floración",
+    "description": "Flores color vino y amarillas abiertas entre hojas, de pincelada gruesa.",
+    "image": "assets/works/floracion.jpg",
+    "thumb": "assets/works/thumbs/floracion.jpg",
+    "w": 2000,
+    "h": 1461,
+    "available": 0,
+    "tone": "#bbbaa1",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
+    "year": null,
+    "medium": null,
+    "widthCm": null,
+    "heightCm": null
+  },
+  {
+    "id": "fiesta",
+    "title": "Fiesta",
+    "description": "Formas de retazos en rosa, naranja y turquesa, con lunares amarillos y enredaderas blancas.",
+    "image": "assets/works/fiesta.jpg",
+    "thumb": "assets/works/thumbs/fiesta.jpg",
+    "w": 2000,
+    "h": 1728,
+    "available": 0,
+    "tone": "#bbb0ae",
+    "widths": [
+      640,
+      1280
+    ],
+    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,

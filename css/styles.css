@@ -724,7 +724,7 @@ main { display: block; padding-top: var(--nav-h); }
   min-height: 56px;
   padding: calc(.3rem + env(safe-area-inset-top)) var(--pad) .3rem;
 }
-.viewer-count { margin: 0; font-size: .8rem; letter-spacing: .1em; color: var(--muted); font-variant-numeric: tabular-nums; }
+.viewer-count { margin: 0; font-size: .8rem; letter-spacing: .1em; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .viewer-close { justify-self: end; min-height: 44px; padding-left: 1rem; font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 500; }
 .modes { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--paper-2); }
 .modes button {
@@ -845,12 +845,12 @@ input[type="range"]:disabled { opacity: .35; cursor: default; }
 .viewer.is-step .viewer-side > h2, .viewer.is-step .viewer-desc { animation: rise-soft .6s var(--ease); }
 @keyframes rise-soft { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
-/* La sala, el motor */
+/* El espacio, el motor */
 .room { position: absolute; inset: 0; overflow: hidden; background: var(--paper-3); user-select: none; -webkit-user-select: none; }
 .room-view { position: absolute; inset: 0; overflow: hidden; }
 .room-photo, .room-photo img { position: absolute; left: 0; top: 0; max-width: none; transform-origin: 0 0; }
 .room-photo img { display: block; transition: opacity .5s ease; }
-.room.is-swapping .room-photo img, .room.is-swapping .room-art { opacity: 0; }
+.room.is-swapping .room-photo img, .room.is-swapping .room-art, .room.is-swapping .room-front { opacity: 0; }
 .room-art {
   position: absolute;
   left: 0;
@@ -860,58 +860,19 @@ input[type="range"]:disabled { opacity: .35; cursor: default; }
 }
 .room.is-live .room-art { cursor: grab; touch-action: none; }
 .room.is-dragging .room-art { cursor: grabbing; }
-.room-canvas {
+.room-render { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.room-paint { position: absolute; left: 0; top: 0; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
+.room-paint picture, .room-paint img { display: block; width: 1px; height: 1px; }
+.room-front {
   position: absolute;
-  inset: 0;
-  overflow: hidden;
-  isolation: isolate;
-}
-.room-paint { position: absolute; inset: var(--pad, 0); overflow: hidden; }
-.room-paint picture, .room-paint img { display: block; width: 100%; height: 100%; object-fit: cover; max-width: none; }
-.room-paint img { filter: contrast(.95) saturate(.96) brightness(.99); }
-.room[data-frame="none"] .room-paint { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .06), inset -1px -1px 0 rgba(0, 0, 0, .08); }
-.room[data-frame="black"] .room-canvas {
-  background: #1d1a18;
-  box-shadow: inset 0 0 0 var(--rim, 0) #1f1b19, inset 0 0 0 calc(var(--rim, 0) + 1px) rgba(255, 255, 255, .06);
-}
-.room[data-frame="black"] .room-canvas::before,
-.room[data-frame="oak"] .room-canvas::before {
-  content: "";
-  position: absolute;
-  inset: var(--rim, 0);
-  background: #0f0d0c;
-  box-shadow: inset 0 0 calc(var(--gap, 0) * 1.4) rgba(0, 0, 0, .8);
-}
-.room[data-frame="oak"] .room-canvas {
-  background: linear-gradient(135deg, #c79f72, #a9805a 45%, #c49b6d 70%, #9c7550);
-}
-.room[data-frame="oak"] .room-canvas::before { background: #3a2c20; }
-.room-light {
-  position: absolute;
-  inset: calc(var(--blur, 8px) * -2);
-  z-index: 2;
-  background-repeat: no-repeat;
-  filter: blur(var(--blur, 8px)) saturate(var(--tint, .3)) brightness(var(--gain, 1.1));
-  mix-blend-mode: multiply;
+  left: 0;
+  top: 0;
+  max-width: none;
+  transform-origin: 0 0;
   pointer-events: none;
+  transition: opacity .5s ease;
 }
-.room-sheen {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  background: linear-gradient(var(--ang, 160deg), rgba(255, 255, 255, .1), rgba(255, 255, 255, 0) 44%);
-  mix-blend-mode: soft-light;
-}
-.room.is-warm .room-sheen { background: linear-gradient(var(--ang, 120deg), rgba(255, 236, 200, .2), rgba(255, 236, 200, 0) 48%); }
-.room-sheen::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: url("../assets/brand/grain.png") 0 0 / 220px;
-  opacity: .16;
-  mix-blend-mode: overlay;
-}
+.room-front[hidden] { display: none; }
 
 /* La artista */
 .person { position: relative; min-height: calc(100svh - var(--nav-h)); color: var(--on-night); background: var(--night); overflow: hidden; }
@@ -1327,10 +1288,31 @@ html:not(.vt) body { animation: page-in .7s var(--ease) both; }
   .viewer-stage { height: var(--stage-h); min-height: 0; transition: height .5s var(--ease); }
   .viewer.is-compact .viewer-stage { height: var(--stage-c); }
   .viewer-room { bottom: auto; height: var(--stage-h); transition: transform .5s var(--ease), opacity .45s ease; }
-  .viewer.is-compact .viewer-room { transform: translate3d(0, calc((var(--stage-c) - var(--stage-h)) * .35), 0); }
+  .viewer.is-compact .viewer-room { transform: translate3d(0, var(--room-shift, calc((var(--stage-c) - var(--stage-h)) * .35)), 0); }
   .viewer-dock { transition: left .5s var(--ease), padding .5s var(--ease), background .3s ease, box-shadow .3s ease; }
   .viewer-dock > span { transition: opacity .2s ease; }
   .viewer.is-compact .viewer-dock { left: calc(100% - var(--pad) - 11.5rem); padding: 0; background: transparent; box-shadow: none; }
   .viewer.is-compact .viewer-dock > span { opacity: 0; pointer-events: none; position: absolute; }
   .viewer.is-compact .viewer-dock em { flex: 1; text-align: center; padding: .85rem 1.1rem; box-shadow: 0 14px 30px -12px rgba(26, 22, 20, .55); }
 }
+
+/* Panel del visor en el teléfono: una manija y dos pasos */
+.viewer-grip { display: none; }
+@media (max-width: 979px) {
+  .viewer-side { overflow: hidden; overscroll-behavior: contain; }
+  .viewer.is-compact .viewer-side { overflow-y: auto; }
+  .viewer-grip { display: flex; order: -2; align-self: stretch; justify-content: center; align-items: center; height: 26px; margin: -10px 0 2px; }
+  .viewer-grip span { width: 42px; height: 4px; border-radius: 3px; background: rgba(26, 22, 20, .22); transition: background .3s ease, width .4s var(--ease); }
+  .viewer.is-compact .viewer-grip span { width: 28px; background: rgba(26, 22, 20, .35); }
+}
+
+/* Trayectoria con fotos y tira del estudio */
+.timeline .when-note { display: block; margin-top: .25rem; color: var(--ink-2); font-size: .95rem; }
+.timeline .when-photos { display: flex; gap: .6rem; margin-top: .9rem; overflow-x: auto; scrollbar-width: none; }
+.timeline .when-photos::-webkit-scrollbar { display: none; }
+.timeline .when-photos picture { flex: none; }
+.timeline .when-photos img { display: block; height: clamp(150px, 22vw, 230px); width: auto; border-radius: 3px; box-shadow: 0 14px 28px -18px rgba(26, 22, 20, .5); }
+.studio-strip { padding-block: clamp(2.6rem, 7vw, 5rem) 0; }
+.studio-strip .eyebrow { width: min(var(--max), 100%); margin-inline: auto; padding-inline: var(--pad); }
+.studio-strip .scroller img { height: min(62svh, 560px); width: auto; max-width: 82vw; object-fit: cover; }
+.studio-strip .scroller figure { width: auto; }

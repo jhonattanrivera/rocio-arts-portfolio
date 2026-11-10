@@ -37,18 +37,6 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/galeria.html"/>
   </url>
   <url>
-    <loc>https://jhonattanrivera.github.io/rocio-arts-portfolio/disponible.html</loc>
-    <xhtml:link rel="alternate" hreflang="es" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/disponible.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/disponible.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/disponible.html"/>
-  </url>
-  <url>
-    <loc>https://jhonattanrivera.github.io/rocio-arts-portfolio/en/disponible.html</loc>
-    <xhtml:link rel="alternate" hreflang="es" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/disponible.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/disponible.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/disponible.html"/>
-  </url>
-  <url>
     <loc>https://jhonattanrivera.github.io/rocio-arts-portfolio/encargos.html</loc>
     <xhtml:link rel="alternate" hreflang="es" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/encargos.html"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/encargos.html"/>

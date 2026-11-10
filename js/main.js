@@ -8,7 +8,7 @@
   var ROOT = (window.SITE && window.SITE.root) || "";
 
   var RAIL = ["marilyn", "ocean-eyes", "el-camino", "flores", "cidade-maravilhosa", "junto-a-ti", "abbey-road", "summer", "forever"];
-  var DEMO = [["el-camino", "tarde"], ["ocean-eyes", "sala"], ["flores", "molduras"], ["mi-lugar-feliz", "entrada"], ["urban-city", "concreto"]];
+  var DEMO = [["el-camino", "comedor"], ["ocean-eyes", "sala"], ["bruma-floral", "habitacion"], ["mi-lugar-feliz", "escalera"], ["flores", "tarde"], ["urban-city", "entrada"]];
 
   function t(key) { return window.ui ? window.ui(key) : key; }
   function wa(text) { return window.artWa ? window.artWa(text) : "https://wa.me/50689877207?text=" + encodeURIComponent(text); }
@@ -23,6 +23,12 @@
     } catch (err) { return null; }
     return value;
   }
+  var SHOW_AVAILABLE = !!(window.SITE_FLAGS && window.SITE_FLAGS.showAvailable);
+  if (!SHOW_AVAILABLE && document.body.classList.contains("page-disponible")) {
+    location.replace("obras.html");
+    return;
+  }
+  document.querySelectorAll(".filters").forEach(function (node) { node.hidden = !SHOW_AVAILABLE; });
   function availableList() {
     return WORKS.filter(function (work) { return work.available; })
       .sort(function (a, b) { return a.available - b.available; });
@@ -383,7 +389,7 @@
       title.className = "card-title";
       title.textContent = work.title;
       cap.append(title);
-      if (work.available) {
+      if (work.available && SHOW_AVAILABLE) {
         var note = document.createElement("span");
         note.className = "card-note";
         note.textContent = t("available");
@@ -528,6 +534,7 @@
         '<p class="viewer-hint" aria-hidden="true"></p>' +
       "</div>" +
       '<aside class="viewer-side">' +
+        '<button type="button" class="viewer-grip" aria-expanded="false" aria-label="' + t("tools") + '"><span></span></button>' +
         '<p class="viewer-status" hidden></p>' +
         '<h2 id="viewer-title"></h2>' +
         '<p class="viewer-facts"></p>' +
@@ -567,29 +574,63 @@
   var sizeInput = q("#viewer-size");
   var sizeOut = q(".tool-size output");
   var toolNote = q(".tool-note");
+  /* En el teléfono el panel tiene dos pasos: cerrado (la escena manda) y
+     abierto (las herramientas). Se cambia con un gesto, nunca con el scroll. */
   var side = q(".viewer-side");
-  var sideTick = 0;
+  var grip = q(".viewer-grip");
   var compact = false;
-  var compactLock = 0;
+  var gestureLock = 0;
+  function phone() { return window.innerWidth < 980; }
+  function frameRoom() {
+    if (!room || !phone()) return;
+    var hostH = roomHost.offsetHeight;
+    var ch = Math.max(window.innerHeight * 0.4, 230);
+    var art = room.art.getBoundingClientRect();
+    var host = roomHost.getBoundingClientRect();
+    var shift = viewer.classList.contains("is-compact") ? parseFloat(viewer.style.getPropertyValue("--room-shift")) || 0 : 0;
+    var cy = art.top - host.top + art.height / 2 - shift;
+    var next = Math.max(ch - hostH, Math.min(0, ch / 2 - cy));
+    viewer.style.setProperty("--room-shift", Math.round(next) + "px");
+  }
   function setCompact(on) {
+    if (!phone()) on = false;
     if (on === compact) return;
+    if (on) frameRoom();
     compact = on;
     viewer.classList.toggle("is-compact", on);
-    compactLock = performance.now() + 560;
-    window.setTimeout(paintSide, 600);
+    if (grip) grip.setAttribute("aria-expanded", on ? "true" : "false");
+    if (!on) side.scrollTop = 0;
+    gestureLock = performance.now() + 520;
   }
-  function paintSide() {
-    sideTick = 0;
-    if (window.innerWidth >= 980) { setCompact(false); return; }
-    if (performance.now() < compactLock) return;
-    var y = side.scrollTop;
-    if (!compact && y > 56) setCompact(true);
-    else if (compact && y < 6) setCompact(false);
-  }
-  side.addEventListener("scroll", function () {
-    if (!sideTick) sideTick = requestAnimationFrame(paintSide);
+  var swipe = null;
+  side.addEventListener("touchstart", function (event) {
+    if (!phone()) return;
+    var t = event.touches[0];
+    swipe = { y: t.clientY, x: t.clientX, top: side.scrollTop, done: false };
   }, { passive: true });
-  window.addEventListener("resize", paintSide);
+  side.addEventListener("touchmove", function (event) {
+    if (!swipe || !phone()) return;
+    var t = event.touches[0];
+    var dy = t.clientY - swipe.y;
+    var dx = t.clientX - swipe.x;
+    if (event.target.closest && event.target.closest(".picks") && Math.abs(dx) > Math.abs(dy)) return;
+    if (event.target.closest && event.target.closest("input[type=range]")) return;
+    if (!compact) {
+      event.preventDefault();
+      if (!swipe.done && dy < -18 && performance.now() > gestureLock) { swipe.done = true; setCompact(true); }
+    } else if (swipe.top <= 0 && side.scrollTop <= 0 && dy > 0) {
+      event.preventDefault();
+      if (!swipe.done && dy > 22 && performance.now() > gestureLock) { swipe.done = true; setCompact(false); }
+    }
+  }, { passive: false });
+  side.addEventListener("touchend", function () { swipe = null; }, { passive: true });
+  side.addEventListener("wheel", function (event) {
+    if (!phone()) return;
+    if (!compact && event.deltaY > 4) { event.preventDefault(); if (performance.now() > gestureLock) setCompact(true); }
+    else if (compact && side.scrollTop <= 0 && event.deltaY < -4) { event.preventDefault(); if (performance.now() > gestureLock) setCompact(false); }
+  }, { passive: false });
+  if (grip) grip.addEventListener("click", function () { setCompact(!compact); });
+  window.addEventListener("resize", function () { if (!phone()) setCompact(false); });
   var view = { s: 1, x: 0, y: 0 };
   var pointers = new Map();
   var pinchStart = null;
@@ -698,11 +739,12 @@
     var bits = facts(work);
     viewerFacts.textContent = bits.join(" · ");
     viewerFacts.hidden = !bits.length;
-    viewerStatus.hidden = !work.available;
-    viewerStatus.textContent = work.available ? t("available") : "";
+    viewerStatus.hidden = !(work.available && SHOW_AVAILABLE);
+    viewerStatus.textContent = work.available && SHOW_AVAILABLE ? t("available") : "";
     viewerName.textContent = work.title;
     viewerAsk.href = wa(askText(work));
     if (mode === "room" && room) room.setWork(work);
+    if (compact) window.setTimeout(frameRoom, 60);
     [-1, 1].forEach(function (dir) {
       var neighbor = cycle[(index + dir + cycle.length) % cycle.length];
       if (!neighbor || !neighbor.widths) return;
@@ -712,9 +754,9 @@
   }
 
   function show() {
-    side.scrollTop = 0;
-    compactLock = 0;
+    gestureLock = 0;
     setCompact(false);
+    side.scrollTop = 0;
     viewer.classList.add("is-open");
     viewer.setAttribute("aria-hidden", "false");
     setPageHidden(true);
@@ -806,6 +848,7 @@
     var pick = event.target.closest(".pick");
     if (pick && room) {
       room.setRoom(pick.dataset.room);
+      if (compact) window.setTimeout(frameRoom, 450);
       store("rocio-room", pick.dataset.room);
       syncPicks();
       return;

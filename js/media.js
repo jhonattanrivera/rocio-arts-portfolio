@@ -12,6 +12,7 @@
   window.artSrcset = function (work, ext) {
     var list = widths(work);
     if (!list.length) return "";
+    if (ext === "avif" && work.avif === false) return "";
     if (ext === "jpg") {
       var small = list.filter(function (w) { return w < work.w - 1; }).map(function (w) {
         return asset("assets/media/works/" + work.id + "-" + w + ".jpg") + " " + w + "w";
@@ -51,7 +52,8 @@
     img.decoding = "async";
     if (opts.eager) img.fetchPriority = "high";
     else img.loading = "lazy";
-    pic.append(avif, webp, img);
+    if (avif.srcset) pic.append(avif);
+    pic.append(webp, img);
     return pic;
   };
 
@@ -62,7 +64,7 @@
     if (work.widthCm && work.heightCm) bits.push(work.widthCm + " × " + work.heightCm + " cm");
     else if (work.widthCm) bits.push(work.widthCm + (window.ui ? window.ui("cmWide") : " cm"));
     else if (work.heightCm) bits.push(work.heightCm + (window.ui ? window.ui("cmHigh") : " cm"));
-    if (work.available) bits.push(window.ui ? window.ui("price") : "Precio a consulta");
+    if (work.available && window.SITE_FLAGS && window.SITE_FLAGS.showAvailable) bits.push(window.ui ? window.ui("price") : "Precio a consulta");
     return bits;
   };
 
@@ -72,7 +74,7 @@
 
   window.artAsk = function (work) {
     var en = window.SITE && window.SITE.lang === "en";
-    return work.available
+    return work.available && window.SITE_FLAGS && window.SITE_FLAGS.showAvailable
       ? (en
         ? "Hello Rocio, I am interested in the work " + work.title + ". Is it still available?"
         : "Hola Rocio, me interesa la obra " + work.title + ". ¿Sigue disponible?")
