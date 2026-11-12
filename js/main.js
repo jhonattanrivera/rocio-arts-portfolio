@@ -39,6 +39,39 @@
     node.textContent = String(new Date().getFullYear());
   });
 
+  /* Tema claro u oscuro. Claro por defecto; la elección queda guardada.
+     El cambio se revela en círculo desde el botón, con la página misma. */
+  var themeButtons = document.querySelectorAll("[data-theme-toggle]");
+  var themeMeta = document.querySelector('meta[name="theme-color"]');
+  function themeNow() { return html.dataset.theme === "dark" ? "dark" : "light"; }
+  function paintTheme(theme) {
+    if (theme === "dark") html.dataset.theme = "dark";
+    else delete html.dataset.theme;
+    if (themeMeta) themeMeta.content = theme === "dark" ? "#14110f" : "#f6f2ec";
+    themeButtons.forEach(function (button) { button.setAttribute("aria-pressed", theme === "dark" ? "true" : "false"); });
+  }
+  function setTheme(theme, from) {
+    store("rocio-theme", theme);
+    if (reduce || !document.startViewTransition || !from) { paintTheme(theme); return; }
+    var box = from.getBoundingClientRect();
+    var x = box.left + box.width / 2;
+    var y = box.top + box.height / 2;
+    var r = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+    html.classList.add("is-theming");
+    var shift = document.startViewTransition(function () { paintTheme(theme); });
+    shift.ready.then(function () {
+      html.animate(
+        { clipPath: ["circle(0px at " + x + "px " + y + "px)", "circle(" + r + "px at " + x + "px " + y + "px)"] },
+        { duration: 760, easing: "cubic-bezier(.65, 0, .35, 1)", pseudoElement: "::view-transition-new(root)" }
+      );
+    }).catch(function () {});
+    shift.finished.finally(function () { html.classList.remove("is-theming"); });
+  }
+  paintTheme(themeNow());
+  themeButtons.forEach(function (button) {
+    button.addEventListener("click", function () { setTheme(themeNow() === "dark" ? "light" : "dark", button); });
+  });
+
   /* Navegación */
   var nav = document.querySelector(".nav");
   var toggle = document.querySelector(".nav-toggle");
@@ -503,7 +536,7 @@
     return;
   }
 
-  /* Visor: la obra sola, o colgada en una sala */
+  /* Visor: la obra sola, o colgada en tu espacio */
   var arrowL = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
   var arrowR = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9.5 5 16.5 12l-7 7" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
   var viewer = document.createElement("div");
