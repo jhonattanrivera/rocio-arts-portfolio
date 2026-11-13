@@ -25,6 +25,7 @@ window.WORKS = [
     "tone": "#d0aeab",
     "widths": [
       640,
+      960,
       1280,
       1666
     ],
@@ -45,9 +46,9 @@ window.WORKS = [
     "tone": "#b0beb8",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -65,9 +66,9 @@ window.WORKS = [
     "tone": "#bebaae",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -85,9 +86,9 @@ window.WORKS = [
     "tone": "#b7c4be",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -105,9 +106,9 @@ window.WORKS = [
     "tone": "#b3c2c1",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -126,7 +127,6 @@ window.WORKS = [
     "widths": [
       640
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -145,7 +145,6 @@ window.WORKS = [
     "widths": [
       640
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -163,9 +162,9 @@ window.WORKS = [
     "tone": "#b7b3b0",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -183,9 +182,9 @@ window.WORKS = [
     "tone": "#cdc9c2",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -203,9 +202,9 @@ window.WORKS = [
     "tone": "#a8baba",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -223,9 +222,9 @@ window.WORKS = [
     "tone": "#babdb7",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -243,9 +242,9 @@ window.WORKS = [
     "tone": "#b2b4b3",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -263,9 +262,9 @@ window.WORKS = [
     "tone": "#cac3bd",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -283,9 +282,9 @@ window.WORKS = [
     "tone": "#b1b8b8",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -303,9 +302,9 @@ window.WORKS = [
     "tone": "#a5b8b4",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -323,9 +322,9 @@ window.WORKS = [
     "tone": "#b1bbbb",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -343,9 +342,9 @@ window.WORKS = [
     "tone": "#b6c8c5",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -363,9 +362,9 @@ window.WORKS = [
     "tone": "#b2b7a9",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -383,9 +382,9 @@ window.WORKS = [
     "tone": "#bdc8b3",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -403,9 +402,9 @@ window.WORKS = [
     "tone": "#a9b5b6",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -423,9 +422,9 @@ window.WORKS = [
     "tone": "#bdbbb3",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -443,9 +442,9 @@ window.WORKS = [
     "tone": "#aabbbd",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -463,9 +462,9 @@ window.WORKS = [
     "tone": "#cbd1bf",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -483,9 +482,9 @@ window.WORKS = [
     "tone": "#b9bab6",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -503,9 +502,9 @@ window.WORKS = [
     "tone": "#c0c0aa",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -524,7 +523,6 @@ window.WORKS = [
     "widths": [
       640
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -542,9 +540,9 @@ window.WORKS = [
     "tone": "#b7bd99",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -562,9 +560,9 @@ window.WORKS = [
     "tone": "#a5b5b9",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -582,9 +580,9 @@ window.WORKS = [
     "tone": "#bbbaa1",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -602,9 +600,9 @@ window.WORKS = [
     "tone": "#bbb0ae",
     "widths": [
       640,
+      960,
       1280
     ],
-    "avif": false,
     "year": null,
     "medium": null,
     "widthCm": null,
@@ -679,6 +677,7 @@ window.WORKS = [
     "tone": "#9eabb9",
     "widths": [
       640,
+      960,
       1280,
       2000
     ],
@@ -775,6 +774,7 @@ window.WORKS = [
     "tone": "#cfab9c",
     "widths": [
       640,
+      960,
       1280,
       1654
     ],
@@ -833,6 +833,7 @@ window.WORKS = [
     "tone": "#6bd0c9",
     "widths": [
       640,
+      960,
       1280,
       1600
     ],
@@ -853,6 +854,7 @@ window.WORKS = [
     "tone": "#67ccda",
     "widths": [
       640,
+      960,
       1280,
       2000
     ],
@@ -930,6 +932,7 @@ window.WORKS = [
     "tone": "#6caab9",
     "widths": [
       640,
+      960,
       1280,
       2000
     ],
@@ -950,6 +953,7 @@ window.WORKS = [
     "tone": "#bdad9c",
     "widths": [
       640,
+      960,
       1280,
       2000
     ],
@@ -988,6 +992,7 @@ window.WORKS = [
     "tone": "#6ca9cb",
     "widths": [
       640,
+      960,
       1280,
       2000
     ],
@@ -1046,6 +1051,7 @@ window.WORKS = [
     "tone": "#6cbfcb",
     "widths": [
       640,
+      960,
       1280,
       1600
     ],
@@ -1104,6 +1110,7 @@ window.WORKS = [
     "tone": "#7fbebc",
     "widths": [
       640,
+      960,
       1280,
       1600
     ],
@@ -1124,6 +1131,7 @@ window.WORKS = [
     "tone": "#8cbfbb",
     "widths": [
       640,
+      960,
       1280,
       1600
     ],
@@ -1144,6 +1152,7 @@ window.WORKS = [
     "tone": "#68c1be",
     "widths": [
       640,
+      960,
       1280,
       2000
     ],
@@ -1164,6 +1173,7 @@ window.WORKS = [
     "tone": "#6aadbd",
     "widths": [
       640,
+      960,
       1280,
       1600
     ],
@@ -1184,6 +1194,7 @@ window.WORKS = [
     "tone": "#d0e3e8",
     "widths": [
       640,
+      960,
       1280,
       1600
     ],
@@ -1260,6 +1271,7 @@ window.WORKS = [
     "tone": "#69bdcc",
     "widths": [
       640,
+      960,
       1280,
       1600
     ],
@@ -1299,6 +1311,7 @@ window.WORKS = [
     "tone": "#7ea0b7",
     "widths": [
       640,
+      960,
       1280,
       2000
     ],
@@ -1319,6 +1332,7 @@ window.WORKS = [
     "tone": "#6baebc",
     "widths": [
       640,
+      960,
       1280,
       2000
     ],
@@ -1339,6 +1353,7 @@ window.WORKS = [
     "tone": "#6ca1bc",
     "widths": [
       640,
+      960,
       1280,
       2000
     ],
@@ -1359,6 +1374,7 @@ window.WORKS = [
     "tone": "#6cbcc8",
     "widths": [
       640,
+      960,
       1280,
       1964
     ],
@@ -1379,6 +1395,7 @@ window.WORKS = [
     "tone": "#9fdcdb",
     "widths": [
       640,
+      960,
       1280,
       2000
     ],
@@ -1399,6 +1416,7 @@ window.WORKS = [
     "tone": "#eae0cf",
     "widths": [
       640,
+      960,
       1280
     ],
     "year": null,
@@ -1436,6 +1454,7 @@ window.WORKS = [
     "tone": "#6f9ecb",
     "widths": [
       640,
+      960,
       1280,
       2000
     ],
@@ -1446,7 +1465,7 @@ window.WORKS = [
   },
   {
     "id": "sin-titulo",
-    "title": "Sin título",
+    "title": "Postal de Londres",
     "description": "Londres en un solo plano: Big Ben, el London Eye, Tower Bridge y un bus rojo, apoyados sobre la bandera.",
     "image": "assets/works/sin-titulo.jpg",
     "thumb": "assets/works/thumbs/sin-titulo.jpg",
@@ -1465,7 +1484,7 @@ window.WORKS = [
   },
   {
     "id": "sin-titulo-2",
-    "title": "Sin título",
+    "title": "Entre dos",
     "description": "Dos figuras blancas caminan hacia los bordes y dejan en el centro un estallido de rosa, naranja y verde.",
     "image": "assets/works/sin-titulo-2.jpg",
     "thumb": "assets/works/thumbs/sin-titulo-2.jpg",
@@ -1475,6 +1494,7 @@ window.WORKS = [
     "tone": "#bc7177",
     "widths": [
       640,
+      960,
       1280,
       2000
     ],
@@ -1485,7 +1505,7 @@ window.WORKS = [
   },
   {
     "id": "sin-titulo-3",
-    "title": "Sin título",
+    "title": "Esperanza",
     "description": "Una familia en blanco y un globo con forma de corazón. En el globo se lee hope.",
     "image": "assets/works/sin-titulo-3.jpg",
     "thumb": "assets/works/thumbs/sin-titulo-3.jpg",
@@ -1495,6 +1515,7 @@ window.WORKS = [
     "tone": "#c17f85",
     "widths": [
       640,
+      960,
       1280,
       2000
     ],
@@ -1505,7 +1526,7 @@ window.WORKS = [
   },
   {
     "id": "sin-titulo-4",
-    "title": "Sin título",
+    "title": "Omnia vincit amor",
     "description": "Una familia y un perro entre el color. En el lienzo está escrito omnia vincit amor.",
     "image": "assets/works/sin-titulo-4.jpg",
     "thumb": "assets/works/thumbs/sin-titulo-4.jpg",
@@ -1515,6 +1536,7 @@ window.WORKS = [
     "tone": "#8ebfcb",
     "widths": [
       640,
+      960,
       1280,
       2000
     ],

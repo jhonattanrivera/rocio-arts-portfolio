@@ -25,35 +25,39 @@
     }).join(", ");
   };
 
+  /* El orden importa: loading, sizes y las <source> tienen que estar
+     antes de dar src. Si no, Safari descarga la imagen al instante
+     (sin esperar al scroll) y en JPG, y luego otra vez en AVIF o WebP. */
   window.artPicture = function (work, opts) {
     opts = opts || {};
     var pic = document.createElement("picture");
     var avif = document.createElement("source");
     avif.type = "image/avif";
-    avif.srcset = window.artSrcset(work, "avif");
     var webp = document.createElement("source");
     webp.type = "image/webp";
-    webp.srcset = window.artSrcset(work, "webp");
     if (opts.sizes) {
       avif.sizes = opts.sizes;
       webp.sizes = opts.sizes;
     }
+    avif.srcset = window.artSrcset(work, "avif");
+    webp.srcset = window.artSrcset(work, "webp");
+    if (avif.srcset) pic.append(avif);
+    pic.append(webp);
     var img = document.createElement("img");
-    var list = widths(work);
-    var mid = list.find(function (w) { return w >= 640 && w < work.w - 1; }) || list[0];
-    img.src = asset(mid && mid < work.w - 1
-      ? "assets/media/works/" + work.id + "-" + mid + ".jpg"
-      : work.image);
-    img.srcset = window.artSrcset(work, "jpg");
-    if (opts.sizes) img.sizes = opts.sizes;
+    if (opts.eager) img.fetchPriority = opts.priority || "high";
+    else img.loading = "lazy";
+    img.decoding = "async";
     img.alt = opts.alt || (window.artAlt ? window.artAlt(work) : work.title);
     img.width = work.w;
     img.height = work.h;
-    img.decoding = "async";
-    if (opts.eager) img.fetchPriority = "high";
-    else img.loading = "lazy";
-    if (avif.srcset) pic.append(avif);
-    pic.append(webp, img);
+    if (opts.sizes) img.sizes = opts.sizes;
+    pic.append(img);
+    var list = widths(work);
+    var mid = list.find(function (w) { return w >= 640 && w < work.w - 1; }) || list[0];
+    img.srcset = window.artSrcset(work, "jpg");
+    img.src = asset(mid && mid < work.w - 1
+      ? "assets/media/works/" + work.id + "-" + mid + ".jpg"
+      : work.image);
     return pic;
   };
 

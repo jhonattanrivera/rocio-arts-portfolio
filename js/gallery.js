@@ -1,4 +1,4 @@
-import * as THREE from "./vendor/three.module.js?v=20261110g";
+import * as THREE from "./vendor/three.module.min.js?v=20261112c";
 
 /* El jardín: una exposición al aire libre.
    Un pasillo de losas entre setos, flores con los colores de las obras,
@@ -113,15 +113,24 @@ function boot() {
     return root + path;
   }
 
-  function texUrl(work) {
+  /* La textura usa el mismo ancho de siempre: el 960 es solo para la cuadrícula de Obras. */
+  function texWidth(work) {
     var list = work.widths || [];
     var chosen = null;
     for (var i = 0; i < list.length; i++) {
-      if (list[i] >= 600 && list[i] <= (low ? 960 : 1300)) chosen = list[i];
+      if (list[i] >= 600 && list[i] <= (low ? 960 : 1300) && list[i] !== 960) chosen = list[i];
     }
-    if (!chosen) chosen = list[0];
+    return chosen || list[0];
+  }
+  function texUrl(work) {
+    var chosen = texWidth(work);
     if (!chosen || chosen >= work.w - 1) return asset(work.image);
     return asset("assets/media/works/" + work.id + "-" + chosen + ".jpg");
+  }
+  /* La misma imagen en WebP, más liviana; si el navegador no la abre, queda el JPG. */
+  function texWebp(work) {
+    var chosen = texWidth(work);
+    return chosen ? asset("assets/media/works/" + work.id + "-" + chosen + ".webp") : "";
   }
 
   /* Texturas pintadas en código */
@@ -1089,7 +1098,7 @@ function boot() {
       });
       glows.push(glow);
       pickables.push(box);
-      queue.push({ url: texUrl(item.work), mat: art, x: item.x, z: item.z });
+      queue.push({ url: texWebp(item.work) || texUrl(item.work), fallback: texUrl(item.work), mat: art, x: item.x, z: item.z });
     });
     posts.castShadow = true;
     posts.receiveShadow = true;
@@ -1181,8 +1190,13 @@ function boot() {
       if (note) note.textContent = loaded < total ? ui("hanging", "") + loaded + " / " + total : "";
       pump();
     }, undefined, function () {
-      loaded += 1;
       inflight -= 1;
+      if (item.fallback && item.url !== item.fallback) {
+        item.url = item.fallback;
+        loadOne(item);
+        return;
+      }
+      loaded += 1;
       pump();
     });
   }

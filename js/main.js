@@ -750,6 +750,7 @@
     photo.classList.remove("is-loupe");
   }
 
+  var preloads = [];
   function paint() {
     var work = cycle[index];
     if (!work) return;
@@ -778,11 +779,12 @@
     viewerAsk.href = wa(askText(work));
     if (mode === "room" && room) room.setWork(work);
     if (compact) window.setTimeout(frameRoom, 60);
-    [-1, 1].forEach(function (dir) {
+    /* Precarga la vecina en el mismo formato y ancho que usará el visor,
+       para que al deslizar ya esté en caché. */
+    preloads = [-1, 1].map(function (dir) {
       var neighbor = cycle[(index + dir + cycle.length) % cycle.length];
-      if (!neighbor || !neighbor.widths) return;
-      var pre = new Image();
-      pre.src = ROOT + "assets/media/works/" + neighbor.id + "-" + (neighbor.widths[0] || 640) + ".jpg";
+      if (!neighbor || !neighbor.widths || !window.artPicture) return null;
+      return window.artPicture(neighbor, { sizes: "(min-width: 980px) 66vw, 100vw", eager: true, priority: "low", alt: "" });
     });
   }
 
