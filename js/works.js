@@ -23,6 +23,7 @@ window.WORKS = [
     "h": 2000,
     "available": 0,
     "tone": "#d0aeab",
+    "blur": "7.sp+up6azmr/TwJeg43l00YKFk8LgmqKXmZqQkLC4fKrEwoiVtJ+oxJiWgJWyr5elpKCeoJ+sx3+HurLLpJOrfZS4roWKtaKQw4eMvpWWtpGSiK7YknqQdJ+8lZKrlX2Lh4+qooOKn6DGbn+nZICrcpnGk4yQrYaOtX2JnKK+fo24b5zMeJ/HpK3BkpCcd4i7Tn3lmnWXdoi+m4uemKa4iqTCkY+Yg5DR",
     "widths": [
       640,
       960,
@@ -44,6 +45,7 @@ window.WORKS = [
     "h": 1734,
     "available": 0,
     "tone": "#b0beb8",
+    "blur": "8.c8eedMqifNCpf9OzjNKmqs+IksaAd8uUkp91dKCQea6XYLiMcbyMlbx8caF7WapseJeYooWmvpeZg5t3ZoiLuYRadYyWVIlogI97oIGKhHt5fndmjoSRU2tiU2xbbm+AhX6No56qOGthU3yKUIp9PW9LVH16a5OYtYZOr4p7iZCZY5O3SmiIZIiWpoqLfoBgK4eBU5N9ZG6XdYOzhGmLPIV/Vm1tLE5e",
     "widths": [
       640,
       960,
@@ -64,6 +66,7 @@ window.WORKS = [
     "h": 1210,
     "available": 0,
     "tone": "#bebaae",
+    "blur": "8.0LWazrOe2Lqp28it38u249PAyLun0K+UpIiBZYd5p3FZuaFOyplSvYF+fI51g4lNhoubl4hRk31GgZZ/hKWA1pV9molvko9inXM9Z19fb28+a29Vh21Wj3yIqY5Ql3dce2JTSVtVcHlKe0xSfnJLY2RNcGBkYl4n",
     "widths": [
       640,
       960,
@@ -84,6 +87,7 @@ window.WORKS = [
     "h": 1702,
     "available": 0,
     "tone": "#b7c4be",
+    "blur": "8.Qb/AOcXFNsTCKsLBNMHDUsfKRb++Orq5dtDLcczPXsbLTMDJZa3Ghq23fq+yXbS4prKFlsmue8K6dLjHi6m7naa6qrSul5VZjJx3epeCnrmUroSScI1xqY2AsKJrdmpco6eRd3OJrLFFtqGJiG9SnHBpnXKOk3Ztt55SUX1WoaiIi4ZLcpx5pqBczJ9vppFocVZWgHpViY5SjIV1kJCVjoqFoHyAcG01",
     "widths": [
       640,
       960,
@@ -104,6 +108,7 @@ window.WORKS = [
     "h": 1325,
     "available": 0,
     "tone": "#b3c2c1",
+    "blur": "8.Ycisx2l1gpVTdI6WEIO6mZpgr25lVoJocLC9lMXXg7SZUpyvWIq8jrCChKS0doGJmZqzVrDkWL3LW53FbpLBXsi/NI66rY+ysZ1PlrWyjaWdppy10Zepe7KeZIpzhZO6X4uPhZ6tjo1vpKGLmZOEeJmYRX5dTHmF",
     "widths": [
       640,
       960,
@@ -124,6 +129,7 @@ window.WORKS = [
     "h": 511,
     "available": 0,
     "tone": "#bfc2bf",
+    "blur": "8.y8vAzcq+y8e4y8a0xsS6yMW9yMa/wL+0jJqKubm7z8/Fzs3Fz8zGwsfEtrquk6mpiZqFjHZ7jpGiqa+usrOYn4qhoo9+Zm5sfYiGeX10fZGXm5CGm5afiWlgWGRpXmZgZIJzeouBS1F3VXJ+U3J2coJxSFtZUW1Z",
     "widths": [
       640
     ],
@@ -142,6 +148,7 @@ window.WORKS = [
     "h": 1101,
     "available": 0,
     "tone": "#b4a8a3",
+    "blur": "7.YBE3fxJLqjVvxW1v1JCD3aKt5ZuuY1dFcEBJs0ZywU5y02qF0GWO1FyKTWFqi2tOmWhJwmliwWpmy2poqnRgTWBZUk5QNVVIam9RmZE9em9sbm5wUUUye0w+dVxRi3lDo4JFjFY2bW9nVEYzUEg8cVgrpoc9fVlJW1xXa2QwgGI2a2ptZlkvbGsde25FgF08lWc6ZlBSX2ZZSUknWlJQU0g0XVpdflU1",
     "widths": [
       640
     ],
@@ -160,6 +167,7 @@ window.WORKS = [
     "h": 1727,
     "available": 0,
     "tone": "#b7b3b0",
+    "blur": "8.I1uew2lmOXyO+DZWZZRVx2e1zV+pOmioN2Guvmx2XnmLxF12XKqBwZmhpJB0V25ma3CYi4Kze4lgO4WeooyRupJvgIZhtmlYdF1Sg6OdbKpeLYmN1XOGsI+JeZ6hmmg8jTg7s3l1p5pxgYprkZpnmaqWmLGdinZBelhwc3GPk21KsWZEu4xigJaHg2JTzU5LgVxebnOGoHVTxGlEeXBpa3pttmZ3jGNI",
     "widths": [
       640,
       960,
@@ -180,6 +188,7 @@ window.WORKS = [
     "h": 1180,
     "available": 0,
     "tone": "#cdc9c2",
+    "blur": "8.l5GH08ChtrSzzci+ysGlmp6pqqiYsqmjinFxu5ONuZ2QsauUsK+UvZCFmJOVnZ6NkpOJv5qGy5yKw66RxZ17nYtvp5Z7sqCMs6mRy62KpLmoubqUmJ+ahqKTvK6HqpqUqJSFybWUt7aivbKlxaydra2emZmOnJSR",
     "widths": [
       640,
       960,
@@ -200,6 +209,7 @@ window.WORKS = [
     "h": 1783,
     "available": 0,
     "tone": "#a8baba",
+    "blur": "8.QoI/Sn8zQYx2BXeiObzhU4OqQWRwJHIiVYmMYplrUZinEoa2PMLsXpXCWWqHGXYanV6hhKjOjo7Im32QLo5Va5PEX3+JSIJVuI+6mbWffZGYPZJbPYdOVH6wcIiMooR6pLnEyKy8TqCdSsHFP4WhVYCgdoKV7qPFipmyoJ+rY6TFWL66V4Z5ZIV2WndqZ3+ncX+Mcn6CdHqTZXyFYnZ1b2R3T3JqX36f",
     "widths": [
       640,
       960,
@@ -220,6 +230,7 @@ window.WORKS = [
     "h": 959,
     "available": 0,
     "tone": "#babdb7",
+    "blur": "8.f56deKulZKetX6WoYJqoXp+gV5GZa5CLlo99rKKChYCDdpSCjoWDqpJmkpGNhX5ogZB3p4hzn5ySkJVplZpnhZiNf4NooIWJiIuDk3yAlYqCnXNytI92b4FknHJtfHhZ",
     "widths": [
       640,
       960,
@@ -240,6 +251,7 @@ window.WORKS = [
     "h": 1545,
     "available": 0,
     "tone": "#b2b4b3",
+    "blur": "8.KqiaRnxbxElCxV9gMGBxe2BlZ4lcIZV/qXyBWIZtmXRvr3d/MW6D1HVsd4JBh0tSaH+jr4lsXn+agqCjSomUpqKccohzjTZSTnmqtZqPsoGMbn6FqYqKn5CbhYuOgX59goKFY6G+gnJyg4eRZ3hjin2djo+MtX6CiINUbIqXcGlgj1lbOXdodGiUeZB1g3hh",
     "widths": [
       640,
       960,
@@ -260,6 +272,7 @@ window.WORKS = [
     "h": 1118,
     "available": 0,
     "tone": "#cac3bd",
+    "blur": "8.1cCuw72gy8ST08qf1s6tvsGiwaqWzMKbuaKYt5+bwK6Zsq+NtaWQuqeNrnyDiYp7pY2MtoiLopuKmZeIs5aMuZWJnIt6r4Z9nJeKno+AnXt2upKDqYWDnoGHqHBuhnRnl36AeYR0mm1qinVrmoF9dWlch3d0eWte",
     "widths": [
       640,
       960,
@@ -280,6 +293,7 @@ window.WORKS = [
     "h": 2000,
     "available": 0,
     "tone": "#b1b8b8",
+    "blur": "6.Ln+iloCGhp+wbaOLs7BPSZI6xKqciaGhc668e6aTnKhpk31xnqSqWqGgN6S9sIGfdoarS6OxZ3+XbqSlLZS/yGeXmIWplqNkfZybb5uTVVuDy4uvmnObgmZtfZ2wYrK8XnjEkY+cb32BlWBjkoKRi42bjYCteYKNcoKPgGpYe296gJCLY1xgZFVaYWRpbnBn",
     "widths": [
       640,
       960,
@@ -300,6 +314,7 @@ window.WORKS = [
     "h": 1745,
     "available": 0,
     "tone": "#a5b8b4",
+    "blur": "8.Y6yuQtDTPtLTO9DLKdDLKczHPbu4eFhIY355bbLAcp+WP9fRN9TOTLu7Y46dmzpHVo2KjWt0Z4p+PJyOSaSNXYNpZ32ATFtvdHdoVIBrX4h1gG6HZo6PRZp9U5GOVFViWYRqZpBjZH5wNXyNR4heTYBnRHdiilFUeY1znmpbX4JGYntojmZzXnRzYopgN2pBMIh7XnJoXIF9gGyGPW1Zf4R2WHdWfHJg",
     "widths": [
       640,
       960,
@@ -320,6 +335,7 @@ window.WORKS = [
     "h": 1091,
     "available": 0,
     "tone": "#b1bbbb",
+    "blur": "8.HI6y1F52835PmIGKGq2r+FdbsWxdBWuHYnOlnJKubZ2igomFvle2nX2aV4+aKoymFH+lg6nFfZmXgaWKeX+xeo+hXKl4VYWfTnxrhGxPdoZ+XZl5cYF8k5WEf6GEjXtT",
     "widths": [
       640,
       960,
@@ -340,6 +356,7 @@ window.WORKS = [
     "h": 1335,
     "available": 0,
     "tone": "#b6c8c5",
+    "blur": "8.Y8nEWLquatnrY9b2Y9X3XtD2WM/qV8rZWKSUR6mNbNvtXNn4Xdr7Ztb1XMjmTsXRgZeAr4abecvYTdPyzr65xpyvnLq1lH9bcJZzsoJek5+LY8GysK6ivaKer6ZswYF7tItyo6RvrJGBcaySUqKBa5Z9ipmTi4+NaoFel7CUX5N4fqKvaYeYN4KThXhbbIdSWn9ZhqOSeJV7UpWFfIuDhpRpa2dmUXxd",
     "widths": [
       640,
       960,
@@ -360,6 +377,7 @@ window.WORKS = [
     "h": 1163,
     "available": 0,
     "tone": "#b2b7a9",
+    "blur": "8.QXIHPplPWZGk2YxK/4Ivl5SMM4gjMXMAQ4Qfeqtxh6WlmoZxyG8sxXdvS41Fg5MlN3Ysg8Kal7CyGpqVPXgUqmhKZoh/jbauPG8bkquFkZOAIZy5OMW1qYNtnolngJ+cfIFShYlwql5HlVNuuZZ8p59uI5Co1Uxgc3VTmGFkzVqBs3JspY93mqp/GZa3p1dqYHJZlWNlk3F3aHBRUnZWXnFaT2xRT2VW",
     "widths": [
       640,
       960,
@@ -380,6 +398,7 @@ window.WORKS = [
     "h": 1413,
     "available": 0,
     "tone": "#bdc8b3",
+    "blur": "8.6N1n8eNM1uJiyOBuxt16tNJ5r9F4qsh1tcWJqcZwn8Z5fsaAhr5+t6dQic54frxniKdkuZh9n655mLyNm86dnKZ7sKxzkJxOjaODt6eCcKqVepp1eZlqk4VYY4RtbodsXaF1fKt8oJFsiJZ+dptvgH5ZVIRdRH5abYZdYXpxaoVxb4liP3VHXXlUOm5LMGxJ",
     "widths": [
       640,
       960,
@@ -400,6 +419,7 @@ window.WORKS = [
     "h": 1738,
     "available": 0,
     "tone": "#a9b5b6",
+    "blur": "8.D1mb0Yg6el0mo4BtbYd5rmc+qnIyAD15NGmrtJhsfnptoIx8eJiLpGhan2lEE1ODy3KYQr/BHJvAQYyuYoyxSYCdVm6GkomrxZ1fTbS5Qn6phZS7g5jBYm9+EYuNapV5+IxYa5WPP5jCe5fXPovhY6/YtoF5d3lgyoqEgaCwT8XZDo3AGW/bQXCaxmJSioCJZYFVfYNSVIhrW4lub29IVnpbYGRNinZB",
     "widths": [
       640,
       960,
@@ -420,6 +440,7 @@ window.WORKS = [
     "h": 2000,
     "available": 0,
     "tone": "#bdbbb3",
+    "blur": "6.k5utqaGenJyKtXhPu518urKQqKOktpyMmoxsfn5yrZh6sZmAe4twkpt/h5iFbHpYfZh3hoV7enRpYoZqdZJlU3hbWX5toYWAvoKRbpSfWG1xU3dytp2hsHp0n4drtYGRbGmXd4mXmqN4vJCEsZR9u5WRsrZeup1Au41SlHtwhYNhiJJ1fZ5QwH1mqn1qelpG",
     "widths": [
       640,
       960,
@@ -440,6 +461,7 @@ window.WORKS = [
     "h": 975,
     "available": 0,
     "tone": "#aabbbd",
+    "blur": "8.asuscKCeVZrMunN9I3qQ1mWHL2d+JY9vVsLBhaiLZaPFd6WsKn6ijHCIKXeLLIeATpK7baS0bKrJY8K7TIqidpaMVZSjU2F1bZGfc5iYmK6qe7O7epqsd46PhGZ/ZHBee4R6lYJ8e497dJBua4J0b3ttTWdjaltM",
     "widths": [
       640,
       960,
@@ -460,6 +482,7 @@ window.WORKS = [
     "h": 2000,
     "available": 0,
     "tone": "#cbd1bf",
+    "blur": "6.bcqt5bC1y4+Wt9h8qd+LhdiXtcKj8MzE68uuxMtj1rdTtMuB68+LwL2JxLuL8MVs7L1I38pd9ulbx8Bdyq9+88JW18Iv168o7fB4cpl5iaeuloub7q0mn86YjqxVUazBbJG/eIurv6+TmNG+gsuIcMvSwoikiIiQtqato7OyguTEZufcmMrImXmHla6wi8O8",
     "widths": [
       640,
       960,
@@ -480,6 +503,7 @@ window.WORKS = [
     "h": 609,
     "available": 0,
     "tone": "#b9bab6",
+    "blur": "8.sn1Kv22ATItfxHGoUXiUfYWk0IaFUaqDmm1WhoCNfZNzfIXDj5SYgaW0na+on6l4lV5WjH2Dp6Ske5W0vY9uqIucpJd4npmee4Rqk4d6hI59U4yJhox4r3J0io5zjqKk",
     "widths": [
       640,
       960,
@@ -500,6 +524,7 @@ window.WORKS = [
     "h": 1378,
     "available": 0,
     "tone": "#c0c0aa",
+    "blur": "8.lqOBoZ54jJhXj4tdlpJsmpdfm49nrZt0h4pri5hrl6FVi6FasaNpkKRmo5tVkZhZgIZMd4dem5Ffp5hXl55Lo6VVp6Rhp6JUlYRGhYtYn5ROo5dMjpxXqJhGuqBlsKtYbHdVnY9OuKZNiIlNq59lmotNrZNer5VZhntOioVXmpFQn4hTnoxNjZJMsJles6Bf",
     "widths": [
       640,
       960,
@@ -520,6 +545,7 @@ window.WORKS = [
     "h": 699,
     "available": 0,
     "tone": "#b7c1c5",
+    "blur": "8.c6mQxoKiMrG7wpNYvoBSYpmbr19fJphZlJmUtrS9c7OyMZveTZTIQqComnp4iZKTopmos7S7gKCqV5rkh57CoIWOdYSahXmUkJ+nkKOre5u8wJKfmJWqjpCrcJWxc3dx",
     "widths": [
       640
     ],
@@ -538,6 +564,7 @@ window.WORKS = [
     "h": 1783,
     "available": 0,
     "tone": "#b7bd99",
+    "blur": "8.fI0xVWsnT2QIbYgwfpZOsrNXppwpbHQAmqxbmKFLc5BOeZlBf55HtKUrjoohWWUIl69VoK1ZjZU+jZ45xa16u5pogogvVmwciKs8pqlulppToK4moZlMjYlNe5ImYX8jkqcyn5Vekp43h6IudIoPcoE2lpAsX4MpgZMnfpAwkY47ho4Yh5wsj5NJhYo8X40xlIcSXXYddYQtZYcZe4cjcn8WbYQqPWgi",
     "widths": [
       640,
       960,
@@ -558,6 +585,7 @@ window.WORKS = [
     "h": 1090,
     "available": 0,
     "tone": "#a5b5b9",
+    "blur": "8.d2tkVWt7SXFuOXB/NWt9RGh2V3WRdXt1Z4F2nayTbJWSXqOzZZandI2CaoChVZuiQW2RXF59e5ynUXyOXo6qTJyvYYqDOpOnRYWqTIKYUnmKL3mHWoKTUo+8dZOhRYSO",
     "widths": [
       640,
       960,
@@ -578,6 +606,7 @@ window.WORKS = [
     "h": 1461,
     "available": 0,
     "tone": "#bbbaa1",
+    "blur": "8.t55Zi4NVoIZUjodorZc9j3FFnYtbgHguqJRlhoxAdHdBgn89lpdDmY1SlZNOrZFApZhWqJ9pi49Kqo1In5JFpJZbhYBIpZFDrptVdoM8m5RHlpBQhn44gZFbgpBPfItUqY5WmpA5jog+npBLoZdLg4FHgIxNnZxQqpVoi449b38te4FTjH49nZdHkpNLqoZY",
     "widths": [
       640,
       960,
@@ -598,6 +627,7 @@ window.WORKS = [
     "h": 1728,
     "available": 0,
     "tone": "#bbb0ae",
+    "blur": "8.X5lhtY9CmYCjr5mO3ngduWFytHBVZIRKnmWXln1b/xtvunCCpXQzuY+VvJBshYpmwmOJeG9UuWiM112cs3p2ZaTDmISB1WF0rW9jV29fyXmj5FKywHmTYZi/Y3mNwk5gP5DDclo342eLu0p4g2wfunWilmh/j15GX4mvqXiDa5t/Sqa0pnAzxGx7jmNNXHxodY9mlI5wcplkcot0gHU3hnRogH1af35E",
     "widths": [
       640,
       960,
@@ -618,6 +648,7 @@ window.WORKS = [
     "h": 1137,
     "available": 0,
     "tone": "#eddd9c",
+    "blur": "8.zSEUymkgz5pB5sNk8M1p9MJPaaCxDJrDrTgr6MFn3K1K9tq29t3D88tquKltL3momkQd8NV0zLJ91cOy5tzQw7ul6MJbdmiRm2c97diP5cqR4sm76tHD3ce359BvYpWGtIlD2b126q6B4LimypyT7M+k59eIkYZKeWlX38aT0b2R0qGi18fDwKF2ysaOoGxAiU1G24lYq551fFNtlWiAgFxUc5WHl1FHJ0ZLWUJPU1VnQVRgY1hxQFhnRlx5UDpw",
     "widths": [
       640,
       1162
@@ -637,6 +668,7 @@ window.WORKS = [
     "h": 1467,
     "available": 0,
     "tone": "#e0bdac",
+    "blur": "7.enq4a4a/qpqltIebrnOXd4e+b47Ed4K5qKGc37CW6LmdxqeZcqW5YaTPeWWieqXNhbjbsqawj8XliZO6mn2nTZrEoZSNyKCM25R5xbOih5qvSpvHemifjXef256FyHVf3KGOZYK6aY26nGODGFW8uYBuz5eCs2p8HofAVKjVSXu5SUaXvZWHxJGOn4yQLZTKoV+HbGKcXVmCm118jWV+U4K6dJK5s1uX",
     "widths": [
       640,
       1242
@@ -656,6 +688,7 @@ window.WORKS = [
     "h": 2000,
     "available": 0,
     "tone": "#eac1a9",
+    "blur": "4.k4KGbY96nYN2WZCUn4Rv35tm6p1ijXt5qbeQyL6OurKLwJKAi5OO6KeC6aV9toN7wXh84otk245im4x+cICnyHBr4odiqm+K5lh0lpKQfo+ft3GPx11wvFtTHGmQs11w",
     "widths": [
       640,
       1112
@@ -675,6 +708,7 @@ window.WORKS = [
     "h": 1733,
     "available": 1,
     "tone": "#9eabb9",
+    "blur": "8.PWR3RmWDOGx5/1mj+FujpTlMX1ZUTERFZ2WBfU1rKIaJno9sunJ3r36I25pNZVJd9WOK2T5eN5uhqKdiT3l+hp2f0aiKmFtnw2eHtj9dpHuAaneQSniQgYGDy01aj1l0fFxmf2eQvqKojoKATDlMkD5Kykh3d3B4n3puXXB8e4qXnmBmgE46SGpei01tp2d6noKChXakgnCdq3mGfHV3fmx5X2F8YmJF",
     "widths": [
       640,
       960,
@@ -696,6 +730,7 @@ window.WORKS = [
     "h": 541,
     "available": 0,
     "tone": "#9fcfc9",
+    "blur": "8.sZugo3VthJmZpZiiU5aRoXprfXN1nnJZoZOTgoZuwqV+i8y7k8O2vrKgj416uXBktKFxsoaN0LiCnLqQlKylq5SUjHl2kG5Wrp2F0LJWnKeTlY+saY+Rj4R2k4pvfnNxh7qxgbazdZecjJyZdpSLh2RilJB7iGx9snlqtGlrkW1xgXhscmRqY09UcWlgWWp1",
     "widths": [
       640,
       736
@@ -715,6 +750,7 @@ window.WORKS = [
     "h": 989,
     "available": 0,
     "tone": "#70abbc",
+    "blur": "8.mLfMl7G4rL+0kKWynKm3hqK5l7vWjavGiKS2mJubl45/h4mDlYeEkJihlrDEpK/HqLCInpl0b3OAlnRwe4mbqX93l62XvMqyipWwa4iJf4B9gHl1j3J5k4JviKWuobfPhqK5faKvgnRxi2pqfXiEi3GHi6++oLzVhpy2dp21eYudkoCAl4N/dIumepm2hqTBH4KoF3SbGWiNioyQkpWjE5a9G6LFIarVOZyvP4+dNXCMLnCHG3mgGn6nLnWXCoyy",
     "widths": [
       640,
       952
@@ -734,6 +770,7 @@ window.WORKS = [
     "h": 937,
     "available": 0,
     "tone": "#6ebbca",
+    "blur": "8.AI+sEZS5Cpe4AZe4A5O6AJS8Mn6GAJu0KYqfIJG0AKLSB5XQBInQAJ/LmVtLTomXkYFofmBdTYCTVXiNDnyyWYacplo+lGQ+r4Rgq2Uuq1EbgFw9jVtMn1c9s18tk14zr5mNnYmApIl3s5V+nop4o4h4q5N9j39pJFqVEVmfDFmfDk2RGlaRCEuMAz2DESlc",
     "widths": [
       640,
       1164
@@ -753,6 +790,7 @@ window.WORKS = [
     "h": 807,
     "available": 0,
     "tone": "#ce7a7c",
+    "blur": "8.1Rkjj1ZTSpOW+0CEuT+IekKNRCiua4ZCpT9CpzY4s1ly1jFaoFJdsVZS1kR/jYAzmkpUokYu0Tk9vlBUoWRa2FpVqnKAxZWNr6ayd1ZldGxp2pqgoXdlz4WVv1l44c3KtaeyhmSDpmty18XEx4uQ25qiq2515MPIl4qKpX+BvZV7tpqcs5iXtZ2kjG97wbe9fHNuinxxv5d7eHV2voaYjX+EqYiatnyV",
     "widths": [
       640,
       992
@@ -772,6 +810,7 @@ window.WORKS = [
     "h": 2000,
     "available": 0,
     "tone": "#cfab9c",
+    "blur": "7.rIe4hp3SdI7CeJXVm3zBlJykgnnKkl6OzZevt7u93qWftoabwnWgqWZ6fIym0LOgwqyV5ZSfxaKXt46KkGabWYOstMamwr+Ou5SAo6iFpp+HXmmJR3mnsZOYzpOEyId4v5CFtnN5YmWKfGV4qm9sxod1qWFWwZeXl2dscHF3j1yaaFmBrG9ctYyTs2JRR2mWfn6yaDRgbVJmnYOMZZvHkKK+ZVV3eXK+",
     "widths": [
       640,
       960,
@@ -793,6 +832,7 @@ window.WORKS = [
     "h": 985,
     "available": 0,
     "tone": "#8ebdbd",
+    "blur": "8.JbK6dK+geqqVUWViUFpWc5+RkrKUpLeVOqettbWL16Fngop9WW1ss6+Wt5NhoK2LULq+b52evKGwhJ6cXIKFh5ecq6GolqmSZLGyoKGkr52iiamieZCHZZ6Xr41/aKmdZZGSwMDMwb/Ih5Wao6F+tqx40aVWtZ1fdZ2umKWvmp+miZ2ko5ZqrpReqIZLnoJLQWh5SVRiYoSQUm10Z3twamhSbXVaY3FVcHyPf4OGW2l5eHd2a3mJbHF2Wml0T1ZY",
     "widths": [
       640,
       984
@@ -812,6 +852,7 @@ window.WORKS = [
     "h": 450,
     "available": 0,
     "tone": "#ae9c7b",
+    "blur": "8.v6yPspZnrX9ItYE7rn9LkX1qvaBvyLuoinNTdFM/fk46bUg+dkUrZFBVbmNpraOahXhegm1fhm1Oi3pqmHpkqZR5joh+o6KW",
     "widths": [
       640,
       1036
@@ -831,6 +872,7 @@ window.WORKS = [
     "h": 1334,
     "available": 0,
     "tone": "#6bd0c9",
+    "blur": "8.FMrKk5WetFlmxomR5Ftz1lFR61lICIawr45wtJtzhJZ2opOjnmt/wrmHt3tad4N1omVgp8Mqzqx9jau0cpmtr8S1LLyugISNjmZQe4t5qqScoriwfpCXtci4YcKcklpZVFl3jX4ScrqwjsS8pWFT1bKqfoGZUWyLm4YVh5owoJyBp7SnoJV/yXFifW5rgZ2eYVxmi0s9oIx9k6KeoqaAjGhmV4NIcnhc",
     "widths": [
       640,
       960,
@@ -852,6 +894,7 @@ window.WORKS = [
     "h": 991,
     "available": 0,
     "tone": "#67ccda",
+    "blur": "8.AKv1AK73AK3xBJfMSW18AHyrJHqkDHecH6/nHqriFZG8LJG1A5CwRJawqJaOo4d2AMjtAMfwN8PifL7KobCoq52Km1pDp25IjpieoIOKr1JPsGFRmDk3gVVUcCwriUAx",
     "widths": [
       640,
       960,
@@ -873,6 +916,7 @@ window.WORKS = [
     "h": 1024,
     "available": 0,
     "tone": "#727b87",
+    "blur": "7.orzdpr/fobrcjanQgaXOb5bDbJXCp77aobjQuZ+LloeIqI6EcIymZoy0m7rSpZWFkGxDg2hWoG44mnRcZ4WpoL3QrJVqmn9NrHQ4lWFCjG5NaYWpscPUqJiBem9Nh3BHo3dKZXKEXHmgt8jXpLbGbHJua1xFXFxrUm6UWHWbc4CNXXCBb2hql4NwQUhZKD1aKj1bLj9eLzZPHSxEFidAGDNXHjBJFydF",
     "widths": [
       640,
       918
@@ -892,6 +936,7 @@ window.WORKS = [
     "h": 658,
     "available": 0,
     "tone": "#6cccce",
+    "blur": "8.GLrFHLS8AMvbANPlANbfAM7jAMvnAMXbTaKgdoeHAMHTAMTiAMDXAMXPAMnYALzNZ4OEhnhxIJahAK/BAK+5ALW5A77OALDCkGpdh3Bfom9Zi3deeXNrWn58YHV4OnyKfGFphWFad29ahWhbbmpqc2tmVWVzAH6YiWRKhnBVSWxzAIWTAISWAIySAICSAIWX",
     "widths": [
       640,
       954
@@ -911,6 +956,7 @@ window.WORKS = [
     "h": 538,
     "available": 0,
     "tone": "#6fa0a8",
+    "blur": "8.TmiHo2qLmp+hbn2JvmKDpKeWWnJ1BW+It5ZvcIqUoZOXP3yVUXyTnJyqi3N9mYdzXpmXdJSjgJ+lYKmjlYybq4ymbHeMppKdc2FicZKbn4uPcnyBkHWNeYSLh3uDdHRY",
     "widths": [
       640,
       1024
@@ -930,6 +976,7 @@ window.WORKS = [
     "h": 1033,
     "available": 2,
     "tone": "#6caab9",
+    "blur": "8.7yRb9RdUTHlqpmNkpmBvzIk1Rnp+EXB/vEpd3mdAPXqXlpSeeoOYlYuNEHiaAG+La3Z0g3CHgGl0ipKeXoOkjGt+jmJ+e25zY19bgl94cl5wi2FdVGt4h3KBem1+g1Zn",
     "widths": [
       640,
       960,
@@ -951,6 +998,7 @@ window.WORKS = [
     "h": 903,
     "available": 0,
     "tone": "#bdad9c",
+    "blur": "8.u8DItrKxxr2xyMrRx8vWw8TCoai0y9HVt6qxy6RuyK+Bz7m1vrSxcYKLjHh2t7S4urq7sYdmqpF9sJGMm4x3aHR1gX14x7+8wL27ooZrnIZfmH15oHRmg2pnnnJjwLa5",
     "widths": [
       640,
       960,
@@ -972,6 +1020,7 @@ window.WORKS = [
     "h": 712,
     "available": 0,
     "tone": "#8cc0cc",
+    "blur": "7.wXNkxXaN5ZZ66JSR/3t9/19nmrG802NVy3Zo0ZSF5KuH9Z+K3H15r4aNnWV+p6OmscbHzayWyca+v8XJzmaGqYWHgKCnb7W/3amVequ5erzLeIakxUljz4OB35+M6bKg8qSS04SGsG+as2Z2gIOX2JSG0W9yyJuWfoujmZ6k1DlWaXmMlWNqlYSPfWh1Q6bHy2KCjmt5c2yCuIKCg4WGenNcpo+IsGiQ",
     "widths": [
       580
     ],
@@ -990,6 +1039,7 @@ window.WORKS = [
     "h": 1730,
     "available": 3,
     "tone": "#6ca9cb",
+    "blur": "8.OIO0JYC2Z1B9jF9fwYBSjoKNJHi2F3O2JpbKP5CrdnJZnpuTunlxiZa1AHzUAHXIKr+5Oa6clZ9xdKSgfperkrS3ZXqEInaIVnd9YIeRe46PX4+hhrq2gsK4qYdev1FzYXaPsVtyz45vo6GknVlWgYSWVVNgTXyIX42LzlJKkIONkI5ttYRQg2tza3k7WGN7Q2xoeGhsU2JulllAh4c5NnVUanRjKVRa",
     "widths": [
       640,
       960,
@@ -1011,6 +1061,7 @@ window.WORKS = [
     "h": 788,
     "available": 0,
     "tone": "#abbcca",
+    "blur": "8.a5i+aZa/kYWet3qks4+njpulhLnVaMTofJrDioaxvJuYU7bTgLfWj7G8gMLRbMjiy6aMTIuNrsbLi4e0h77WU5OVZ7vAja6xnWyQZGyJtK7KeaTJjdjmVk+EkVx9aIudlHGkpIGRk6+zSLS5WqaqWX24nZq6fKrSdipwlHtkdHyIUEtoTWOedG6wjWqsQ2+6",
     "widths": [
       640,
       1024
@@ -1030,6 +1081,7 @@ window.WORKS = [
     "h": 624,
     "available": 0,
     "tone": "#6daabc",
+    "blur": "8.dJqSoauEa5SvpkqEqZeCqHh5glp7b3+JV6K8YKa0YpO0V3a8FXfAdoGtapK6WmF+cmafh5/BfbbRQXGvHIi5d4Kahaa4fVl+R2qKmJOYYbHMcanGYpOsb6/Ag6SrY2ZjbXqcfoOUdKeaiJ6rfoR/bHNuXXl9clh0",
     "widths": [
       640,
       1024
@@ -1049,6 +1101,7 @@ window.WORKS = [
     "h": 975,
     "available": 0,
     "tone": "#6cbfcb",
+    "blur": "8.6SdxHZjHTZbLl5XJqGZ6tkh2PXW1Eqq2jYC5n155rbzedJ7OoaiiiIy7vFJ8nbdRk4R5g3mkdrvsT77cX6rLDYGvzTkvMneo1UNCfGmca63aj7ugWZqsAD2hfI91Z3ShryVEjkJcP4ehu6knKmqTH0J6ApavAKe9",
     "widths": [
       640,
       960,
@@ -1070,6 +1123,7 @@ window.WORKS = [
     "h": 643,
     "available": 0,
     "tone": "#80d2d7",
+    "blur": "8.LdDiIdHjHNHjDsndDcTXDcHSD7rKEbjIO8PUN7bLFsrgCs7jGNDkF77QIqCxHaKyfYaRbm2HW211R4iZYZGbdY2KTmp4V1tsb3B9e3V+k3ZxYWx0ZVlenW87iWQ0d2JOTkFybUNHX2poTlBYeUxHk2E5jl01g11R",
     "widths": [
       640,
       1030
@@ -1089,6 +1143,7 @@ window.WORKS = [
     "h": 782,
     "available": 0,
     "tone": "#e1ca9c",
+    "blur": "8.llsauIxB2qIx4KtE6Llk6bVS36U6yYwpimdGm4xz38CE38ys69e9576F4qdH0ZEuXE5iW1xxYXSUXHGaaHqdb32WuJZjy59HXFNpY1hqkI5/rqeOu6qO17Z86MBy0a5iYV9yYl5tmoNWv5lI0ahg4LVe265SxKZf",
     "widths": [
       640,
       1170
@@ -1108,6 +1163,7 @@ window.WORKS = [
     "h": 884,
     "available": 0,
     "tone": "#7fbebc",
+    "blur": "8.DbTBKKi02Fxmv2d5Uom2nmliLKqgIZ6UVZaegoaEYYpzfJSsbJyou3RseXWEI3mWimR0x3aJYJqyVYaTgouaXpOakHCBrzpQW4NflXhkum9oYH1Cb25Gk01Tc1tAWGJX",
     "widths": [
       640,
       960,
@@ -1129,6 +1185,7 @@ window.WORKS = [
     "h": 1340,
     "available": 0,
     "tone": "#8cbfbb",
+    "blur": "8.mIhqj39rk2RhQDs1RoNwfHqCqKehrHJqn1l6r3VfkH1912J+wYxRwpaJq56VQWp+XJeKkXhkc4ZseYuVt36Axp59v6KkKXl3upahkZF1vXFdoHZ9jnyQqJKTrYuNj4p8omVduEw103RpzJSYsoOBn3Bl05qbxoaCfVVQUWNabomdlaejm2xvm5Zzs31oSFRkb1ZVSGhkioCZf4F7nkVGU4temWNXPTss",
     "widths": [
       640,
       960,
@@ -1150,6 +1207,7 @@ window.WORKS = [
     "h": 1233,
     "available": 4,
     "tone": "#68c1be",
+    "blur": "8.V3k8UXI2gYuL91uZnUp3dnF6h3wtJWEmVHlCkIBjp41vMoCVK4+clY+SuHdkZ10nQpecwXBzfYyXP5SuJ6eweLG8uYCURXCQgnaHfpOOi4CKd6KSeqehfZ2jz2hqdnqLXEpeXG2AclhecoZpZ4lrVnB4XEFnbVJe",
     "widths": [
       640,
       960,
@@ -1171,6 +1229,7 @@ window.WORKS = [
     "h": 1048,
     "available": 0,
     "tone": "#6aadbd",
+    "blur": "8.ytzflL7Jlr7Dnr+9lLvDm7u+rbO3w9LYo77QFY+uLaG5EJW6b3yEkGpSanR+ta2mo7zOBoStBnypSH2gg2ZJOnqhHqTPlcjds7i4VmluUGhwWm5xUWNnX3+DYXaBqK+1wczMip6ljqSoi5+jl6WkkqOokaSqvsPG",
     "widths": [
       640,
       960,
@@ -1192,6 +1251,7 @@ window.WORKS = [
     "h": 886,
     "available": 0,
     "tone": "#d0e3e8",
+    "blur": "8.rN/0veP4weP1t+HzweTzxeDzwN7unOH0iLPIg5y9e46fgqbGhJ6zhHmcmX6ettLnkaa9bnOZdnyYWYitaIKlg3SefnigncTam7rMWnymfIWfV4exXoqne3uagoeloNfr",
     "widths": [
       640,
       960,
@@ -1213,6 +1273,7 @@ window.WORKS = [
     "h": 959,
     "available": 0,
     "tone": "#df807c",
+    "blur": "8./0hJ/0VJ/0FB/y8r+SMg+h0d7x0c9hsc/0pP/0tS/0dL/zMw+yQf/B4c7SEd4SIcrndpvGdkuGldq1Y+xyod0R0auzYhozompJt4jYBvkIR3eFpPW0I5bD05dldFeE5Inpd0dVVafGpfTV5fSk9ZRkhPblo+d2FNloSKeVN/aWB+VFNcPlJqQzxeXkVFVk9LTkmWdG2KR0mTd2ScXVeYVD+UYltxRzp1",
     "widths": [
       640,
       1156
@@ -1232,6 +1293,7 @@ window.WORKS = [
     "h": 424,
     "available": 0,
     "tone": "#6dc0c9",
+    "blur": "8.d4rTYnG+qmXHs4OHsKRNfYyjcsO5ZL64dJLBZpbAmY6piZapYoGMeYlvjLKQX6eRcpipIpawbpmgkam4jMfUfpmRapRJfp1LlaOQbKB0a5dUtmtywqljbY+QCKG3Y4OMZJODW7ywVKCIN2VkRXNdTFg6VHlmcnOA",
     "widths": [
       644
     ],
@@ -1250,6 +1312,7 @@ window.WORKS = [
     "h": 596,
     "available": 0,
     "tone": "#aecd69",
+    "blur": "8.WnVKR29UrZJW7Es4mnh5aKEAgL0AeccbZn9qXbKrtbOoyFVR5k5oTJ2TgLYRltIkkp5zeru3fbCmrIuMzoqqhK2dWmWlXGK/uZN3faavd4WCspGgzZav0ppxcrzDnLy3MHV6eIFacW49aII+ZpFwooOfV4R1ZGxP",
     "widths": [
       640,
       934
@@ -1269,6 +1332,7 @@ window.WORKS = [
     "h": 844,
     "available": 0,
     "tone": "#69bdcc",
+    "blur": "8.MLbJO76/roGERKLWi4eypmdOHsbQMMPGAJbEG6e6kaKvFqHPCpLCl5apcKCgQoypq1+DqFZS5IqlZaO0TJi1iKe9in2O3ldznFJVlIONmJGWVnNdVXNboY2XglBNgHJx",
     "widths": [
       640,
       960,
@@ -1290,6 +1354,7 @@ window.WORKS = [
     "h": 415,
     "available": 0,
     "tone": "#6c99a8",
+    "blur": "8.QLG8rI2ydInSdeD7atv0Oa62OoSgJG2KIJfXjW+oUWyNZsjpVJLORbnRJ2iMDVuD44xrppiKZ4GRpDlkWW28ur2QrHJUhnSLf3Kog7OkP2yid6GvcHOnvWmLPlF0AXug",
     "widths": [
       640,
       920
@@ -1309,6 +1374,7 @@ window.WORKS = [
     "h": 934,
     "available": 8,
     "tone": "#7ea0b7",
+    "blur": "8.MXKfJ1+IZSw9aW+MRmd1r3KoHm9SZY+Iz4bBnYXBQpiZUomecJCjh3euNG+ST3WNl1hobGiIUHiEVHaOfZGjqXujMHylu5ezklZvmHePgnSMWFiOammnlFCCjVNylzNf",
     "widths": [
       640,
       960,
@@ -1330,6 +1396,7 @@ window.WORKS = [
     "h": 998,
     "available": 0,
     "tone": "#6baebc",
+    "blur": "8.4X+SjX98l4dj13Nax1hFooh+XWx3Im+L2JOhq4Vmg1FL2U1dwVlroH5dqnaONnKeo6+4bXGKql5Iq2tSgoKDxklOrlZsAISgfGJ0mVRnlj0/qWhNk41cllhNdFtUj1tx",
     "widths": [
       640,
       960,
@@ -1351,6 +1418,7 @@ window.WORKS = [
     "h": 1045,
     "available": 5,
     "tone": "#6ca1bc",
+    "blur": "8.dqihwIiXiGhwaFuHpm5wx2JfSn55WG1ipaujsq2lY5iPVXicYWh/fG+CdXSFkXOAm4SMlnN0n2Jwrlh2jW1+eWN3t2mLZVJmgWhde3N6RXiBa1Zzl2RzVWFuY2BqX19t",
     "widths": [
       640,
       960,
@@ -1372,6 +1440,7 @@ window.WORKS = [
     "h": 2000,
     "available": 6,
     "tone": "#6cbcc8",
+    "blur": "8.AIOnCXucG4eiCoWiCIupBoupEoyrDoWkAJm9AIGhApu1AJq6AJ/CCZy9B5m9AJW9NJGrF6W+E6zFAqzJAK3PGqnOJ6LDNJm7inV0a2x9d4WRZIuUOpGrcZakXXBqcUthg3hVgGBvknl0X3iCeXx7j3SEel9Cemxon2tPZ214hISSfYpfdXeJhlpebI2CZnd1SmNueH6FeIiJjIx5SWByinuQMmZ6YX2IPWJoOYKKSWJxblVcaGxzVGlxPFxpPnuI",
     "widths": [
       640,
       960,
@@ -1393,6 +1462,7 @@ window.WORKS = [
     "h": 1339,
     "available": 7,
     "tone": "#9fdcdb",
+    "blur": "8.ZpGecZCRja2wYYWSa56atop4RYWGRZKjdoaAiZeXd7S8XJKpi7zCWre5d7SlrMjQWsa9abHCk5SJSLnClqKocbG5dXOYa4BloKyDlqS1gpvFZMW4ZZ/Ge3NzuKiRR6i4fr+EecGzVKfAX3Vjc09Wb2dXmoWNQ7TT",
     "widths": [
       640,
       960,
@@ -1414,6 +1484,7 @@ window.WORKS = [
     "h": 1600,
     "available": 0,
     "tone": "#eae0cf",
+    "blur": "6.482w6di46Nax7Nqz69m459Kw4cyv2s+z1Na7zb+X7Nu56NSx4Mqt18isgZyDuJxN7Nu56NSx2sWp4tO6SkgopIVb6tq659KwwayQ697Fj3M2o5Bo6NvG49G6eGtT1sWspph+ppBz5trM4dPFupt7nY6IsqaYy7+14NLF4NPH5MuyuaeatJqEhX6Hv6qa49PG",
     "widths": [
       640,
       960,
@@ -1434,6 +1505,7 @@ window.WORKS = [
     "h": 258,
     "available": 0,
     "tone": "#6ca0ab",
+    "blur": "8.Z62uYJqYS6yiD5yado2sarG+DnCXAXWSoMW6iaydlaW7XJmhPm6TLISXFXF/KHKIma6upsTDiayxnrewnMO/fpmacpKmgJeqaJiygJWrXn2hboyaa5KlTJucPoGnSm6O",
     "widths": [
       508
     ],
@@ -1452,6 +1524,7 @@ window.WORKS = [
     "h": 923,
     "available": 0,
     "tone": "#6f9ecb",
+    "blur": "8.eoWvYpTBaJiyYZC4Z4qpa5iiY5OXYXynTGqUQZ/PKoW3Q5K6J3+2Ana/C4bLQ2vJLkBnCXHZAHDXE3zeB4HdCXHTE2bESlyrko6Oh4SOnp6roaKzioygl5yvrbK9p6av",
     "widths": [
       640,
       960,
@@ -1473,6 +1546,7 @@ window.WORKS = [
     "h": 952,
     "available": 0,
     "tone": "#9fd0db",
+    "blur": "8.ksjcls3iVbvZYMrrmdbrvtXglczdj9LnY7DJYbvVQLbYccrloszbksbXiM7knNHjb4CGYH+TOmGFRnSTY4eYfam4eZqmlLPAtJt2nYmDhH2Xu5NgVlxmaltwhXt8lrG+u5hhkHt5bWB/o4uIal5td3B9rouGx450wI1DlYFokHp5cXuGW1JiiYKIqYCBwYBmg2Zlg2Jrg3uCbGqHbF5vcWp8hVhvd2F4",
     "widths": [
       640,
       1162
@@ -1492,6 +1566,7 @@ window.WORKS = [
     "h": 985,
     "available": 0,
     "tone": "#bc7177",
+    "blur": "8.iXyK9lknvElkkzeDpm12hjs6ZnlNcXiFx6Kas6lcdHdj+ytX11YclGdvjVJn12mDqpmnaaS5ilNroU5SwVAoqTs8mm9Rm3R3Zn+Ro2V7dHJfomZeoTQ2SDMzaWFRmC43",
     "widths": [
       640,
       960,
@@ -1513,6 +1588,7 @@ window.WORKS = [
     "h": 1206,
     "available": 0,
     "tone": "#c17f85",
+    "blur": "8.u1lZrDVAXIqCi2U9m3sfm6VWomRbFDtyupdzqZSHi7GovF15l0R7sm+DlGdxQHCMya+op6imm7u4uIuIf5ipdKCqo1p4cXZFkZuFj5B5kJGenXd9sKyirrikXll+ioBfdz4x0mJnuG9nsnZwhnFdqHxvpEdHaTIz",
     "widths": [
       640,
       960,
@@ -1534,6 +1610,7 @@ window.WORKS = [
     "h": 1362,
     "available": 0,
     "tone": "#8ebfcb",
+    "blur": "8.PZatepe4i5CjrIagYYeSo5OrLpGgJZS3lJ68i6/DhKK6pq/Nhpa5kMDOcJuzfoiTfZa7q6i/kZ+yaK3Ek6a6i3+WjHyVl2GDaI6xiX2UaYWpmo+thYKgkpy3boihe5KvPXuBNXaNfX6hnWKOkmyGmWN7l2aDYUld",
     "widths": [
       640,
       960,

@@ -213,7 +213,7 @@
       link.setAttribute("aria-label", t("open") + work.title);
       var frame = document.createElement("span");
       frame.className = "rail-frame";
-      frame.append(window.artPicture(work, { sizes: "(min-width: 980px) 40vw, 80vw", alt: altOf(work) }));
+      frame.append(window.artPicture(work, { sizes: "(min-width: 980px) 40vw, 80vw", alt: altOf(work), blur: true }));
       var cap = document.createElement("span");
       cap.className = "rail-cap";
       var n = document.createElement("span");
@@ -384,6 +384,7 @@
   var catalog = document.querySelector("[data-mount='catalog']");
   var countNode = document.querySelector("[data-count]");
   var visible = WORKS.slice();
+  document.querySelectorAll("[data-total]").forEach(function (node) { node.textContent = String(WORKS.length); });
 
   function card(work, opts) {
     var link = document.createElement("a");
@@ -397,10 +398,35 @@
     var frame = document.createElement("span");
     frame.className = "frame";
     if (window.artPicture) {
-      frame.append(window.artPicture(work, { sizes: opts.sizes, eager: opts.eager, alt: altOf(work) }));
+      frame.append(window.artPicture(work, { sizes: opts.sizes, eager: opts.eager, alt: altOf(work), blur: true }));
     }
     link.append(frame);
     return link;
+  }
+
+  /* Ninguna obra espera al scroll: todas ocupan su lugar desde el
+     principio, con su vista previa. Solo las de la primera pantalla
+     entran una vez, en orden de lectura, con un fundido lento. */
+  function enterMasonry() {
+    if (reduce) return;
+    var vh = window.innerHeight;
+    var first = [];
+    Array.prototype.forEach.call(masonry.children, function (link) {
+      var r = link.getBoundingClientRect();
+      if (r.top < vh && r.bottom > 0) first.push({ link: link, top: r.top, left: r.left });
+    });
+    first.sort(function (a, b) { return (a.top - b.top) || (a.left - b.left); });
+    first.forEach(function (f, k) {
+      var link = f.link;
+      link.style.setProperty("--d", Math.min(k, 7) * 110 + "ms");
+      link.classList.add("is-arriving");
+      link.addEventListener("animationend", function done(e) {
+        if (e.target !== link || e.animationName !== "card-rise") return;
+        link.removeEventListener("animationend", done);
+        link.classList.remove("is-arriving");
+        link.style.removeProperty("--d");
+      });
+    });
   }
 
   function renderMasonry(list) {
@@ -409,13 +435,12 @@
     masonry.replaceChildren();
     list.forEach(function (work, i) {
       var link = card(work, {
-        className: "card reveal",
+        className: "card",
         href: "#" + work.id,
         eager: i < 4,
         cursor: t("seeRoomShort"),
         sizes: window.ART_GRID_SIZES
       });
-      link.style.setProperty("--d", ((i % 4) * 70) + "ms");
       var cap = document.createElement("span");
       cap.className = "card-cap";
       var title = document.createElement("span");
@@ -430,8 +455,8 @@
       }
       link.append(cap);
       masonry.append(link);
-      watch(link);
     });
+    enterMasonry();
     if (countNode) countNode.textContent = String(list.length);
   }
 
@@ -489,8 +514,8 @@
   if (masonry) { masonry.dataset.cycle = "visible"; renderMasonry(WORKS); }
 
   /* Obras: cuando la página ya cargó, las imágenes que esperaban el scroll
-     se bajan de a dos, de arriba hacia abajo. Son las mismas <img> de la
-     página: mismo formato y tamaño, nada cambia a la vista. */
+     se bajan de a tres (de a una en 3G), empezando por las más cercanas.
+     Son las mismas <img> de la página: mismo formato y tamaño. */
   function viewerBusy() { return !!document.querySelector(".viewer.is-open"); }
   if (masonry && window.artCanWarm && window.artCanWarm()) {
     window.artWhenIdle(function () {
@@ -503,8 +528,10 @@
           .map(function (img) { return { img: img, d: Math.abs(img.getBoundingClientRect().top + window.scrollY - top) }; })
           .sort(function (a, b) { return a.d - b.d; });
       }
+      var c = navigator.connection;
+      var lanes = c && /3g/.test(c.effectiveType || "") ? 1 : 3;
       function next() {
-        if (running >= 2) return;
+        if (running >= lanes) return;
         if (viewerBusy()) {
           if (!paused) { paused = true; window.setTimeout(function () { paused = false; next(); }, 1500); }
           return;

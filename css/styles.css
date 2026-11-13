@@ -748,6 +748,28 @@ main { display: block; padding-top: var(--nav-h); }
 .js .reveal { opacity: 0; transform: translateY(26px); transition: opacity .9s ease var(--d, 0ms), transform 1.1s var(--ease) var(--d, 0ms); }
 .js .reveal.is-in { opacity: 1; transform: none; }
 
+/* Carga progresiva de las obras: primero un campo de color con la obra
+   desenfocada (lista al instante), luego la imagen nítida encima con un
+   fundido largo y un asentamiento mínimo, como al enfocar. */
+.art-blur {
+  background-color: var(--tone, var(--paper-3));
+  background-image: var(--blur, none);
+  background-size: cover;
+  background-position: center;
+}
+.js .art-blur img {
+  opacity: 0;
+  transition: opacity 1.2s cubic-bezier(.33, 0, .2, 1), transform 1.2s var(--ease);
+}
+.js .frame .art-blur img { transform: scale(1.025); transition: opacity 1.2s cubic-bezier(.33, 0, .2, 1), transform 1.8s var(--ease); }
+.js .art-blur.is-ready img { opacity: 1; }
+.js .frame .art-blur.is-ready img { transform: none; }
+/* Entrada de la primera pantalla de Obras, una sola vez. Es una animación
+   y no una transición: arranca sola, sin depender de un cuadro de JS. */
+.js .card.is-arriving { animation: card-fade 1.3s cubic-bezier(.33, 0, .2, 1) var(--d, 0ms) both, card-rise 1.6s var(--ease) var(--d, 0ms) both; }
+@keyframes card-fade { from { opacity: 0; } }
+@keyframes card-rise { from { transform: translateY(14px); } }
+
 /* Disponible */
 .catalog { display: grid; gap: clamp(4rem, 11vw, 9rem); padding-block: 2rem 3rem; }
 .catalog-item { display: grid; gap: 1.4rem; align-items: center; }
@@ -1055,7 +1077,8 @@ body.is-walking { overflow: hidden; }
 .wall h2 { margin: 0 0 1rem; font-size: clamp(2.2rem, 8vw, 4rem); line-height: .95; }
 .wall-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem .9rem; }
 .wall-card { display: block; color: inherit; text-decoration: none; }
-.wall-card img { display: block; width: 100%; height: auto; box-shadow: 0 16px 30px -18px rgb(var(--shade) / calc(.42 * var(--shade-k))); }
+.wall-card picture { display: block; box-shadow: 0 16px 30px -18px rgb(var(--shade) / calc(.42 * var(--shade-k))); }
+.wall-card img { display: block; width: 100%; height: auto; }
 .wall-card span { display: block; margin-top: .55rem; font-family: var(--serif); font-size: 1.25rem; line-height: 1.05; }
 .sheet[hidden] { display: none !important; }
 .sheet { position: fixed; inset: 0; z-index: 110; display: flex; align-items: flex-end; justify-content: center; background: rgba(16, 20, 20, .45); }
