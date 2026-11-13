@@ -61,6 +61,30 @@
     return pic;
   };
 
+  /* sizes de la cuadrícula de Obras. La precarga del inicio usa el mismo,
+     para que el navegador elija exactamente el mismo archivo. */
+  window.ART_GRID_SIZES = "(min-width: 1280px) 23vw, (min-width: 900px) 30vw, (min-width: 560px) 45vw, 47vw";
+
+  /* Precarga en segundo plano: nunca con ahorro de datos ni en 2G. */
+  window.artCanWarm = function () {
+    var c = navigator.connection;
+    if (!c) return true;
+    if (c.saveData) return false;
+    return !/(^|-)2g$/.test(c.effectiveType || "");
+  };
+
+  /* Espera a que la página haya cargado y el navegador esté libre. */
+  window.artWhenIdle = function (fn, delay) {
+    function idle() {
+      window.setTimeout(function () {
+        if (window.requestIdleCallback) window.requestIdleCallback(fn, { timeout: 4000 });
+        else fn();
+      }, delay || 0);
+    }
+    if (document.readyState === "complete") idle();
+    else window.addEventListener("load", idle, { once: true });
+  };
+
   window.artFacts = function (work) {
     var bits = [];
     if (work.year) bits.push(String(work.year));

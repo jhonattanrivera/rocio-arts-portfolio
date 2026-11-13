@@ -413,7 +413,7 @@
         href: "#" + work.id,
         eager: i < 4,
         cursor: t("seeRoomShort"),
-        sizes: "(min-width: 1280px) 23vw, (min-width: 900px) 30vw, (min-width: 560px) 45vw, 47vw"
+        sizes: window.ART_GRID_SIZES
       });
       link.style.setProperty("--d", ((i % 4) * 70) + "ms");
       var cap = document.createElement("span");
@@ -487,6 +487,102 @@
   }
 
   if (masonry) { masonry.dataset.cycle = "visible"; renderMasonry(WORKS); }
+
+  /* Obras: cuando la página ya cargó, las imágenes que esperaban el scroll
+     se bajan de a dos, de arriba hacia abajo. Son las mismas <img> de la
+     página: mismo formato y tamaño, nada cambia a la vista. */
+  function viewerBusy() { return !!document.querySelector(".viewer.is-open"); }
+  if (masonry && window.artCanWarm && window.artCanWarm()) {
+    window.artWhenIdle(function () {
+      var running = 0;
+      var paused = false;
+      function pending() {
+        var top = window.scrollY;
+        return Array.prototype.slice.call(masonry.querySelectorAll("img"))
+          .filter(function (img) { return !img.dataset.warm && !(img.complete && img.naturalWidth); })
+          .map(function (img) { return { img: img, d: Math.abs(img.getBoundingClientRect().top + window.scrollY - top) }; })
+          .sort(function (a, b) { return a.d - b.d; });
+      }
+      function next() {
+        if (running >= 2) return;
+        if (viewerBusy()) {
+          if (!paused) { paused = true; window.setTimeout(function () { paused = false; next(); }, 1500); }
+          return;
+        }
+        var item = pending()[0];
+        if (!item) return;
+        var img = item.img;
+        img.dataset.warm = "1";
+        running += 1;
+        var done = false;
+        function finish() {
+          if (done) return;
+          done = true;
+          running -= 1;
+          next();
+        }
+        img.addEventListener("load", finish, { once: true });
+        img.addEventListener("error", finish, { once: true });
+        window.setTimeout(finish, 10000);
+        img.fetchPriority = "low";
+        img.loading = "eager";
+        next();
+      }
+      next();
+    }, 300);
+  }
+
+  /* Inicio: con el navegador libre, deja listas en caché las obras de la
+     primera pantalla de Obras. Las columnas se leen del propio CSS con una
+     muestra invisible que se quita enseguida. */
+  if (document.body.classList.contains("page-home") && window.artPicture && window.artCanWarm && window.artCanWarm()) {
+    window.artWhenIdle(function () {
+      var probe = document.createElement("div");
+      probe.className = "masonry";
+      probe.setAttribute("aria-hidden", "true");
+      probe.style.cssText = "position:absolute;left:0;top:0;visibility:hidden;pointer-events:none;height:0;overflow:hidden;";
+      probe.innerHTML = '<span class="card" style="--ratio:1"><span class="frame"></span><span class="card-cap"><span class="card-title">Ag</span></span></span>';
+      document.body.append(probe);
+      var cardNode = probe.firstChild;
+      var cs = window.getComputedStyle(probe);
+      var cols = parseInt(cs.columnCount, 10) || 2;
+      var colW = cardNode.querySelector(".frame").getBoundingClientRect().width;
+      var extra = cardNode.getBoundingClientRect().height - colW + (parseFloat(window.getComputedStyle(cardNode).marginBottom) || 0);
+      probe.remove();
+      if (!colW) return;
+      var heights = WORKS.map(function (work) { return colW * work.h / work.w + extra; });
+      var total = heights.reduce(function (a, b) { return a + b; }, 0);
+      var limit = window.innerHeight;
+      var pick = [];
+      var y = 0, col = 0, acc = 0;
+      heights.forEach(function (h, i) {
+        if (col < cols - 1 && acc + h / 2 > total * (col + 1) / cols) { col += 1; y = 0; if (i > 0 && pick.indexOf(i - 1) < 0) pick.push(i - 1); }
+        if (y < limit && pick.indexOf(i) < 0) pick.push(i);
+        y += h;
+        acc += h;
+      });
+      var queue = pick.slice(0, 14).map(function (i) { return WORKS[i]; });
+      var keep = [];
+      var running = 0;
+      function next() {
+        while (running < 2 && queue.length) {
+          var work = queue.shift();
+          var pic = window.artPicture(work, { sizes: window.ART_GRID_SIZES, eager: true, priority: "low", alt: "" });
+          var img = pic.querySelector("img");
+          keep.push(pic);
+          running += 1;
+          (function (img) {
+            var done = false;
+            function finish() { if (done) return; done = true; running -= 1; next(); }
+            img.addEventListener("load", finish, { once: true });
+            img.addEventListener("error", finish, { once: true });
+            window.setTimeout(finish, 10000);
+          })(img);
+        }
+      }
+      next();
+    }, 1500);
+  }
   if (catalog) { catalog.dataset.cycle = "available"; renderCatalog(availableList()); }
 
   document.querySelectorAll("[data-filter]").forEach(function (button) {
