@@ -43,11 +43,13 @@
      El cambio se revela en círculo desde el botón, con la página misma. */
   var themeButtons = document.querySelectorAll("[data-theme-toggle]");
   var themeMeta = document.querySelector('meta[name="theme-color"]');
+  var schemeMeta = document.querySelector('meta[name="color-scheme"]');
   function themeNow() { return html.dataset.theme === "dark" ? "dark" : "light"; }
   function paintTheme(theme) {
     if (theme === "dark") html.dataset.theme = "dark";
     else delete html.dataset.theme;
     if (themeMeta) themeMeta.content = theme === "dark" ? "#14110f" : "#f6f2ec";
+    if (schemeMeta) schemeMeta.content = theme === "dark" ? "dark" : "light";
     themeButtons.forEach(function (button) { button.setAttribute("aria-pressed", theme === "dark" ? "true" : "false"); });
   }
   function setTheme(theme, from) {
