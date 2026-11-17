@@ -162,7 +162,9 @@ async function openMenuAndGo(page, label, href, text) {
 // sondean cada 100 ms en vez de esperar cuadros de animación.
 async function checkGarden(page, label, vp, english) {
   const poll = { polling: 100, timeout: 30000 };
-  await page.waitForSelector("[data-wall] .wall-card", { timeout: 8000 }).catch(() => fail(`${label}: el jardín en plano quedó vacío`));
+  // Las obras en plano existen desde el parseo (sala.js), pero la vista previa 3D puede estar
+  // bloqueando la página (ver runGarden): hasta 30 s, como las demás esperas del jardín.
+  await page.waitForSelector("[data-wall] .wall-card", { timeout: 30000 }).catch(() => fail(`${label}: el jardín en plano quedó vacío`));
   // gallery.js (con three.js) llega como módulo después de la carga: hasta que arranca,
   // el botón todavía no hace nada. Se espera a que el jardín exponga window.JARDIN.
   await page.waitForFunction(() => window.JARDIN || document.documentElement.classList.contains("sala-flat"), null, poll)
@@ -292,7 +294,11 @@ async function runGarden(browser, base, vp, english) {
   try {
     await page.goto(base, { waitUntil: "load" });
     await openMenuAndGo(page, label, "galeria.html", "El jardín");
-    const h1 = (await page.locator("main h1").first().textContent())?.trim();
+    // Al llegar "load" el jardín puede estar armando su vista previa 3D. En headless la primera
+    // imagen se dibuja por software (SwiftShader): bloquea la página 4-6 s, y más si el jardín
+    // anterior todavía ocupa la CPU. Con GPU es una fracción de segundo. Por eso esta lectura
+    // espera hasta 30 s, como las demás esperas del jardín: lo que se comprueba es el título.
+    const h1 = (await page.locator("main h1").first().textContent({ timeout: 30000 }))?.trim();
     if (!h1) fail(`${label}: galeria.html no tiene título`);
     await checkSpanish(page, label, english);
     await checkGarden(page, label, vp, english);

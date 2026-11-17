@@ -44,6 +44,7 @@ En celular (390x844, táctil) y en escritorio (1280x800), con el navegador en es
 ## Notas
 
 - El 3D corre por software en headless (SwiftShader, pocos cuadros por segundo). Por eso el jardín se prueba al final y de a un tamaño, sus esperas sondean cada 100 ms y el script sale sin `browser.close()`, que tarda unos 20 s en soltar ese renderer.
+- Al llegar `load`, el jardín puede estar armando su vista previa 3D: por software esa primera imagen bloquea la página 4-6 s (con GPU, una fracción de segundo). Toda lectura en `galeria.html` después de cargar espera hasta 30 s, como las demás esperas del jardín.
 - `gallery.js` llega como módulo después de la carga; hasta que expone `window.JARDIN` el botón "Entrar al jardín" no hace nada, así que verify espera esa señal antes de tocarlo.
 - En vivo no se piden todas las variantes de `srcset` ni una ruta inexistente: GitHub Pages responde 503 a algunas cuando llegan cientos juntas, y eso volvía la prueba inestable sin decir nada del sitio.
 - `package.json` y `node_modules/` solo existen para esta verificación; el sitio no los usa.
