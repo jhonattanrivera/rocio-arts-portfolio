@@ -20,6 +20,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Instrument+Sans:wght@400..600&family=Sedgwick+Ave&display=swap">
   <link rel="stylesheet" href="css/styles.css?v=20261113b">
+  <link rel="modulepreload" href="js/gallery.js?v=20261117a">
+  <link rel="modulepreload" href="js/vendor/three.module.min.js?v=20261112c">
   <script>document.documentElement.classList.add("js"); try { if (localStorage.getItem("rocio-theme") === "dark") { document.documentElement.dataset.theme = "dark"; var tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = "#14110f"; var cs = document.querySelector('meta[name="color-scheme"]'); if (cs) cs.content = "dark"; } } catch (err) {}</script>
 </head>
 <body class="page-sala">
@@ -49,7 +51,7 @@
         <h1>Una exposición <em>al aire libre.</em></h1>
         <p class="lede">Un pasillo entre setos y flores, con dieciséis obras bajo el sol de la mañana y la sombra de los árboles. Toca un cuadro para consultarlo.</p>
         <div class="cover-actions">
-          <button type="button" class="enter" id="enter">Entrar al jardín</button>
+          <button type="button" class="enter" id="enter" data-loading="Cargando…">Entrar al jardín</button>
           <a class="text-link" href="#muro">Verlas en plano</a>
         </div>
         <ul class="cover-help">
@@ -97,6 +99,35 @@
     </div>
   </div>
 
+  <script>
+    // El botón responde desde que se ve. gallery.js (con three.js) tarda en llegar en un
+    // celular lento: un toque anterior queda anotado, el botón dice que el jardín está
+    // cargando (con su mismo ancho, para que nada se mueva) y gallery.js entra solo al
+    // arrancar (ver EARLY_ENTER en gallery.js).
+    (function () {
+      var enter = document.getElementById("enter");
+      if (!enter) return;
+      var label = enter.textContent;
+      var early = window.EARLY_ENTER = {
+        pending: false,
+        stop: function () { enter.removeEventListener("click", wait); },
+        done: function () {
+          early.pending = false;
+          enter.removeAttribute("aria-busy");
+          enter.style.minWidth = "";
+          if (enter.textContent === enter.dataset.loading) enter.textContent = label;
+        }
+      };
+      function wait() {
+        if (early.pending) return;
+        early.pending = true;
+        enter.setAttribute("aria-busy", "true");
+        enter.style.minWidth = enter.getBoundingClientRect().width + "px";
+        enter.textContent = enter.dataset.loading;
+      }
+      enter.addEventListener("click", wait);
+    })();
+  </script>
   <script src="js/i18n.js?v=20261112c"></script>
   <script src="js/media.js?v=20261113b"></script>
   <script src="js/works.js?v=20261113b"></script>
@@ -104,7 +135,7 @@
   <script src="js/main.js?v=20261114a"></script>
   <script src="js/sala.js?v=20261113b"></script>
   <script type="module">
-    import("./js/gallery.js?v=20261112c").catch(function () {
+    import("./js/gallery.js?v=20261117a").catch(function () {
       var enter = document.getElementById("enter");
       if (enter) enter.hidden = true;
       document.documentElement.classList.add("sala-flat");

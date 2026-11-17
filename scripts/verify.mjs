@@ -309,6 +309,58 @@ async function runGarden(browser, base, vp, english) {
   await context.close();
 }
 
+// Toque temprano en "Entrar al jardín": en carga fría (contexto nuevo, sin caché), el toque
+// llega antes de que exista el handler de gallery.js y el jardín entra solo, sin un segundo toque.
+// Para que el toque sea temprano siempre, sin esperas fijas, la respuesta de gallery.js se
+// retiene hasta después del toque; three.js y lo demás llegan como en una visita normal.
+async function runEarlyTap(browser, base, vp, path, texts) {
+  const context = await newViewport(browser, vp);
+  await context.addInitScript(() => { try { sessionStorage.setItem("rocio-intro", "1"); } catch (e) {} });
+  let release;
+  const held = new Promise((ok) => { release = ok; });
+  await context.route((u) => u.pathname.endsWith("/js/gallery.js"), async (route) => { await held; await route.continue(); });
+  const page = await context.newPage();
+  page.setDefaultTimeout(10000);
+  const label = `${vp.name} toque temprano ${path}`;
+  watch(page, label);
+  const before = failures.length;
+  const poll = { polling: 100, timeout: 30000 };
+  const state = () => page.evaluate(() => {
+    const b = document.getElementById("enter"), link = b.nextElementSibling;
+    return {
+      jardin: !!window.JARDIN, text: b.textContent.trim(), busy: b.getAttribute("aria-busy"),
+      w: b.getBoundingClientRect().width, linkX: link.getBoundingClientRect().left, linkY: link.getBoundingClientRect().top,
+    };
+  });
+  try {
+    await page.goto(new URL(path, base).href, { waitUntil: "domcontentloaded" });
+    const enter = page.locator("#enter");
+    await enter.waitFor({ state: "visible" });
+    // Las fuentes primero: si cambian entre las dos medidas, el botón cambiaría de ancho por ellas.
+    await page.evaluate(() => document.fonts.ready.then(() => {}));
+    const pre = await state();
+    if (pre.text !== texts.enter) fail(`${label}: el botón dice "${pre.text}" y esperaba "${texts.enter}"`);
+    await (vp.mobile ? enter.tap() : enter.click());
+    const tapped = await state();
+    if (tapped.jardin) fail(`${label}: gallery.js ya había arrancado; el toque no fue temprano`);
+    if (tapped.busy !== "true" || tapped.text !== texts.loading) fail(`${label}: tras el toque temprano el botón dice "${tapped.text}" (aria-busy=${tapped.busy}) y esperaba "${texts.loading}"`);
+    if (Math.abs(tapped.w - pre.w) > 0.5 || Math.abs(tapped.linkX - pre.linkX) > 0.5 || Math.abs(tapped.linkY - pre.linkY) > 0.5)
+      fail(`${label}: el estado de carga mueve el diseño (botón ${Math.round(pre.w)} → ${Math.round(tapped.w)} px, enlace se mueve)`);
+    release();
+    await page.waitForFunction(() => document.body.classList.contains("is-walking") && document.getElementById("sala").dataset.ready === "1", null, poll)
+      .catch(() => fail(`${label}: tras un solo toque temprano el jardín 3D no arrancó`));
+    if (await page.evaluate(() => document.documentElement.classList.contains("sala-flat"))) fail(`${label}: el jardín cayó a la vista plana (sin 3D)`);
+    const end = await state();
+    if (end.busy !== null || end.text !== texts.enter) fail(`${label}: el botón quedó en estado de carga ("${end.text}", aria-busy=${end.busy})`);
+  } catch (e) {
+    fail(`${label}: ${e.message.split("\n")[0]}`);
+  } finally {
+    release();
+  }
+  if (failures.length > before) await shot(page, `${vp.name}-toque-temprano-${path.replace(/\W+/g, "-")}`);
+  await context.close();
+}
+
 // ---------- Todas las páginas y sus enlaces internos ----------
 async function checkPagesAndLinks(browser, base) {
   const context = await browser.newContext({ locale: "es-CO" });
@@ -421,6 +473,11 @@ async function main() {
     const [counted] = await Promise.all([checkPagesAndLinks(browser, base), ...VPS.map((vp) => runViewport(browser, base, vp, english))]);
     if (process.env.VERIFY_TIMING) console.log("fase 1", ((Date.now() - t0) / 1000).toFixed(1));
     // El jardín al final y de a uno: su WebGL por software ocupa toda la CPU y volvería lento lo demás.
+    // El toque temprano importa en el celular lento; se prueba en español y en inglés. Va antes
+    // que los recorridos del jardín: después del de escritorio, Chromium tarda 20-40 s en soltar
+    // su renderer y abrir una página nueva esperaría todo ese tiempo.
+    await runEarlyTap(browser, base, VPS[0], "galeria.html", { enter: "Entrar al jardín", loading: "Cargando…" });
+    await runEarlyTap(browser, base, VPS[0], "en/galeria.html", { enter: "Enter the garden", loading: "Loading…" });
     for (const vp of VPS) await runGarden(browser, base, vp, english);
     const secs = ((Date.now() - t0) / 1000).toFixed(1);
     if (failures.length) {

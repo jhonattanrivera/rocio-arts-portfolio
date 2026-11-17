@@ -30,6 +30,11 @@ var reticle = document.querySelector(".reticle");
 var listBtn = document.getElementById("to-list");
 var returnBtn = document.getElementById("return-walk");
 
+// Un toque en "Entrar al jardín" que llegó antes que este módulo lo anotó la página
+// (EARLY_ENTER, en galeria.html). Desde aquí los toques los atiende el jardín.
+var early = window.EARLY_ENTER || null;
+if (early) early.stop();
+
 function ui(key, fallback) { return window.ui ? window.ui(key) : fallback; }
 
 function showFlat(message) {
@@ -45,7 +50,11 @@ function showFlat(message) {
 }
 
 if (!canvas || !window.SALA || !hasWebGL()) {
+  var tapped = early && early.pending;
+  if (early) early.done();
   showFlat("");
+  // Sin 3D el botón baja a las obras: el toque pendiente hace eso mismo.
+  if (tapped && enterBtn) enterBtn.click();
 } else {
   boot();
 }
@@ -1390,6 +1399,7 @@ function boot() {
         document.body.classList.remove("is-walking");
         showFlat(ui("noWebgl", ""));
       }
+      if (early) early.done();
     });
   }
 
@@ -1534,7 +1544,7 @@ function boot() {
   }
 
   var params = new URLSearchParams(location.search);
-  if (params.get("entrar") === "1") enterSala();
+  if (params.get("entrar") === "1" || (early && early.pending)) enterSala();
   else if (!saveData) {
     if (document.readyState === "complete") startPreview();
     else window.addEventListener("load", startPreview, { once: true });
