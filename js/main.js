@@ -7,8 +7,8 @@
   var fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   var ROOT = (window.SITE && window.SITE.root) || "";
 
-  var RAIL = ["marilyn", "ocean-eyes", "el-camino", "flores", "cidade-maravilhosa", "junto-a-ti", "abbey-road", "summer", "forever"];
-  var DEMO = [["el-camino", "comedor"], ["ocean-eyes", "sala"], ["bruma-floral", "habitacion"], ["mi-lugar-feliz", "escalera"], ["flores", "tarde"], ["urban-city", "entrada"]];
+  var RAIL = ["rosal", "hacia-el-cielo", "dos-jardines", "nina-de-las-rosas", "luz-de-mayo", "entre-mujeres", "colibries", "camino-rosa", "la-puerta"];
+  var DEMO = [["prado", "comedor"], ["dos-jardines", "sala"], ["bruma-floral", "habitacion"], ["luz-de-mayo", "escalera"], ["colibries", "tarde"], ["hacia-el-cielo", "entrada"]];
 
   function t(key) { return window.ui ? window.ui(key) : key; }
   function wa(text) { return window.artWa ? window.artWa(text) : "https://wa.me/50689877207?text=" + encodeURIComponent(text); }
@@ -48,7 +48,7 @@
   function paintTheme(theme) {
     if (theme === "dark") html.dataset.theme = "dark";
     else delete html.dataset.theme;
-    if (themeMeta) themeMeta.content = theme === "dark" ? "#14110f" : "#f6f2ec";
+    if (themeMeta) themeMeta.content = getComputedStyle(html).getPropertyValue("--paper").trim();
     if (schemeMeta) schemeMeta.content = theme === "dark" ? "dark" : "light";
     themeButtons.forEach(function (button) { button.setAttribute("aria-pressed", theme === "dark" ? "true" : "false"); });
   }
@@ -197,9 +197,7 @@
   /* Riel de selección: el scroll vertical lo mueve de lado */
   var rail = document.querySelector("[data-rail]");
   var railTrack = rail && rail.querySelector("[data-mount='rail']");
-  var railCount = rail && rail.querySelector("[data-rail-count]");
   var railBar = rail && rail.querySelector("[data-rail-bar]");
-  var railCards = [];
   var railPinned = false;
   var railExtra = 0;
   if (railTrack && window.artPicture) {
@@ -227,7 +225,6 @@
       cap.append(n, title);
       link.append(frame, cap);
       railTrack.append(link);
-      railCards.push(link);
     });
     railPinned = !reduce;
     rail.classList.toggle("is-pinned", railPinned);
@@ -243,10 +240,6 @@
     var p = railExtra ? Math.max(0, Math.min(1, -r.top / railExtra)) : 0;
     railTrack.style.transform = "translate3d(" + (-p * railExtra).toFixed(1) + "px,0,0)";
     if (railBar) railBar.style.transform = "scaleX(" + p.toFixed(4) + ")";
-    if (railCount && railCards.length) {
-      var i = Math.min(railCards.length - 1, Math.round(p * (railCards.length - 1)));
-      railCount.textContent = pad2(i + 1) + " / " + pad2(railCards.length);
-    }
   }
 
   var scrollTick = false;
@@ -269,18 +262,33 @@
   sizeRail();
   onScroll();
 
-  /* Intro: el brochazo, la firma, y la firma que vuela al menú */
+  /* Intro: el verde oliva, la firma que se escribe, y la firma que vuela al menú.
+     Espera a la fuente para no escribir la firma con otra letra. */
   var intro = document.getElementById("intro");
   function heroGo() { html.classList.add("hero-go"); }
   if (intro && html.classList.contains("show-intro")) {
     var introDone = false;
     var logo = intro.querySelector(".intro-logo");
-    var brand = document.querySelector(".nav .brand svg");
-    var leaveTimer = window.setTimeout(leave, 2050);
+    var brand = document.querySelector(".nav .brand .wordmark");
+    var leaveTimer = 0;
+    var introStart = Date.now();
+    /* La espera por la letra se descuenta del tiempo de la intro: el telón no se
+       alarga, solo queda lo justo para que la firma termine de escribirse. */
+    function begin() {
+      if (leaveTimer || introDone) return;
+      intro.classList.add("is-ready");
+      leaveTimer = window.setTimeout(leave, Math.max(1700, 2150 - (Date.now() - introStart)));
+    }
+    /* la letra la pidió el <head> (WORDMARK_FONTS); si tarda, la firma sale igual */
+    if (window.WORDMARK_FONTS) {
+      window.WORDMARK_FONTS.then(begin, begin);
+      window.setTimeout(begin, 900);
+    } else begin();
     function leave() {
       if (introDone) return;
       introDone = true;
       window.clearTimeout(leaveTimer);
+      intro.classList.add("is-ready");
       try { sessionStorage.setItem("rocio-intro", "1"); } catch (err) { /* privado */ }
       if (logo && brand) {
         var a = logo.getBoundingClientRect();
@@ -288,6 +296,8 @@
         if (a.width && b.width) {
           logo.style.transformOrigin = "0 0";
           logo.style.transform = "translate(" + (b.left - a.left) + "px," + (b.top - a.top) + "px) scale(" + (b.width / a.width) + ")";
+          /* llega con el color que le toca en la barra: claro sobre la foto, tinta sobre el papel */
+          logo.style.color = window.getComputedStyle(brand).color;
         }
       }
       intro.classList.add("is-leaving");
@@ -384,9 +394,7 @@
   /* Galería y catálogo */
   var masonry = document.querySelector("[data-mount='masonry']");
   var catalog = document.querySelector("[data-mount='catalog']");
-  var countNode = document.querySelector("[data-count]");
   var visible = WORKS.slice();
-  document.querySelectorAll("[data-total]").forEach(function (node) { node.textContent = String(WORKS.length); });
 
   function card(work, opts) {
     var link = document.createElement("a");
@@ -459,7 +467,6 @@
       masonry.append(link);
     });
     enterMasonry();
-    if (countNode) countNode.textContent = String(list.length);
   }
 
   function renderCatalog(list) {
@@ -676,7 +683,6 @@
   }).join("");
   viewer.innerHTML =
     '<div class="viewer-top">' +
-      '<p class="viewer-count"></p>' +
       '<div class="modes" role="group" aria-label="' + t("viewMode") + '">' +
         '<button type="button" data-mode="room" aria-pressed="false">' + t("inRoom") + "</button>" +
         '<button type="button" data-mode="art" aria-pressed="false">' + t("artOnly") + "</button>" +
@@ -720,7 +726,6 @@
   var pinch = q(".pinch");
   var photo = q(".viewer-photo");
   var roomHost = q(".viewer-room");
-  var viewerCount = q(".viewer-count");
   var viewerTitle = q("#viewer-title");
   var viewerDesc = q(".viewer-desc");
   var viewerFacts = q(".viewer-facts");
@@ -892,7 +897,6 @@
     viewerImg.width = work.w;
     viewerImg.height = work.h;
     viewerImg.alt = altOf(work);
-    viewerCount.textContent = pad2(index + 1) + " / " + pad2(cycle.length);
     viewerTitle.textContent = work.title;
     viewerDesc.textContent = textOf(work);
     var bits = facts(work);

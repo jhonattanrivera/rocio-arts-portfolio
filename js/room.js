@@ -225,6 +225,7 @@
     var art = el.querySelector(".room-art");
     var paint = el.querySelector(".room-paint");
     var render = el.querySelector(".room-render");
+    var shades = [];
     var front = el.querySelector(".room-front");
     var renderCtx = render.getContext("2d");
     var light = document.createElement("canvas");
@@ -373,37 +374,59 @@
       x.filter = "none";
       x.clearRect(0, 0, cw, ch);
       var rim = L.rim * sc, gap = L.gap * sc, pad = L.pad * sc;
-      if (L.frame === "black" || L.frame === "oak") {
-        if (L.frame === "oak") {
-          var gr = x.createLinearGradient(0, 0, cw, ch);
-          gr.addColorStop(0, "#c79f72"); gr.addColorStop(0.45, "#a9805a"); gr.addColorStop(0.7, "#c49b6d"); gr.addColorStop(1, "#9c7550");
-          x.fillStyle = gr;
-        } else x.fillStyle = "#1f1b19";
-        x.fillRect(0, 0, cw, ch);
-        x.fillStyle = L.frame === "oak" ? "#3a2c20" : "#0f0d0c";
-        x.fillRect(rim, rim, cw - 2 * rim, ch - 2 * rim);
-        x.strokeStyle = L.frame === "oak" ? "rgba(255,240,220,.18)" : "rgba(255,255,255,.07)";
-        x.lineWidth = Math.max(1, sc * 0.6);
-        x.strokeRect(x.lineWidth / 2, x.lineWidth / 2, cw - x.lineWidth, ch - x.lineWidth);
-      }
-      var iw = cw - 2 * pad, ih = ch - 2 * pad;
-      x.fillStyle = L.tone;
-      x.fillRect(pad, pad, iw, ih);
+      /* Una obra puede tener varios paneles (un díptico): cada uno lleva su marco y
+         su borde, y entre ellos queda la pared. La pintura entera (con el espacio
+         entre paneles) ocupa el ancho que dejan los marcos; cada panel muestra su
+         tramo con un recorte. Luz, brillo y grano se recortan a los paneles. */
+      var parts = L.panels;
+      var split = parts.length > 1;
+      var iw = cw - 2 * parts.length * pad, ih = ch - 2 * pad;
+      var boxes = parts.map(function (p, i) {
+        var bx = p[0] * iw + 2 * i * pad;
+        return { x: bx, w: (p[1] - p[0]) * iw + 2 * pad, ix: bx + pad - p[0] * iw };
+      });
+      x.save();
+      x.beginPath();
+      boxes.forEach(function (b) { x.rect(b.x, 0, b.w, ch); });
+      x.clip();
       var im = paintImg;
-      if (im && im.complete && im.naturalWidth) {
-        try { x.filter = "contrast(.95) saturate(.96) brightness(.99)"; } catch (err) { /* sin filtro */ }
-        x.drawImage(im, pad, pad, iw, ih);
-        x.filter = "none";
+      var ready = im && im.complete && im.naturalWidth;
+      var gr = null;
+      if (L.frame === "oak") {
+        gr = x.createLinearGradient(0, 0, cw, ch);
+        gr.addColorStop(0, "#c79f72"); gr.addColorStop(0.45, "#a9805a"); gr.addColorStop(0.7, "#c49b6d"); gr.addColorStop(1, "#9c7550");
       }
-      if (L.frame === "none") {
-        x.strokeStyle = "rgba(0,0,0,.08)";
-        x.lineWidth = Math.max(1, sc * 0.5);
-        x.strokeRect(x.lineWidth / 2, x.lineWidth / 2, cw - x.lineWidth, ch - x.lineWidth);
-      } else {
-        x.strokeStyle = "rgba(0,0,0,.45)";
-        x.lineWidth = Math.max(1, gap * 0.5);
-        x.strokeRect(pad - x.lineWidth / 2, pad - x.lineWidth / 2, iw + x.lineWidth, ih + x.lineWidth);
-      }
+      boxes.forEach(function (b) {
+        var bx = b.x, bw = b.w;
+        if (L.frame === "black" || L.frame === "oak") {
+          x.fillStyle = gr || "#1f1b19";
+          x.fillRect(bx, 0, bw, ch);
+          x.fillStyle = L.frame === "oak" ? "#3a2c20" : "#0f0d0c";
+          x.fillRect(bx + rim, rim, bw - 2 * rim, ch - 2 * rim);
+          x.strokeStyle = L.frame === "oak" ? "rgba(255,240,220,.18)" : "rgba(255,255,255,.07)";
+          x.lineWidth = Math.max(1, sc * 0.6);
+          x.strokeRect(bx + x.lineWidth / 2, x.lineWidth / 2, bw - x.lineWidth, ch - x.lineWidth);
+        }
+        var px = bx + pad, pw = bw - 2 * pad;
+        x.fillStyle = L.tone;
+        x.fillRect(px, pad, pw, ih);
+        if (ready) {
+          x.save();
+          if (split) { x.beginPath(); x.rect(px, pad, pw, ih); x.clip(); }
+          try { x.filter = "contrast(.95) saturate(.96) brightness(.99)"; } catch (err) { /* sin filtro */ }
+          x.drawImage(im, b.ix, pad, iw, ih);
+          x.restore();
+        }
+        if (L.frame === "none") {
+          x.strokeStyle = "rgba(0,0,0,.08)";
+          x.lineWidth = Math.max(1, sc * 0.5);
+          x.strokeRect(bx + x.lineWidth / 2, x.lineWidth / 2, bw - x.lineWidth, ch - x.lineWidth);
+        } else {
+          x.strokeStyle = "rgba(0,0,0,.45)";
+          x.lineWidth = Math.max(1, gap * 0.5);
+          x.strokeRect(px - x.lineWidth / 2, pad - x.lineWidth / 2, pw + x.lineWidth, ih + x.lineWidth);
+        }
+      });
       if (lightReady) {
         x.globalCompositeOperation = "multiply";
         x.imageSmoothingEnabled = true;
@@ -426,8 +449,7 @@
         x.fillStyle = pat;
         x.fillRect(0, 0, cw, ch);
       }
-      x.globalCompositeOperation = "source-over";
-      x.globalAlpha = 1;
+      x.restore();
     }
     function grainImage() {
       if (grain.ready) return grain.img;
@@ -449,9 +471,10 @@
       if (!W || !H) return;
       var iw = room.w, ih = room.h;
       var d = dims();
+      var panels = state.work.panels && state.work.panels.length > 1 ? state.work.panels : [[0, 1]];
       var rim = state.frame === "none" ? 0 : 2.6;
       var gap = state.frame === "none" ? 0 : 0.9;
-      var ow = d.w + 2 * (rim + gap);
+      var ow = d.w + panels.length * 2 * (rim + gap);
       var oh = d.h + 2 * (rim + gap);
       var b = g.box;
       var k = Math.min(1, (b[2] - b[0]) / ow, (b[3] - b[1]) / oh);
@@ -512,16 +535,32 @@
 
       var lx = room.light[0], ly = room.light[1];
       var depth = state.frame === "none" ? 1 : 0.8;
-      art.style.boxShadow =
-        (lx * 0.5 * u) + "px " + (ly * 0.8 * u * depth) + "px " + (1.4 * u) + "px rgba(28,20,12," + (room.warm ? 0.34 : 0.28) + ")," +
-        (lx * 3.2 * u) + "px " + (ly * 4.6 * u * depth) + "px " + (11 * u) + "px rgba(28,20,12," + (room.warm ? 0.24 : 0.18) + ")";
+      var near = [lx * 0.5 * u, ly * 0.8 * u * depth, 1.4 * u, room.warm ? 0.34 : 0.28];
+      var far = [lx * 3.2 * u, ly * 4.6 * u * depth, 11 * u, room.warm ? 0.24 : 0.18];
+      /* Cada lienzo proyecta su sombra: una caja por panel detrás del canvas, en el
+         mismo lugar que draw() le da al panel. Así un díptico deja ver la pared entre
+         sus sombras, y la sombra sigue siendo un box-shadow barato al arrastrar. */
+      var shadowCss = [near, far].map(function (v) { return v[0] + "px " + v[1] + "px " + v[2] + "px rgba(28,20,12," + v[3] + ")"; }).join(",");
+      while (shades.length < panels.length) {
+        var shade = document.createElement("span");
+        shade.className = "room-shade";
+        art.insertBefore(shade, render);
+        shades.push(shade);
+      }
+      while (shades.length > panels.length) shades.pop().remove();
+      var iwCss = lw - 2 * panels.length * pad;
+      panels.forEach(function (p, i) {
+        shades[i].style.left = (p[0] * iwCss + 2 * i * pad) + "px";
+        shades[i].style.width = ((p[1] - p[0]) * iwCss + 2 * pad) + "px";
+        shades[i].style.boxShadow = shadowCss;
+      });
       var smp = sampler(room);
       lightReady = lightReady && smp.ready;
       if (smp.ready) paintLight(room, g, [x0, y0], ow, oh, smp);
       else lightReady = false;
       var dpr = Math.min(2, window.devicePixelRatio || 1);
       if (paintImg) paintImg.sizes = Math.round((Math.max(lw, lh) - 2 * pad) * dpr) + "px";
-      look = { lw: lw, lh: lh, rim: rim * u * k, gap: gap * u * k, pad: pad, frame: state.frame, ang: Math.atan2(ly, lx) + Math.PI / 2, warm: !!room.warm, tone: state.work.tone || "#ddd", dpr: dpr };
+      look = { lw: lw, lh: lh, rim: rim * u * k, gap: gap * u * k, pad: pad, frame: state.frame, panels: panels, ang: Math.atan2(ly, lx) + Math.PI / 2, warm: !!room.warm, tone: state.work.tone || "#ddd", dpr: dpr };
       draw();
 
       if (cmShown !== last.cm || d.real !== last.real || room.id !== last.room) {

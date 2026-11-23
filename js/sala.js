@@ -4,10 +4,9 @@
   WORKS.forEach(function (work) { byId[work.id] = work; });
 
   var IDS = [
-    "serenidad", "marilyn", "ocean-eyes",
-    "el-camino", "forever", "cidade-maravilhosa", "summer", "oceano",
-    "take-my-hand", "my-love", "familia", "junto-a-ti", "memorias-2",
-    "mi-lugar-feliz", "urban-city", "abstracto-azul"
+    "rosal", "hacia-el-cielo", "entre-mujeres", "primavera", "nina-de-las-rosas", "hogar", "prado",
+    "colibries", "camino-rosa", "leer-contigo", "rosas-sobre-turquesa", "la-puerta", "bruma-floral",
+    "hortensias", "luz-de-mayo", "jardin-secreto"
   ];
 
   var wall = document.querySelector("[data-wall]");

@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f6f2ec">
   <meta name="color-scheme" content="light">
-  <meta name="description" content="Rocio Villamizar’s garden: an open-air exhibition to walk among her works and enquire about the one that stays with you.">
-  <title>The garden — Rocio Villamizar</title>
+  <meta name="description" content="Rocío Villamizar’s garden: an open-air exhibition to walk among her works and enquire about the one that stays with you.">
+  <title>The garden — Rocío Villamizar</title>
   <link rel="alternate" hreflang="es" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/galeria.html">
   <link rel="alternate" hreflang="en" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/galeria.html">
   <link rel="alternate" hreflang="x-default" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/galeria.html">
   <link rel="canonical" href="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/galeria.html">
-  <meta property="og:title" content="The garden — Rocio Villamizar">
+  <meta property="og:title" content="The garden — Rocío Villamizar">
   <meta property="og:description" content="An open-air exhibition, between hedges and flowers, in the morning sun.">
   <meta property="og:url" content="https://jhonattanrivera.github.io/rocio-arts-portfolio/en/galeria.html">
   <meta property="og:image" content="https://jhonattanrivera.github.io/rocio-arts-portfolio/assets/brand/jardin-1600.jpg">
@@ -19,15 +19,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Instrument+Sans:wght@400..600&family=Sedgwick+Ave&display=swap">
-  <link rel="stylesheet" href="../css/styles.css?v=20261113b">
-  <link rel="modulepreload" href="../js/gallery.js?v=20261117a">
+  <link rel="stylesheet" href="../css/styles.css?v=20261123d">
+  <link rel="modulepreload" href="../js/gallery.js?v=20261123d">
   <link rel="modulepreload" href="../js/vendor/three.module.min.js?v=20261112c">
-  <script>document.documentElement.classList.add("js"); try { if (localStorage.getItem("rocio-theme") === "dark") { document.documentElement.dataset.theme = "dark"; var tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = "#14110f"; var cs = document.querySelector('meta[name="color-scheme"]'); if (cs) cs.content = "dark"; } } catch (err) {}</script>
+  <script>document.documentElement.classList.add("js"); try { if (localStorage.getItem("rocio-theme") === "dark") { document.documentElement.dataset.theme = "dark"; var tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = getComputedStyle(document.documentElement).getPropertyValue("--paper").trim(); var cs = document.querySelector('meta[name="color-scheme"]'); if (cs) cs.content = "dark"; } } catch (err) {}</script>
 </head>
 <body class="page-sala">
   <a class="skip" href="#contenido">Skip to content</a>
   <header class="nav">
-    <a class="brand" href="index.html" aria-label="Rocio Villamizar"><svg viewBox="0 0 9600 3300" aria-hidden="true"><use class="logo-wash" href="../assets/brand/logo.svg#wash"/><use class="logo-ink" href="../assets/brand/logo.svg#ink"/></svg></a>
+    <a class="brand" href="index.html" aria-label="Rocío Villamizar, home"><span class="wordmark" aria-hidden="true"><span>Rocío</span> <em>Villamizar</em></span></a>
     <div class="nav-side">
       <p class="langs" aria-label="Language">
         <a class="lang-es" href="../galeria.html" hreflang="es" lang="es" data-set-lang="es">ES</a>
@@ -49,7 +49,7 @@
       <div class="cover-inner">
         <p class="eyebrow">The garden</p>
         <h1>An exhibition <em>in the open air.</em></h1>
-        <p class="lede">A path between hedges and flowers, with sixteen works in the morning sun and the shade of the trees. Tap a painting to enquire about it.</p>
+        <p class="lede">A path between hedges and flowers, with the works in the morning sun and the shade of the trees. Tap a painting to enquire about it.</p>
         <div class="cover-actions">
           <button type="button" class="enter" id="enter" data-loading="Loading…">Enter the garden</button>
           <a class="text-link" href="#muro">See them as a list</a>
@@ -128,14 +128,14 @@
       enter.addEventListener("click", wait);
     })();
   </script>
-  <script src="../js/i18n.js?v=20261112c"></script>
-  <script src="../js/media.js?v=20261113b"></script>
-  <script src="../js/works.js?v=20261113b"></script>
-  <script src="../js/room.js?v=20261112c"></script>
-  <script src="../js/main.js?v=20261114a"></script>
-  <script src="../js/sala.js?v=20261113b"></script>
+  <script src="../js/i18n.js?v=20261123d"></script>
+  <script src="../js/media.js?v=20261123d"></script>
+  <script src="../js/works.js?v=20261123d"></script>
+  <script src="../js/room.js?v=20261123d"></script>
+  <script src="../js/main.js?v=20261123d"></script>
+  <script src="../js/sala.js?v=20261123d"></script>
   <script type="module">
-    import("../js/gallery.js?v=20261117a").catch(function () {
+    import("../js/gallery.js?v=20261123d").catch(function () {
       var enter = document.getElementById("enter");
       if (enter) enter.hidden = true;
       document.documentElement.classList.add("sala-flat");

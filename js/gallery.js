@@ -1080,7 +1080,7 @@ function boot() {
       box.castShadow = true;
       box.receiveShadow = true;
       box.userData.id = item.work.id;
-      var glow = new THREE.Mesh(new THREE.PlaneGeometry(item.w + 0.12, item.h + 0.12), new THREE.MeshBasicMaterial({ color: 0xc8456f }));
+      var glow = new THREE.Mesh(new THREE.PlaneGeometry(item.w + 0.12, item.h + 0.12), new THREE.MeshBasicMaterial({ color: 0x7f9a4e }) /* el verde del acento, un poco más claro para que brille bajo el sol del jardín */);
       glow.position.z = -0.024;
       glow.visible = false;
       glow.userData.id = item.work.id;
@@ -1141,14 +1141,17 @@ function boot() {
 
     queue.sort(function (a, b) { return Math.abs(a.z - pos.z) - Math.abs(b.z - pos.z); });
     total = queue.length;
+    if (note && total) note.textContent = ui("hanging", "");
     pump();
   }
 
   function buildHang() {
     var by = window.SALA.byId;
-    var left = ["el-camino", "forever", "cidade-maravilhosa", "summer", "oceano", "take-my-hand", "my-love"];
-    var right = ["familia", "junto-a-ti", "memorias-2", "mi-lugar-feliz", "urban-city", "abstracto-azul"];
-    var end = ["marilyn", "serenidad", "ocean-eyes"];
+    /* Las mismas obras y en el mismo orden que el muro "en plano" (sala.js) */
+    var ids = window.SALA.ids;
+    var left = ids.slice(0, 7);
+    var right = ids.slice(7, 13);
+    var end = ids.slice(13, 16);
     var out = [];
     function size(work, maxW, maxH) {
       var ratio = work.w / work.h;
@@ -1172,7 +1175,7 @@ function boot() {
     end.forEach(function (id, i) {
       var work = by[id];
       if (!work) return;
-      var big = id === "serenidad";
+      var big = i === 1;
       var d = size(work, big ? 1.7 : 1.4, big ? 1.95 : 1.4);
       out.push({ work: work, w: d.w, h: d.h, x: (i - 1) * 2.35, y: big ? 1.62 : 1.48, z: END_Z + 1.25 + (big ? 0 : 0.25), rot: (i - 1) * -0.18 });
     });
@@ -1194,10 +1197,8 @@ function boot() {
       item.mat.emissiveIntensity = 0.13;
       item.mat.color.set(0xffffff);
       item.mat.needsUpdate = true;
-      loaded += 1;
       inflight -= 1;
-      if (note) note.textContent = loaded < total ? ui("hanging", "") + loaded + " / " + total : "";
-      pump();
+      landed();
     }, undefined, function () {
       inflight -= 1;
       if (item.fallback && item.url !== item.fallback) {
@@ -1205,9 +1206,15 @@ function boot() {
         loadOne(item);
         return;
       }
-      loaded += 1;
-      pump();
+      landed();
     });
+  }
+
+  /* Una obra más colgada (o que no se pudo colgar): al terminar se quita el aviso */
+  function landed() {
+    loaded += 1;
+    if (note && loaded >= total) note.textContent = "";
+    pump();
   }
 
   function resize() {
