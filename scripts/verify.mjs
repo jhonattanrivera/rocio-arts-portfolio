@@ -121,6 +121,16 @@ async function checkSpanish(page, label, english) {
   for (const s of english) if (text.includes(s)) fail(`${label}: texto en inglés en ${page.url()}: "${s}"`);
 }
 
+// Nunca se dice cuántas obras hay: el número cambia y ella no quiere actualizarlo.
+// Vale cualquier número, en cifras o en palabras, en español o en inglés.
+const NUMBER = "\\d+|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieci\\p{L}+|veinti?\\p{L}*|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|cien\\p{L}*|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|\\p{L}+teen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred";
+const COUNT_RE = new RegExp(`(?<![\\p{L}\\d])(${NUMBER})(?:[\\s-]+\\p{L}+)?\\s+(obras|pinturas|cuadros|works|paintings)\\b`, "iu");
+async function checkNoCount(page, label) {
+  const text = await page.evaluate(() => document.body.innerText);
+  const m = COUNT_RE.exec(text);
+  if (m) fail(`${label}: ${page.url()} cuenta las obras ("${m[0]}")`);
+}
+
 async function scrollThrough(page) {
   await page.evaluate(async () => {
     const step = Math.round(innerHeight * 0.9);
@@ -143,6 +153,23 @@ async function checkImages(page, label) {
   const broken = await page.evaluate((fn) =>
     (0, eval)(fn)().filter((i) => !i.complete || i.naturalWidth === 0).map((i) => i.currentSrc || i.src), shown.toString());
   if (!done || broken.length) fail(`${label}: imágenes que no cargan en ${page.url()}: ${broken.slice(0, 5).join(", ") || "(timeout)"}${broken.length > 5 ? ` y ${broken.length - 5} más` : ""}`);
+}
+
+// La obra se dibuja de verdad en la sala: el canvas no queda vacío ni de un solo color
+// (un archivo que el navegador muestra pero no puede pintar en canvas dejaba solo el tono).
+async function waitArtDrawn(page, label, title) {
+  await page.waitForFunction(() => {
+    const c = document.querySelector(".viewer .room-render");
+    if (!c || c.width < 8 || c.height < 8) return false;
+    const d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data;
+    let n = 0, sum = 0, sum2 = 0;
+    for (let i = 0; i < d.length; i += 4 * 31) {
+      if (d[i + 3] < 250) continue;
+      const l = d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11;
+      sum += l; sum2 += l * l; n += 1;
+    }
+    return n > 50 && sum2 / n - (sum / n) ** 2 > 60;
+  }, null, { timeout: 10000 }).catch(() => fail(`${label}: ${title} no se dibuja en la sala del visor (lienzo vacío o de un solo color)`));
 }
 
 async function openMenuAndGo(page, label, href, text) {
@@ -210,28 +237,46 @@ async function runViewport(browser, base, vp, english) {
   let step = "inicio";
   const T = Date.now(); const mark = (s) => process.env.VERIFY_TIMING && console.log(label, s, ((Date.now() - T) / 1000).toFixed(1));
   try {
-    // 1. La firma: la intro dibuja el logo y vuela al menú en la primera visita.
+    // 1. La firma: en la primera visita la intro escribe el nombre en Fraunces sobre un
+    //    verde oliva claro y la firma vuela al menú. El logo del brochazo ya no existe:
+    //    si el inicio lo vuelve a pedir, es un error.
     step = "firma";
-    const svg = page.waitForResponse((r) => r.url().includes("assets/brand/logo.svg"));
     const res = await page.goto(base, { waitUntil: "domcontentloaded" });
     if (res.status() !== 200) fail(`${label}: el inicio respondió ${res.status()}`);
-    const logo = await svg;
-    const svgText = await logo.text();
-    if (logo.status() !== 200 || !/id="wash"/.test(svgText) || !/id="ink"/.test(svgText)) fail(`${label}: logo.svg no tiene #wash y #ink`);
     if (!(await page.evaluate(() => document.documentElement.classList.contains("show-intro")))) fail(`${label}: la intro de la firma no arrancó`);
-    await page.locator("#intro .intro-logo").waitFor({ state: "visible" }).catch(() => fail(`${label}: la firma de la intro no se ve`));
-    const ink = await page.evaluate(() => getComputedStyle(document.querySelector("#intro .intro-ink")).animationName);
-    if (!ink || ink === "none") fail(`${label}: la firma no tiene animación`);
+    await page.locator("#intro .intro-logo.wordmark").waitFor({ state: "visible" }).catch(() => fail(`${label}: la firma de la intro no se ve`));
+    const intro = await page.evaluate(() => {
+      const logo = document.querySelector("#intro .intro-logo");
+      const curtain = document.querySelector("#intro .intro-curtain");
+      // el verde oliva del tema, resuelto por el propio navegador, para comparar en el mismo formato
+      const probe = document.createElement("i");
+      probe.style.backgroundColor = "var(--olive)";
+      document.body.append(probe);
+      const olive = getComputedStyle(probe).backgroundColor;
+      probe.remove();
+      return logo && { text: logo.textContent.replace(/\s+/g, " ").trim(), font: getComputedStyle(logo).fontFamily, bg: curtain ? getComputedStyle(curtain).backgroundColor : "", olive };
+    });
+    if (!intro || intro.text !== "Rocío Villamizar") fail(`${label}: la firma de la intro dice "${intro && intro.text}" y esperaba "Rocío Villamizar"`);
+    if (intro && !/Fraunces/.test(intro.font)) fail(`${label}: la firma de la intro no está en Fraunces (${intro.font})`);
+    if (intro && (!intro.olive || intro.bg !== intro.olive)) fail(`${label}: el fondo de la intro (${intro.bg}) no es el verde oliva del tema (${intro.olive})`);
+    // Se escribe: cada parte del nombre entra con su barrido.
+    await page.waitForFunction(() => {
+      const parts = Array.from(document.querySelectorAll("#intro .intro-logo > *"));
+      return parts.length === 2 && parts.every((el) => getComputedStyle(el).animationName === "wipe");
+    }, null, { timeout: 3000 }).catch(() => fail(`${label}: la firma no tiene animación`));
     await page.waitForFunction(() => !document.getElementById("intro") && !document.documentElement.classList.contains("show-intro") && document.documentElement.classList.contains("hero-go"), null, { timeout: 6000 })
       .catch(() => fail(`${label}: la intro de la firma no termina sola`));
-    await page.locator(".nav .brand svg").waitFor({ state: "visible" });
+    await page.locator(".nav .brand .wordmark").waitFor({ state: "visible" });
+    const brand = (await page.textContent(".nav .brand .wordmark"))?.replace(/\s+/g, " ").trim();
+    if (brand !== "Rocío Villamizar") fail(`${label}: la firma del menú dice "${brand}" y esperaba "Rocío Villamizar"`);
     await page.waitForLoadState("load");
 
     // 2. Inicio en español, con sus secciones.
     step = "inicio";
     await checkSpanish(page, label, english);
-    for (const sel of [".hero h1", "#ahora", "[data-rail]", ".walltest", ".statement", "a.portal", "nav.paths", "footer.footer"])
+    for (const sel of [".hero h1", "[data-rail]", ".walltest", ".statement", "a.portal", "nav.paths", "footer.footer"])
       if (!(await page.$(sel))) fail(`${label}: falta ${sel} en el inicio`);
+    await checkNoCount(page, label);
     await page.waitForSelector(".rail-track > *", { timeout: 5000 }).catch(() => fail(`${label}: la selección de obras quedó vacía`));
     await page.waitForSelector("[data-mount='room-demo'] .room", { timeout: 5000 }).catch(() => fail(`${label}: la demo de "En tu espacio" no se montó`));
 
@@ -248,13 +293,35 @@ async function runViewport(browser, base, vp, english) {
       const art = room && room.querySelector(".room-art");
       return imgs.length && imgs.every((i) => i.complete && i.naturalWidth > 0) && art && art.getBoundingClientRect().width > 20;
     }, null, { timeout: 10000 }).catch(() => fail(`${label}: la sala del visor no carga o no muestra la obra`));
+    await waitArtDrawn(page, label, "Rosal");
     for (const t of ["En tu espacio", "La obra", "Cerrar"])
       if (!(await viewer.getByRole("button", { name: t, exact: true }).count())) fail(`${label}: el visor no tiene el botón "${t}"`);
     const title = (await page.textContent("#viewer-title"))?.trim();
-    if (title !== "Serenidad") fail(`${label}: el visor muestra "${title}" y esperaba "Serenidad"`);
+    if (title !== "Rosal") fail(`${label}: el visor muestra "${title}" y esperaba "Rosal"`);
+    const counted = await page.evaluate(() => /\b\d{1,3}\s*\/\s*\d{1,3}\b/.exec(document.querySelector(".viewer").innerText));
+    if (counted) fail(`${label}: el visor cuenta las obras ("${counted[0]}")`);
     await checkSpanish(page, label + " (visor)", english);
     await page.locator(".viewer-close").click();
     await page.waitForSelector(".viewer.is-open", { state: "detached", timeout: 5000 }).catch(() => fail(`${label}: el visor no cierra`));
+
+    // 3b. Un díptico: dos lienzos, cada uno con su sombra, y la pared entre ellos.
+    mark(step); step = "díptico";
+    await page.goto(new URL("obras.html#dos-jardines", base).href, { waitUntil: "load" });
+    await page.locator(".viewer.is-open").waitFor({ state: "visible" }).catch(() => fail(`${label}: el díptico no abre en el visor`));
+    await waitArtDrawn(page, label, "Dos jardines");
+    const diptych = await page.evaluate(() => {
+      const work = (window.WORKS || []).find((w) => w.id === "dos-jardines");
+      const c = document.querySelector(".viewer .room-render");
+      if (!work || !work.panels || !c) return null;
+      const mid = (work.panels[0][1] + work.panels[1][0]) / 2;
+      const a = c.getContext("2d").getImageData(Math.round(mid * c.width), Math.round(c.height / 2), 1, 1).data[3];
+      return { panels: work.panels.length, shades: document.querySelectorAll(".viewer .room-shade").length, gapAlpha: a };
+    });
+    if (!diptych) fail(`${label}: el díptico no tiene paneles en works.js`);
+    else {
+      if (diptych.shades !== diptych.panels) fail(`${label}: el díptico tiene ${diptych.shades} sombras para ${diptych.panels} paneles`);
+      if (diptych.gapAlpha !== 0) fail(`${label}: entre los paneles del díptico no se ve la pared`);
+    }
 
     // 4. Imágenes del inicio.
     mark(step); step = "imágenes inicio";
@@ -270,6 +337,7 @@ async function runViewport(browser, base, vp, english) {
       const h1 = await page.locator("main h1").first().textContent().catch(() => "");
       if (!h1?.trim()) fail(`${label}: ${href} no tiene título`);
       await checkSpanish(page, label, english);
+      await checkNoCount(page, label);
       if (href === "obras.html") await page.waitForSelector("[data-mount='masonry'] > *", { timeout: 8000 }).catch(() => fail(`${label}: Obras quedó vacía`));
       await checkImages(page, label);
     }
@@ -393,6 +461,9 @@ async function checkPagesAndLinks(browser, base) {
     const lang = await page.evaluate(() => document.documentElement.lang);
     if (lang !== want) fail(`páginas: ${p} tiene lang="${lang}" y esperaba "${want}"`);
     if (!ids.size) ids = new Set(await page.evaluate(() => (window.WORKS || []).map((w) => w.id)));
+    const marks = await page.evaluate(() => Array.from(document.querySelectorAll(".brand .wordmark, .footer-logo .wordmark")).map((n) => n.textContent.replace(/\s+/g, " ").trim()));
+    if (!marks.length || marks.some((t) => t !== "Rocío Villamizar")) fail(`páginas: ${p} tiene la firma "${marks.join(" / ")}" y esperaba "Rocío Villamizar"`);
+    await checkNoCount(page, "páginas");
     const found = await page.evaluate((local) => {
       const out = [];
       for (const a of document.querySelectorAll("a[href]")) out.push(a.href);

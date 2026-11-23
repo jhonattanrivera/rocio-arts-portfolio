@@ -24,9 +24,10 @@ Tarda unos 50 s. Sale con código 0 si todo pasa. Si algo falla, lista cada fall
 
 En celular (390x844, táctil) y en escritorio (1280x800), con el navegador en español:
 
-- La firma: en la primera visita la intro arranca, el logo (`assets/brand/logo.svg` con `#wash` e `#ink`) se ve y se anima, y la intro termina sola dejando la firma en el menú.
-- El inicio tiene sus secciones (portada, Ahora, la selección de obras, En tu espacio, la artista, el portal al jardín, Entrar, pie) y la selección y la demo de la sala se montan.
-- "En tu espacio": "Verla en tu espacio" abre el visor en ese modo con Serenidad colgada en una sala que carga, con los botones "En tu espacio", "La obra" y "Cerrar", y el visor cierra.
+- La firma: en la primera visita la intro arranca sobre el verde oliva claro, escribe "Rocío Villamizar" en Fraunces con un barrido por cada parte del nombre, termina sola y deja la misma firma en el menú. El logo viejo (`logo.svg`, `wash.svg`) no se vuelve a pedir.
+- El inicio tiene sus secciones (portada, la selección de obras, En tu espacio, la artista, el portal al jardín, Entrar, pie) y la selección y la demo de la sala se montan. No hay bloque de "próxima exposición": tenía fechas que había que actualizar.
+- "En tu espacio": "Verla en tu espacio" abre el visor en ese modo con Rosal colgada en una sala que carga, con los botones "En tu espacio", "La obra" y "Cerrar", sin contador de obras, y el visor cierra.
+- Sin conteos: ni el inicio ni Obras, Encargos o La artista dicen cuántas obras hay.
 - El menú lleva a Obras, Encargos y La artista. Cada página tiene título, está en español y todas sus imágenes visibles cargan al bajar.
 - El jardín: desde el menú, "Entrar al jardín" arranca el 3D (WebGL) sin caer a la vista plana. En celular el joystick aparece abajo a la derecha y en escritorio no aparece. "Listado" sale del 3D y la ficha de una obra abre y cierra.
 - El toque temprano: en celular y carga fría, en español y en inglés, un toque en "Entrar al jardín" antes de que llegue `gallery.js` cambia el botón a "Cargando…" / "Loading…" sin mover el diseño y, sin un segundo toque, termina dentro del jardín 3D con el botón de vuelta a su texto.
