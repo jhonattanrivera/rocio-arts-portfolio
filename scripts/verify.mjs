@@ -123,7 +123,7 @@ async function checkSpanish(page, label, english) {
 
 // Nunca se dice cuántas obras hay: el número cambia y ella no quiere actualizarlo.
 // Vale cualquier número, en cifras o en palabras, en español o en inglés.
-const NUMBER = "\\d+|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieci\\p{L}+|veinti?\\p{L}*|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|cien\\p{L}*|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|\\p{L}+teen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred";
+const NUMBER = "\\d+|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieci\\p{L}+|veinti?\\p{L}*|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|cien\\p{L}*|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred";
 const COUNT_RE = new RegExp(`(?<![\\p{L}\\d])(${NUMBER})(?:[\\s-]+\\p{L}+)?\\s+(obras|pinturas|cuadros|works|paintings)\\b`, "iu");
 async function checkNoCount(page, label) {
   const text = await page.evaluate(() => document.body.innerText);
