@@ -1088,43 +1088,7 @@ body.is-walking { overflow: hidden; }
 .sheet .text-link { display: inline-block; margin: .9rem 0 .2rem; }
 .ghost { margin: 0 0 1rem; min-height: 44px; color: var(--accent-ink); font-weight: 500; }
 
-.lang-suggest {
-  position: relative;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: .6rem;
-  margin: 0;
-  padding: .2rem var(--pad);
-  background: var(--paper-2);
-  min-height: 44px;
-}
-.page-home .lang-suggest { position: absolute; top: var(--nav-h); left: 0; right: 0; background: rgb(var(--glass) / .92); }
-.lang-suggest p { margin: 0; font-size: .86rem; line-height: 1.2; }
-.lang-suggest a { color: var(--accent-ink); }
-.lang-suggest button { min-height: 44px; font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-
-/* Cursor y caminos flotantes */
-.cursor {
-  position: fixed;
-  z-index: 150;
-  left: 0;
-  top: 0;
-  width: 10px;
-  height: 10px;
-  margin: -5px 0 0 -5px;
-  border-radius: 999px;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: .76rem;
-  font-weight: 500;
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transition: width .35s var(--ease), height .35s var(--ease), margin .35s var(--ease), padding .35s var(--ease), opacity .25s ease;
-}
-body:hover .cursor { opacity: .9; }
+.page-home body:hover .cursor { opacity: .9; }
 .cursor.is-on { width: auto; height: auto; margin: 14px 0 0 14px; padding: .4rem .8rem; opacity: 1; }
 body.is-locked .cursor, body.is-walking .cursor { display: none; }
 .path-float {
@@ -1230,7 +1194,6 @@ body.is-locked { position: fixed; inset: 0; width: 100%; overflow: hidden; }
   }
   .nav-panel .nav-write::after { display: none; }
   .nav-panel .nav-write:hover { background: var(--accent-ink); }
-  .page-home .nav:not(.is-solid):not(.is-open) .nav-write { background: var(--on-night); color: var(--ink-fixed) !important; }
   .page-home .nav:not(.is-solid):not(.is-open) .nav-panel a::after { opacity: 1; }
 
   .hero {
@@ -1253,6 +1216,14 @@ body.is-locked { position: fixed; inset: 0; width: 100%; overflow: hidden; }
   .hero .text-link.light { color: var(--ink); box-shadow: inset 0 -1px 0 rgb(var(--ink-rgb) / .4); }
   .hero-tag { display: block; z-index: 2; }
   .page-home .nav:not(.is-solid):not(.is-open) .brand .wordmark { color: var(--ink); }
+  /* En escritorio la portada es mitad papel y mitad foto: la barra lleva su vidrio
+     desde el principio y todo va en tinta, así ningún enlace queda blanco sobre el papel. */
+  .page-home .nav:not(.is-open) { background: rgb(var(--glass) / .9); -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2); box-shadow: 0 1px 0 var(--line); }
+  .page-home .nav:not(.is-solid):not(.is-open) .nav-panel > a,
+  .page-home .nav:not(.is-solid):not(.is-open) .theme-toggle,
+  .page-home .nav:not(.is-solid):not(.is-open) .langs a[aria-current="true"] { color: var(--ink); }
+  .page-home .nav:not(.is-solid):not(.is-open) .langs a { color: var(--muted); }
+  .page-home .nav:not(.is-solid):not(.is-open) .nav-write { background: var(--ink); color: var(--paper) !important; }
   .rail-frame { height: min(58svh, 620px); }
   .masonry { columns: 4; }
   .paths { grid-template-columns: 1fr 1fr; column-gap: 3rem; }

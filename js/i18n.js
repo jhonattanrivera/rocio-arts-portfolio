@@ -21,9 +21,6 @@
       flatNow: "Ver las obras",
       noWebgl: "El jardín en tres dimensiones no está disponible en este navegador.",
       lost: "El jardín se detuvo. Puedes ver las obras en plano.",
-      suggest: "También puedes leer este sitio en inglés.",
-      suggestGo: "Leer en inglés",
-      suggestHide: "Ahora no",
       menu: "Menú",
       view: "Ver",
       seeRoom: "Verla en tu espacio",
@@ -61,9 +58,6 @@
       flatNow: "See the works",
       noWebgl: "The three-dimensional garden is not available in this browser.",
       lost: "The garden has stopped. You can see the works as a list.",
-      suggest: "You can also read this site in Spanish.",
-      suggestGo: "Leer en español",
-      suggestHide: "Not now",
       menu: "Menu",
       view: "View",
       seeRoom: "See it in your space",
@@ -149,52 +143,4 @@
     try { localStorage.setItem("rocio-lang", link.getAttribute("data-set-lang")); } catch (err) {}
   });
 
-  function suggest() {
-    var saved = "";
-    var hidden = "";
-    try {
-      saved = localStorage.getItem("rocio-lang") || "";
-      hidden = localStorage.getItem("rocio-suggest") || "";
-    } catch (err) { return; }
-    if (hidden === "off" && !saved) return;
-    var nav = (navigator.language || "").toLowerCase();
-    var file = window.pageFile();
-    var show = false;
-    var href = "";
-    var label = "";
-    var go = "";
-    if (lang === "es" && (saved === "en" || (!saved && nav.indexOf("en") === 0))) {
-      show = true;
-      href = "en/" + file;
-      label = ui.es.suggest;
-      go = ui.es.suggestGo;
-    } else if (lang === "en" && (saved === "es" || (!saved && nav.indexOf("es") === 0))) {
-      show = true;
-      href = "../" + file;
-      label = ui.en.suggest;
-      go = ui.en.suggestGo;
-    }
-    if (!show || !document.body) return;
-    var bar = document.createElement("div");
-    bar.className = "lang-suggest";
-    bar.setAttribute("role", "status");
-    bar.innerHTML = "<p></p><a></a><button type=\"button\"></button>";
-    bar.querySelector("p").textContent = label;
-    var a = bar.querySelector("a");
-    a.href = href;
-    a.textContent = go;
-    a.setAttribute("data-set-lang", lang === "es" ? "en" : "es");
-    var btn = bar.querySelector("button");
-    btn.textContent = lang === "es" ? ui.es.suggestHide : ui.en.suggestHide;
-    btn.addEventListener("click", function () {
-      try { localStorage.setItem("rocio-suggest", "off"); } catch (err) {}
-      bar.remove();
-    });
-    var main = document.getElementById("contenido");
-    if (main) main.prepend(bar);
-    else document.body.append(bar);
-  }
-
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", suggest);
-  else suggest();
 })();
