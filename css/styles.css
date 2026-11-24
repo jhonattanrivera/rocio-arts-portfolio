@@ -1083,8 +1083,10 @@ body.is-walking { overflow: hidden; }
 #to-list { min-width: 7rem; }
 .wall { padding-block: 2rem 6rem; }
 .wall h2 { margin: 0 0 1rem; font-size: clamp(2.2rem, 8vw, 4rem); line-height: .95; }
-.wall-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem .9rem; }
-.wall-card { display: block; color: inherit; text-decoration: none; }
+/* En columnas, como Obras: cada cuadro con su proporción y sin huecos */
+.wall-grid { columns: 2; column-gap: clamp(.9rem, 2.4vw, 2.4rem); }
+.wall-card { display: block; break-inside: avoid; margin: 0 0 clamp(1.4rem, 3.5vw, 2.8rem); color: inherit; text-decoration: none; }
+.wall-more { margin: 1.4rem 0 0; text-align: center; }
 .wall-card picture { display: block; box-shadow: 0 16px 30px -18px rgb(var(--shade) / calc(.42 * var(--shade-k))); }
 .wall-card img { display: block; width: 100%; height: auto; }
 .wall-card span { display: block; margin-top: .55rem; font-family: var(--serif); font-size: 1.25rem; line-height: 1.05; }
@@ -1144,7 +1146,7 @@ body.is-locked { position: fixed; inset: 0; width: 100%; overflow: hidden; }
   .chapter { grid-template-columns: 1fr .82fr; gap: clamp(3rem, 6vw, 6rem); }
   .chapter.flip { grid-template-columns: .82fr 1fr; }
   .chapter.flip .chapter-copy { order: 2; }
-  .wall-grid { grid-template-columns: 1fr 1fr 1fr; }
+  .wall-grid { columns: 3; }
   .steps { grid-template-columns: repeat(3, 1fr); gap: 2.4rem; }
   .steps li { grid-template-columns: 1fr; }
   .steps em { grid-row: auto; }
