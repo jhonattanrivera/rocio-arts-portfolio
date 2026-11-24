@@ -29,7 +29,7 @@ En celular (390x844, táctil) y en escritorio (1280x800), con el navegador en es
 - "En tu espacio": "Verla en tu espacio" abre el visor en ese modo con Rosal colgada en una sala que carga, con los botones "En tu espacio", "La obra" y "Cerrar", sin contador de obras, y el visor cierra.
 - Sin conteos: ni el inicio ni Obras, Encargos o La artista dicen cuántas obras hay.
 - El menú lleva a Obras, Encargos y La artista. Cada página tiene título, está en español y todas sus imágenes visibles cargan al bajar.
-- El jardín: desde el menú, "Entrar al jardín" arranca el 3D (WebGL) sin caer a la vista plana. En celular el joystick aparece abajo a la derecha y en escritorio no aparece. "Listado" sale del 3D y la ficha de una obra abre y cierra.
+- El jardín: desde el menú, "Entrar al jardín" arranca el 3D (WebGL) sin caer a la vista plana. En celular el joystick aparece abajo a la derecha y en escritorio no aparece. La ficha de una obra abre y cierra, no hay vista en plano, y "Todas las obras" lleva del 3D a Obras.
 - El toque temprano: en celular y carga fría, en español y en inglés, un toque en "Entrar al jardín" antes de que llegue `gallery.js` cambia el botón a "Cargando…" / "Loading…" sin mover el diseño y, sin un segundo toque, termina dentro del jardín 3D con el botón de vuelta a su texto.
 - El español: `lang="es"` y ningún texto de la interfaz en inglés (los de `js/i18n.js`) en las páginas en español, el visor ni el jardín.
 - Las 14 páginas (español e inglés, con su `lang`) responden 200, Disponible redirige a Obras mientras `showAvailable` esté apagado, los enlaces y recursos internos responden 200 (en local también cada variante de `srcset`), las anclas apuntan a un id o a una obra, y en local una página inexistente muestra el 404 propio.

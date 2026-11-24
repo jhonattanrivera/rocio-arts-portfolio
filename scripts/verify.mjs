@@ -189,9 +189,6 @@ async function openMenuAndGo(page, label, href, text) {
 // sondean cada 100 ms en vez de esperar cuadros de animación.
 async function checkGarden(page, label, vp, english) {
   const poll = { polling: 100, timeout: 30000 };
-  // Las obras en plano existen desde el parseo (sala.js), pero la vista previa 3D puede estar
-  // bloqueando la página (ver runGarden): hasta 30 s, como las demás esperas del jardín.
-  await page.waitForSelector("[data-wall] .wall-card", { timeout: 30000 }).catch(() => fail(`${label}: el jardín en plano quedó vacío`));
   // gallery.js (con three.js) llega como módulo después de la carga: hasta que arranca,
   // el botón todavía no hace nada. Se espera a que el jardín exponga window.JARDIN.
   await page.waitForFunction(() => window.JARDIN || document.documentElement.classList.contains("sala-flat"), null, poll)
@@ -209,14 +206,16 @@ async function checkGarden(page, label, vp, english) {
     if (!joy.shown) fail(`${label}: el joystick no aparece en celular`);
     else if (joy.cx <= joy.w / 2 || joy.right > 40) fail(`${label}: el joystick no está a la derecha (centro ${Math.round(joy.cx)} de ${joy.w})`);
   } else if (joy.shown) fail(`${label}: el joystick aparece en escritorio`);
-  await page.locator("#to-list").click();
-  await page.waitForFunction(() => !document.body.classList.contains("is-walking"), null, poll)
-    .catch(() => fail(`${label}: "Listado" no sale del jardín`));
-  await page.locator("[data-wall] .wall-card").first().click();
+  // La ficha de una obra del jardín (la que abre un cuadro al tocarlo) abre y cierra.
+  await page.evaluate(() => window.SALA.open(window.SALA.ids[0]));
   await page.waitForSelector("#sheet:not([hidden])", { timeout: 5000 }).catch(() => fail(`${label}: la ficha de una obra del jardín no abre`));
   await checkSpanish(page, label + " (jardín)", english);
   await page.locator("[data-sheet-close]").click();
   await page.waitForSelector("#sheet[hidden]", { state: "attached", timeout: 5000 }).catch(() => fail(`${label}: la ficha del jardín no cierra`));
+  // El jardín es solo 3D: para ver todas las obras se va a Obras.
+  if (await page.$("#muro, [data-wall]")) fail(`${label}: el jardín todavía tiene la vista en plano`);
+  await Promise.all([page.waitForURL((u) => u.pathname.endsWith("/obras.html"), { timeout: 30000 }), page.locator("#to-list").click()])
+    .catch(() => fail(`${label}: "Todas las obras" no lleva del jardín a Obras`));
 }
 
 // ---------- Recorrido por tamaño de pantalla ----------
