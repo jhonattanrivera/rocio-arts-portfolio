@@ -9,7 +9,6 @@
     "hortensias", "luz-de-mayo", "jardin-secreto"
   ];
 
-  var wall = document.querySelector("[data-wall]");
   var sheet = document.getElementById("sheet");
   var photo = sheet && sheet.querySelector(".sheet-photo");
   var title = document.getElementById("sheet-title");
@@ -20,27 +19,6 @@
   var more = document.getElementById("sheet-more");
   var lastFocus = null;
   var openId = "";
-
-  if (wall && window.artPicture) {
-    IDS.forEach(function (id) {
-      var work = byId[id];
-      if (!work) return;
-      var link = document.createElement("a");
-      link.className = "wall-card";
-      link.href = "obras.html#" + work.id;
-      link.dataset.openSheet = work.id;
-      link.style.setProperty("--tone", work.tone || "#e7e1d8");
-      link.append(window.artPicture(work, {
-        sizes: "(min-width: 900px) 30vw, 46vw",
-        alt: window.artAlt ? window.artAlt(work) : work.title,
-        blur: true
-      }));
-      var cap = document.createElement("span");
-      cap.textContent = work.title;
-      link.append(cap);
-      wall.append(link);
-    });
-  }
 
   function fill(work) {
     if (!sheet) return;

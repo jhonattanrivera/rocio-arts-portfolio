@@ -27,8 +27,6 @@ var canvas = document.getElementById("sala");
 var aim = document.getElementById("aim");
 var note = document.getElementById("load-note");
 var reticle = document.querySelector(".reticle");
-var listBtn = document.getElementById("to-list");
-var returnBtn = document.getElementById("return-walk");
 
 // Un toque en "Entrar al jardín" que llegó antes que este módulo lo anotó la página
 // (EARLY_ENTER, en galeria.html). Desde aquí los toques los atiende el jardín.
@@ -41,10 +39,8 @@ function showFlat(message) {
   document.documentElement.classList.add("sala-flat");
   if (enterBtn) {
     enterBtn.textContent = ui("flatNow", "Ver las obras");
-    enterBtn.addEventListener("click", function () {
-      var muro = document.getElementById("muro");
-      if (muro) muro.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
-    });
+    /* sin 3D, el jardín manda a Obras, donde están todas */
+    enterBtn.addEventListener("click", function () { location.href = "obras.html"; });
   }
   if (note && message) note.textContent = message;
 }
@@ -53,7 +49,7 @@ if (!canvas || !window.SALA || !hasWebGL()) {
   var tapped = early && early.pending;
   if (early) early.done();
   showFlat("");
-  // Sin 3D el botón baja a las obras: el toque pendiente hace eso mismo.
+  // Sin 3D el botón lleva a Obras: el toque pendiente hace eso mismo.
   if (tapped && enterBtn) enterBtn.click();
 } else {
   boot();
@@ -1147,7 +1143,7 @@ function boot() {
 
   function buildHang() {
     var by = window.SALA.byId;
-    /* Las mismas obras y en el mismo orden que el muro "en plano" (sala.js) */
+    /* La selección del jardín vive en sala.js (SALA.ids) */
     var ids = window.SALA.ids;
     var left = ids.slice(0, 7);
     var right = ids.slice(7, 13);
@@ -1379,7 +1375,6 @@ function boot() {
     clock = new THREE.Clock();
     started = true;
     canvas.dataset.ready = "1";
-    if (returnBtn) returnBtn.hidden = false;
   }
 
   function enterSala() {
@@ -1411,18 +1406,8 @@ function boot() {
   }
 
   enterBtn.addEventListener("click", enterSala);
-  if (returnBtn) returnBtn.addEventListener("click", enterSala);
 
 
-  if (listBtn) {
-    listBtn.addEventListener("click", function () {
-      stopLoop();
-      document.body.classList.remove("is-walking");
-      document.body.classList.add("left-cover");
-      var muro = document.getElementById("muro");
-      if (muro) muro.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
-    });
-  }
 
   var joy = document.getElementById("joystick");
   var knob = joy && joy.querySelector(".joystick-knob");
