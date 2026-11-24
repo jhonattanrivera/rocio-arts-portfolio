@@ -497,6 +497,19 @@ main { display: block; padding-top: var(--nav-h); }
 }
 .hero-tag span { display: block; font-family: var(--serif); font-style: italic; font-size: 1.25rem; color: var(--on-night); }
 
+/* Próxima exposición: el afiche y sus datos */
+.now { padding-block: clamp(4rem, 10vw, 8rem); }
+.now-grid { display: grid; gap: clamp(2.2rem, 5vw, 4.5rem); align-items: center; }
+.now-poster { margin: 0; justify-self: center; width: min(100%, 26rem); }
+.now-poster img { display: block; width: 100%; height: auto; box-shadow: 0 2px 4px rgb(var(--shade) / calc(.12 * var(--shade-k))), 0 34px 60px -30px rgb(var(--shade) / calc(.55 * var(--shade-k))); }
+.now h2 { margin: 0 0 1rem; font-size: clamp(2.6rem, 7.4vw, 5.2rem); line-height: .92; }
+.now h2 em { font-style: italic; font-variation-settings: "SOFT" 100, "WONK" 1; color: var(--accent-ink); }
+.now blockquote { margin: 0 0 1.8rem; max-width: 26em; font-family: var(--serif); font-style: italic; font-size: clamp(1.25rem, 2.6vw, 1.6rem); line-height: 1.25; color: var(--ink-2); }
+.now-facts { display: grid; gap: .9rem; margin: 0 0 2rem; }
+.now-facts div { display: grid; gap: .1rem; }
+.now-facts dt { font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.now-facts dd { margin: 0; font-size: 1.08rem; }
+
 /* La frase */
 .quote { padding: clamp(5rem, 14vw, 11rem) 0; background: var(--paper-2); }
 .quote p {
@@ -1021,6 +1034,8 @@ input[type="range"]:disabled { opacity: .35; cursor: default; }
 .timeline .when { font-family: var(--serif); font-style: italic; font-variation-settings: "SOFT" 100, "WONK" 1; font-size: 1.5rem; color: var(--muted); }
 .timeline strong { display: block; font-family: var(--serif); font-weight: 400; font-size: 1.35rem; line-height: 1.15; }
 .timeline em { color: var(--muted); font-style: normal; font-size: .95rem; }
+.timeline .now { display: block; margin: 0 0 .15rem; font-family: var(--hand); font-size: 1.15rem; color: var(--accent-ink); }
+.timeline .is-next strong { font-size: 1.7rem; }
 .interview video { display: block; width: min(100%, 960px); height: auto; background: #111; border-radius: 3px; }
 .interview figure { margin: 1.4rem 0 0; }
 .interview figcaption { margin-top: .6rem; color: var(--muted); font-size: .92rem; }
@@ -1125,6 +1140,7 @@ body.is-locked { position: fixed; inset: 0; width: 100%; overflow: hidden; }
   .walltest { grid-template-columns: .8fr 1.2fr; align-items: center; gap: 3rem; }
   .walltest-stage { aspect-ratio: auto; height: min(76svh, 720px); max-height: none; }
   .bio { grid-template-columns: .85fr 1.15fr; gap: 3.4rem; }
+  .now-grid { grid-template-columns: minmax(0, .8fr) minmax(0, 1fr); }
   .chapter { grid-template-columns: 1fr .82fr; gap: clamp(3rem, 6vw, 6rem); }
   .chapter.flip { grid-template-columns: .82fr 1fr; }
   .chapter.flip .chapter-copy { order: 2; }

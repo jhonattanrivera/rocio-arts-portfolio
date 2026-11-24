@@ -5,7 +5,7 @@
 
   var IDS = [
     "rosal", "hacia-el-cielo", "entre-mujeres", "primavera", "nina-de-las-rosas", "hogar", "prado",
-    "colibries", "camino-rosa", "leer-contigo", "rosas-sobre-turquesa", "la-puerta", "bruma-floral",
+    "respirar", "camino-rosa", "leer-contigo", "rosas-sobre-turquesa", "la-puerta", "bruma-floral",
     "hortensias", "luz-de-mayo", "jardin-secreto"
   ];
 

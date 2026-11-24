@@ -82,7 +82,7 @@
   };
 
   window.DESC_EN = {
-    "colibries": "Roses, yellow tulips and violet blooms in a green garden. Two hummingbirds cross the sky.",
+    "respirar": "Roses, yellow tulips and violet blooms in a green garden. Two hummingbirds cross the sky.",
     "amanecer-en-el-jardin": "A long, dense garden under a pale pink sky. Hydrangeas, daisies, irises and fuchsia blooms, all at once.",
     "hacia-el-cielo": "A path of colors crosses a field of flowers toward a turquoise sky with violet clouds. A girl in white walks along it.",
     "entre-mujeres": "A girl, a young woman and a woman walk hand in hand. Behind them, a tapestry of turquoise and pink patches, with hanging flowers.",

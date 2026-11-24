@@ -7,8 +7,8 @@
   var fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   var ROOT = (window.SITE && window.SITE.root) || "";
 
-  var RAIL = ["rosal", "hacia-el-cielo", "dos-jardines", "nina-de-las-rosas", "luz-de-mayo", "entre-mujeres", "colibries", "camino-rosa", "la-puerta"];
-  var DEMO = [["prado", "comedor"], ["dos-jardines", "sala"], ["bruma-floral", "habitacion"], ["luz-de-mayo", "escalera"], ["colibries", "tarde"], ["hacia-el-cielo", "entrada"]];
+  var RAIL = ["rosal", "hacia-el-cielo", "dos-jardines", "nina-de-las-rosas", "luz-de-mayo", "entre-mujeres", "respirar", "camino-rosa", "la-puerta"];
+  var DEMO = [["prado", "comedor"], ["dos-jardines", "sala"], ["bruma-floral", "habitacion"], ["luz-de-mayo", "escalera"], ["respirar", "tarde"], ["hacia-el-cielo", "entrada"]];
 
   function t(key) { return window.ui ? window.ui(key) : key; }
   function wa(text) { return window.artWa ? window.artWa(text) : "https://wa.me/50689877207?text=" + encodeURIComponent(text); }

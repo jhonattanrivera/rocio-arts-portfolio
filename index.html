@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Instrument+Sans:wght@400..600&family=Sedgwick+Ave&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=20261124b">
+  <link rel="stylesheet" href="css/styles.css?v=20261124c">
   <script>
     document.documentElement.classList.add("js"); try { if (localStorage.getItem("rocio-theme") === "dark") { document.documentElement.dataset.theme = "dark"; var tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = getComputedStyle(document.documentElement).getPropertyValue("--paper").trim(); var cs = document.querySelector('meta[name="color-scheme"]'); if (cs) cs.content = "dark"; } } catch (err) {}
     if ("onpagereveal" in window) document.documentElement.classList.add("vt");
@@ -99,6 +99,28 @@
     </section>
 
 
+    <section class="now" id="ahora" aria-labelledby="now-title">
+      <div class="wrap now-grid">
+        <figure class="now-poster reveal">
+          <picture>
+            <source type="image/avif" srcset="assets/media/events/fragmentos-640.avif 640w, assets/media/events/fragmentos-852.avif 852w" sizes="(min-width: 980px) 26rem, 84vw">
+            <source type="image/webp" srcset="assets/media/events/fragmentos-640.webp 640w, assets/media/events/fragmentos-852.webp 852w" sizes="(min-width: 980px) 26rem, 84vw">
+            <img src="assets/media/events/fragmentos-852.jpg" srcset="assets/media/events/fragmentos-640.jpg 640w, assets/media/events/fragmentos-852.jpg 852w" sizes="(min-width: 980px) 26rem, 84vw" width="852" height="1280" alt="Invitación de Rocío Villamizar a la exposición Fragmentos de un jardín, el jueves 3 de diciembre en la Galería Nacional" loading="lazy">
+          </picture>
+        </figure>
+        <div class="now-copy reveal">
+          <p class="eyebrow">Próxima exposición</p>
+          <h2 id="now-title"><em>Fragmentos</em> de un jardín</h2>
+          <blockquote>«La memoria no vuelve intacta: florece en fragmentos.»</blockquote>
+          <dl class="now-facts">
+            <div><dt>Cuándo</dt><dd>Jueves 3 de diciembre · 6:00 a 9:00 p. m.</dd></div>
+            <div><dt>Dónde</dt><dd>Galería Nacional, Museo de los Niños · San José, Costa Rica</dd></div>
+          </dl>
+          <a class="button" href="https://wa.me/50689877207?text=Hola%20Rocio%2C%20quiero%20ir%20a%20la%20exposici%C3%B3n%20Fragmentos%20de%20un%20jard%C3%ADn." target="_blank" rel="noopener noreferrer">Confirmar asistencia</a>
+        </div>
+      </div>
+    </section>
+
     <section class="quote">
       <div class="wrap">
         <p data-words>No es lo que ves. <em>Es lo que sientes.</em></p>
@@ -164,7 +186,7 @@
     </a>
 
     <nav class="paths wrap" aria-label="Entrar">
-      <a href="obras.html"><img src="assets/media/works/colibries-640.jpg" alt="" width="640" height="555" loading="lazy"><em>Obras</em><span>La galería completa</span></a>
+      <a href="obras.html"><img src="assets/media/works/respirar-640.jpg" alt="" width="640" height="555" loading="lazy"><em>Obras</em><span>La galería completa</span></a>
       <a href="galeria.html"><img src="assets/media/works/hacia-el-cielo-640.jpg" alt="" width="640" height="545" loading="lazy"><em>El jardín</em><span>Una exposición al aire libre</span></a>
       <a href="la-artista.html"><img src="assets/media/studio/rocio-sendero-640.jpg" alt="" width="640" height="742" loading="lazy"><em>La artista</em><span>Mi historia y mis exposiciones</span></a>
       <a href="encargos.html"><img src="assets/media/studio/rocio-pintando-640.jpg" alt="" width="640" height="853" loading="lazy"><em>Encargos</em><span>Una obra pensada para tu casa</span></a>
@@ -190,10 +212,10 @@
       </div>
     </div>
   </footer>
-  <script src="js/i18n.js?v=20261124b"></script>
+  <script src="js/i18n.js?v=20261124c"></script>
   <script src="js/media.js?v=20261123d"></script>
-  <script src="js/works.js?v=20261123d"></script>
+  <script src="js/works.js?v=20261124c"></script>
   <script src="js/room.js?v=20261124a"></script>
-  <script src="js/main.js?v=20261123d"></script>
+  <script src="js/main.js?v=20261124c"></script>
 </body>
 </html>

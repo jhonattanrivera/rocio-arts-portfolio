@@ -35,11 +35,11 @@ window.WORKS = [
     "heightCm": null
   },
   {
-    "id": "colibries",
-    "title": "Colibríes",
+    "id": "respirar",
+    "title": "Respirar",
     "description": "Rosas, tulipanes amarillos y flores violeta en un jardín verde. Dos colibríes cruzan el cielo.",
-    "image": "assets/works/colibries.jpg",
-    "thumb": "assets/works/thumbs/colibries.jpg",
+    "image": "assets/works/respirar.jpg",
+    "thumb": "assets/works/thumbs/respirar.jpg",
     "w": 2000,
     "h": 1734,
     "available": 0,
@@ -52,8 +52,8 @@ window.WORKS = [
     ],
     "year": null,
     "medium": null,
-    "widthCm": null,
-    "heightCm": null
+    "widthCm": 150,
+    "heightCm": 130
   },
   {
     "id": "hacia-el-cielo",
