@@ -559,7 +559,7 @@
       if (smp.ready) paintLight(room, g, [x0, y0], ow, oh, smp);
       else lightReady = false;
       var dpr = Math.min(2, window.devicePixelRatio || 1);
-      if (paintImg) paintImg.sizes = Math.round((Math.max(lw, lh) - 2 * pad) * dpr) + "px";
+      if (paintImg) paintImg.sizes = Math.round(Math.max(iwCss, lh - 2 * pad) * dpr) + "px";
       look = { lw: lw, lh: lh, rim: rim * u * k, gap: gap * u * k, pad: pad, frame: state.frame, panels: panels, ang: Math.atan2(ly, lx) + Math.PI / 2, warm: !!room.warm, tone: state.work.tone || "#ddd", dpr: dpr };
       draw();
 
