@@ -165,13 +165,17 @@ h1 strong, h2 strong { font-weight: 640; }
   color: var(--ink);
   font-weight: 500;
   text-decoration: none;
-  background: linear-gradient(transparent 58%, var(--accent-wash) 58%, var(--accent-wash) 92%, transparent 92%) no-repeat 0 0 / 0 100%;
+  background: linear-gradient(transparent 58%, var(--link-wash, var(--accent-wash)) 58%, var(--link-wash, var(--accent-wash)) 92%, transparent 92%) no-repeat 0 0 / 0 100%;
   box-shadow: inset 0 -1px 0 rgb(var(--ink-rgb) / .4);
   transition: background-size .55s var(--ease), box-shadow .3s ease;
   padding: 0 .08em;
 }
 .text-link:hover, .text-link:focus-visible { background-size: 100% 100%; box-shadow: inset 0 -1px 0 transparent; }
-.text-link.light { color: var(--on-night); box-shadow: inset 0 -1px 0 rgb(var(--on-night-rgb) / .55); }
+.text-link.light { --link-wash: rgb(212 226 176 / .34); color: var(--on-night); box-shadow: inset 0 -1px 0 rgb(var(--on-night-rgb) / .55); }
+/* Sobre fotos el resaltado va en salvia claro (el verde del acento no se ve sobre lo oscuro),
+   y la línea se va igual que en los demás enlaces. */
+.text-link.light:hover, .text-link.light:focus-visible,
+.is-preview .cover .text-link:hover, .is-preview .cover .text-link:focus-visible { box-shadow: inset 0 -1px 0 transparent; }
 
 .button {
   display: inline-flex;
@@ -1231,7 +1235,8 @@ body.is-locked { position: fixed; inset: 0; width: 100%; overflow: hidden; }
   .hero h1 em { color: var(--accent-ink); }
   .hero .button.light { background: var(--ink); color: var(--paper); }
   .hero .button.light:hover { background: var(--accent-ink); }
-  .hero .text-link.light { color: var(--ink); box-shadow: inset 0 -1px 0 rgb(var(--ink-rgb) / .4); }
+  .hero .text-link.light { --link-wash: var(--accent-wash); color: var(--ink); box-shadow: inset 0 -1px 0 rgb(var(--ink-rgb) / .4); }
+  .hero .text-link.light:hover, .hero .text-link.light:focus-visible { box-shadow: inset 0 -1px 0 transparent; }
   .hero-tag { display: block; z-index: 2; }
   .page-home .nav:not(.is-solid):not(.is-open) .brand .wordmark { color: var(--ink); }
   /* En escritorio la portada es mitad papel y mitad foto: la barra lleva su vidrio
@@ -1342,7 +1347,7 @@ html:not(.vt) body { animation: page-in .7s var(--ease) both; }
 .is-preview .cover h1 em { color: var(--sage-on-night-em); }
 .is-preview .cover .lede { color: rgb(var(--on-night-rgb) / .9); }
 .is-preview .cover-help { color: rgb(var(--on-night-rgb) / .72); }
-.is-preview .cover .text-link { color: var(--on-night); box-shadow: inset 0 -1px 0 rgb(var(--on-night-rgb) / .55); }
+.is-preview .cover .text-link { --link-wash: rgb(212 226 176 / .34); color: var(--on-night); box-shadow: inset 0 -1px 0 rgb(var(--on-night-rgb) / .55); }
 .is-preview .enter { background: var(--on-night); color: var(--ink-fixed); }
 .is-preview .enter:hover { background: var(--accent-tint); }
 .is-preview .cover { align-items: flex-end; }
