@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Verificación de punta a punta del sitio de Rocio Villamizar con Chromium headless.
 // Uso:
-//   npm run verify          sirve la copia local bajo /rocio-arts-portfolio/ (como GitHub Pages) y la prueba
-//   npm run verify:live     prueba https://jhonattanrivera.github.io/rocio-arts-portfolio/
+//   npm run verify          sirve la copia local en la raíz (como GitHub Pages con rocioarts.com) y la prueba
+//   npm run verify:live     prueba https://rocioarts.com/
 //   node scripts/verify.mjs --url=https://otra-url/
 // Capturas solo si algo falla, en .verify-tmp/ (ignorada por git).
 
@@ -13,8 +13,8 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const LIVE_URL = "https://jhonattanrivera.github.io/rocio-arts-portfolio/";
-const PREFIX = "/rocio-arts-portfolio/";
+const LIVE_URL = "https://rocioarts.com/";
+const PREFIX = "/";
 const SHOTS = join(ROOT, ".verify-tmp");
 const PAGES_ES = ["index.html", "obras.html", "galeria.html", "encargos.html", "la-artista.html", "disponible.html", "404.html"];
 const PAGES_EN = PAGES_ES.map((p) => "en/" + p);
@@ -553,6 +553,22 @@ async function checkPagesAndLinks(browser, base) {
   if (!isLive) {
     const missing = await context.request.get(new URL("no-existe-verify.html", base).href);
     if (missing.status() !== 404 || !(await missing.text()).includes("Esta página no está")) fail("enlaces: una página inexistente no muestra el 404 propio");
+  }
+  // El 404 se ve bien a cualquier profundidad (pide todo desde la raíz), y las páginas
+  // del WordPress anterior llevan a su par en este sitio.
+  {
+    const page = await context.newPage();
+    // el documento responde 404 a propósito; lo que no puede fallar es lo que pide (estilos, scripts)
+    page.on("response", (r) => { if (r.status() >= 400 && r.request().resourceType() !== "document") fail(`enlaces: el 404 pide ${r.url()} y responde ${r.status()}`); });
+    page.on("pageerror", (e) => fail(`enlaces: excepción JS en el 404 (${page.url()}): ${e.message}`));
+    await page.goto(new URL("una/ruta/no-existe-verify/", base).href, { waitUntil: "load" });
+    const styled = await page.evaluate(() => getComputedStyle(document.body).backgroundColor !== "rgba(0, 0, 0, 0)" && !!document.querySelector(".nav .wordmark"));
+    if (!styled) fail("enlaces: el 404 en una ruta profunda se ve sin estilos");
+    for (const [old, now] of [["sobre-mi/", "la-artista.html"], ["servicios/", "encargos.html"]]) {
+      await page.goto(new URL(old, base).href, { waitUntil: "load" });
+      await page.waitForURL((u) => u.pathname.endsWith("/" + now), { timeout: 8000 }).catch(() => fail(`enlaces: /${old} del sitio anterior no lleva a ${now}`));
+    }
+    await page.close();
   }
   await context.close();
   if (process.env.VERIFY_TIMING) console.log("páginas y enlaces listos");

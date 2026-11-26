@@ -5,14 +5,14 @@ description: Verificación de punta a punta del sitio de Rocio Villamizar en un 
 
 # verify
 
-El sitio es estático y no tiene paso de build: lo que está en `main` es lo que publica GitHub Pages en https://jhonattanrivera.github.io/rocio-arts-portfolio/. Por eso "funciona" solo significa algo cuando se abre en un navegador y se recorre.
+El sitio es estático y no tiene paso de build: lo que está en `main` es lo que publica GitHub Pages en https://rocioarts.com/ (dominio propio; el archivo `CNAME` lo fija). Por eso "funciona" solo significa algo cuando se abre en un navegador y se recorre.
 
 ## Cómo correrla
 
 ```sh
 npm install                       # la primera vez (instala Playwright, fijado a una versión)
 npx playwright install chromium   # solo si no hay Chromium de Playwright en la máquina
-npm run verify                    # copia local, servida bajo /rocio-arts-portfolio/ como en Pages
+npm run verify                    # copia local, servida en la raíz como en Pages con el dominio
 npm run verify:live               # sitio publicado
 node scripts/verify.mjs --url=https://otra-url/   # cualquier otra copia publicada
 VERIFY_TIMING=1 npm run verify    # además muestra cuánto tarda cada paso
