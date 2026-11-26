@@ -87,6 +87,7 @@ function boot() {
   var skip = 0;
   var loader = new THREE.TextureLoader();
   var queue = [];
+  var hung = [];
   var inflight = 0;
   var loaded = 0;
   var total = 0;
@@ -118,15 +119,17 @@ function boot() {
     return root + path;
   }
 
-  /* La textura usa el mismo ancho de siempre: el 960 es solo para la cuadrícula de Obras. */
+  /* Los cuadros cuelgan en dos pasadas. Primero una versión liviana de 384 px
+     (assets/media/garden, ~30 KB), que deja el jardín entero colgado enseguida.
+     Después, solo los cuadros a los que uno se acerca cambian a su versión nítida:
+     960 px en computador, 640 en teléfono. */
+  var SHARP_NEAR = 9;
   function texWidth(work) {
+    var want = low ? 640 : 960;
     var list = work.widths || [];
-    var chosen = null;
-    for (var i = 0; i < list.length; i++) {
-      if (list[i] >= 600 && list[i] <= (low ? 960 : 1300) && list[i] !== 960) chosen = list[i];
-    }
-    return chosen || list[0];
+    return list.indexOf(want) >= 0 ? want : list[list.length - 1];
   }
+  function texThumb(work) { return asset("assets/media/garden/" + work.id + ".webp"); }
   function texUrl(work) {
     var chosen = texWidth(work);
     if (!chosen || chosen >= work.w - 1) return asset(work.image);
@@ -1103,7 +1106,7 @@ function boot() {
       });
       glows.push(glow);
       pickables.push(box);
-      queue.push({ url: texWebp(item.work) || texUrl(item.work), fallback: texUrl(item.work), mat: art, x: item.x, z: item.z });
+      queue.push({ url: texThumb(item.work), fallback: texUrl(item.work), hi: texWebp(item.work) || texUrl(item.work), mat: art, x: item.x, z: item.z, sharp: false });
     });
     posts.castShadow = true;
     posts.receiveShadow = true;
@@ -1182,17 +1185,26 @@ function boot() {
     while (inflight < concurrency && queue.length) loadOne(queue.shift());
   }
 
+  function hangTexture(mat, tex) {
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+    var old = mat.map;
+    mat.map = tex;
+    mat.emissiveMap = tex;
+    mat.emissive.set(0xffffff);
+    mat.emissiveIntensity = 0.13;
+    mat.color.set(0xffffff);
+    mat.needsUpdate = true;
+    if (old && old !== tex) old.dispose();
+  }
+
   function loadOne(item) {
     inflight += 1;
     loader.load(item.url, function (tex) {
-      tex.colorSpace = THREE.SRGBColorSpace;
-      tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-      item.mat.map = tex;
-      item.mat.emissiveMap = tex;
-      item.mat.emissive.set(0xffffff);
-      item.mat.emissiveIntensity = 0.13;
-      item.mat.color.set(0xffffff);
-      item.mat.needsUpdate = true;
+      hangTexture(item.mat, tex);
+      /* si la liviana falló y llegó el JPG, ese ya es el nítido */
+      if (item.url === item.fallback) item.sharp = true;
+      hung.push(item);
       inflight -= 1;
       landed();
     }, undefined, function () {
@@ -1211,6 +1223,37 @@ function boot() {
     loaded += 1;
     if (note && loaded >= total) note.textContent = "";
     pump();
+    sharpen();
+  }
+
+  /* La versión nítida del cuadro más cercano que todavía no la tiene, de a uno o dos,
+     solo cuando ya no queda nada por colgar. Se vuelve a mirar mientras uno camina. */
+  function sharpen() {
+    if (queue.length || inflight >= concurrency) return;
+    var best = null;
+    var bd = SHARP_NEAR * SHARP_NEAR;
+    hung.forEach(function (item) {
+      if (item.sharp || item.busy) return;
+      var dx = item.x - pos.x, dz = item.z - pos.z, d = dx * dx + dz * dz;
+      if (d < bd) { bd = d; best = item; }
+    });
+    if (!best) return;
+    var item = best;
+    item.busy = true;
+    inflight += 1;
+    loader.load(item.hi, function (tex) {
+      hangTexture(item.mat, tex);
+      item.sharp = true;
+      item.busy = false;
+      inflight -= 1;
+      sharpen();
+    }, undefined, function () {
+      item.sharp = true;
+      item.busy = false;
+      inflight -= 1;
+      sharpen();
+    });
+    sharpen();
   }
 
   function resize() {
@@ -1341,6 +1384,7 @@ function boot() {
       canvas.dataset.fps = String(Math.round(fpsN / fpsAcc));
       fpsN = 0;
       fpsAcc = 0;
+      sharpen();
     }
   }
   function startLoop() {

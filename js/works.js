@@ -11,6 +11,12 @@
    (el JPG de respaldo está en image, y en los anchos menores). */
 /* showAvailable: true vuelve a marcar las obras disponibles, el filtro y la página Disponible. */
 window.SITE_FLAGS = { showAvailable: false };
+/* Las obras que cuelgan en El jardín, en orden: 7 a la izquierda, 6 a la derecha y 3 al fondo. */
+window.GARDEN_IDS = [
+  "rosal", "hacia-el-cielo", "entre-mujeres", "primavera", "nina-de-las-rosas", "hogar", "prado",
+  "respirar", "camino-rosa", "leer-contigo", "rosas-sobre-turquesa", "la-puerta", "bruma-floral",
+  "hortensias", "luz-de-mayo", "jardin-secreto"
+];
 
 window.WORKS = [
   {

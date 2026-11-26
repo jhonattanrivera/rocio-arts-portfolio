@@ -3,11 +3,17 @@
   var byId = {};
   WORKS.forEach(function (work) { byId[work.id] = work; });
 
-  var IDS = [
-    "rosal", "hacia-el-cielo", "entre-mujeres", "primavera", "nina-de-las-rosas", "hogar", "prado",
-    "respirar", "camino-rosa", "leer-contigo", "rosas-sobre-turquesa", "la-puerta", "bruma-floral",
-    "hortensias", "luz-de-mayo", "jardin-secreto"
-  ];
+  var IDS = window.GARDEN_IDS || [];
+
+  /* Los cuadros livianos del jardín se piden ya, en paralelo con el motor 3D, y el
+     jardín los encuentra en caché al colgarlos (mismo modo CORS que three.js).
+     Con fetch, para no atrasar el evento load de la página. */
+  if (document.getElementById("sala") && window.fetch) {
+    var root = (window.SITE && window.SITE.root) || "";
+    IDS.forEach(function (id) {
+      window.fetch(root + "assets/media/garden/" + id + ".webp", { mode: "cors", credentials: "same-origin", priority: "low" }).catch(function () {});
+    });
+  }
 
   var sheet = document.getElementById("sheet");
   var photo = sheet && sheet.querySelector(".sheet-photo");

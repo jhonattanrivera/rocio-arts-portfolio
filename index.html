@@ -20,11 +20,11 @@
   <meta property="og:image" content="https://jhonattanrivera.github.io/rocio-arts-portfolio/assets/works/rosal.jpg">
   <link rel="icon" href="assets/brand/icon.png" type="image/png">
   <link rel="apple-touch-icon" href="assets/brand/icon.png">
-  <link rel="preload" as="image" type="image/avif" imagesrcset="assets/media/works/rosal-640.avif 640w, assets/media/works/rosal-960.avif 960w, assets/media/works/rosal-1280.avif 1280w" imagesizes="100vw" fetchpriority="high">
+  <link rel="preload" as="image" type="image/avif" imagesrcset="assets/media/works/rosal-640.avif 640w, assets/media/works/rosal-960.avif 960w, assets/media/works/rosal-1280.avif 1280w" imagesizes="(min-width: 980px) 50vw, 100vw" fetchpriority="high">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Instrument+Sans:wght@400..600&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=20261126a">
+  <link rel="stylesheet" href="css/styles.css?v=20261126c">
   <script>
     document.documentElement.classList.add("js"); try { if (localStorage.getItem("rocio-theme") === "dark") { document.documentElement.dataset.theme = "dark"; var tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = getComputedStyle(document.documentElement).getPropertyValue("--paper").trim(); var cs = document.querySelector('meta[name="color-scheme"]'); if (cs) cs.content = "dark"; } } catch (err) {}
     if ("onpagereveal" in window) document.documentElement.classList.add("vt");
@@ -72,7 +72,7 @@
     </div>
     <nav id="menu" class="nav-panel" aria-label="Sitio">
       <a href="obras.html">Obras</a>
-      <a href="galeria.html">El jardín</a>
+      <a href="galeria.html" data-prefetch="js/gallery.js?v=20261126c js/vendor/three.module.min.js?v=20261112c">El jardín</a>
       <a href="encargos.html">Encargos</a>
       <a href="la-artista.html">La artista</a>
       <a class="nav-write" href="https://wa.me/50689877207?text=Hola%20Rocio%2C%20vi%20tu%20trabajo%20y%20quiero%20escribirte." target="_blank" rel="noopener noreferrer">Escribir</a>
@@ -82,9 +82,9 @@
     <section class="hero">
       <a class="hero-media" href="obras.html#rosal" data-open="rosal" data-mode="art" data-cursor="Ver" tabindex="-1" aria-hidden="true">
         <picture>
-          <source type="image/avif" srcset="assets/media/works/rosal-640.avif 640w, assets/media/works/rosal-960.avif 960w, assets/media/works/rosal-1280.avif 1280w" sizes="100vw">
-          <source type="image/webp" srcset="assets/media/works/rosal-640.webp 640w, assets/media/works/rosal-960.webp 960w, assets/media/works/rosal-1280.webp 1280w" sizes="100vw">
-          <img src="assets/media/works/rosal-1280.jpg" srcset="assets/media/works/rosal-640.jpg 640w, assets/media/works/rosal-960.jpg 960w, assets/media/works/rosal-1280.jpg 1280w, assets/works/rosal.jpg 2000w" sizes="100vw" width="2000" height="1783" alt="Rosal, pintura de Rocío Villamizar" fetchpriority="high">
+          <source type="image/avif" srcset="assets/media/works/rosal-640.avif 640w, assets/media/works/rosal-960.avif 960w, assets/media/works/rosal-1280.avif 1280w" sizes="(min-width: 980px) 50vw, 100vw">
+          <source type="image/webp" srcset="assets/media/works/rosal-640.webp 640w, assets/media/works/rosal-960.webp 960w, assets/media/works/rosal-1280.webp 1280w" sizes="(min-width: 980px) 50vw, 100vw">
+          <img src="assets/media/works/rosal-1280.jpg" srcset="assets/media/works/rosal-640.jpg 640w, assets/media/works/rosal-960.jpg 960w, assets/media/works/rosal-1280.jpg 1280w, assets/works/rosal.jpg 2000w" sizes="(min-width: 980px) 50vw, 100vw" width="2000" height="1783" alt="Rosal, pintura de Rocío Villamizar" fetchpriority="high">
         </picture>
       </a>
       <div class="grain" aria-hidden="true"></div>
@@ -209,10 +209,10 @@
       </div>
     </div>
   </footer>
-  <script src="js/i18n.js?v=20261125a"></script>
-  <script src="js/media.js?v=20261125a"></script>
-  <script src="js/works.js?v=20261125a"></script>
-  <script src="js/room.js?v=20261125a"></script>
-  <script src="js/main.js?v=20261126a"></script>
+  <script src="js/i18n.js?v=20261126c"></script>
+  <script src="js/media.js?v=20261126c"></script>
+  <script src="js/works.js?v=20261126c"></script>
+  <script src="js/room.js?v=20261126c"></script>
+  <script src="js/main.js?v=20261126c"></script>
 </body>
 </html>

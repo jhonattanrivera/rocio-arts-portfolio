@@ -174,7 +174,8 @@
         entry.waiting = null;
       } catch (err) { /* sin muestra: la obra queda sin mapa de luz */ }
     };
-    img.src = roomSrc(room, 1200, "jpg");
+    /* la misma foto que muestra el espacio (WebP), así no se baja dos veces */
+    img.src = roomSrc(room, 1200, "webp");
     return entry;
   }
   function pixel(s, x, y, out) {

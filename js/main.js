@@ -307,10 +307,11 @@
     });
   }
 
-  /* Demostración de la sala en el inicio */
+  /* Demostración de la sala en el inicio. Se arma recién cuando se acerca a la
+     pantalla: la foto del espacio y la pintura no compiten con la portada. */
   var demoHost = document.querySelector("[data-mount='room-demo']");
   if (demoHost && window.Room) {
-    var demo = window.Room.create(demoHost, { room: DEMO[0][1] });
+    var demo = null;
     var demoI = 0;
     var demoLabel = document.querySelector("[data-demo-label]");
     var demoTimer = null;
@@ -333,11 +334,20 @@
         window.setTimeout(function () { demoHost.classList.remove("is-fading"); }, 160);
       }, 450);
     }
-    demoShow(0);
-    new IntersectionObserver(function (entries) {
-      window.clearInterval(demoTimer);
-      if (entries[0].isIntersecting && !reduce) demoTimer = window.setInterval(demoTick, 4600);
-    }, { threshold: 0.3 }).observe(demoHost);
+    var startDemo = function () {
+      demo = window.Room.create(demoHost, { room: DEMO[0][1] });
+      demoShow(0);
+      new IntersectionObserver(function (entries) {
+        window.clearInterval(demoTimer);
+        if (entries[0].isIntersecting && !reduce) demoTimer = window.setInterval(demoTick, 4600);
+      }, { threshold: 0.3 }).observe(demoHost);
+    };
+    var demoNear = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      demoNear.disconnect();
+      startDemo();
+    }, { rootMargin: "700px 0px" });
+    demoNear.observe(demoHost);
   }
 
   /* Galería y catálogo */
@@ -571,6 +581,33 @@
       }
       next();
     }, 300);
+  }
+
+  /* El jardín, listo antes de entrar: con el navegador libre, las demás páginas
+     dejan en caché su motor 3D y la primera pasada de cuadros (unos 500 KB). Al
+     apuntar o tocar un enlace al jardín se piden al instante. Nunca con ahorro de
+     datos ni en 2G. */
+  var gardenLink = document.querySelector("[data-prefetch]");
+  if (gardenLink && window.artCanWarm && window.artCanWarm()) {
+    var gardenWarm = false;
+    var warmGarden = function () {
+      if (gardenWarm) return;
+      gardenWarm = true;
+      var root = (window.SITE && window.SITE.root) || "";
+      var files = gardenLink.dataset.prefetch.split(/\s+/).filter(Boolean);
+      (window.GARDEN_IDS || []).forEach(function (id) { files.push("assets/media/garden/" + id + ".webp"); });
+      files.forEach(function (file) {
+        var link = document.createElement("link");
+        link.rel = "prefetch";
+        link.href = root + file;
+        if (/\.webp$/.test(file)) link.crossOrigin = "anonymous";
+        document.head.append(link);
+      });
+    };
+    window.artWhenIdle(warmGarden, 2500);
+    document.querySelectorAll('a[href$="galeria.html"]').forEach(function (a) {
+      ["pointerenter", "touchstart", "focus"].forEach(function (type) { a.addEventListener(type, warmGarden, { once: true, passive: true }); });
+    });
   }
 
   /* Inicio: con el navegador libre, deja listas en caché las obras de la
