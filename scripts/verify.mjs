@@ -296,13 +296,15 @@ async function runViewport(browser, base, vp, english) {
       if (!(await page.$(sel))) fail(`${label}: falta ${sel} en el inicio`);
     await checkNoCount(page, label);
     await page.waitForSelector("[data-mount='wall'] .card", { timeout: 5000 }).catch(() => fail(`${label}: el muro de obras del inicio quedó vacío`));
-    // la franja termina en una tarjeta que lleva a todas las obras
-    const flowEnd = await page.evaluate(() => {
-      const a = document.querySelector("[data-mount='wall'] > a.flow-end:last-child");
-      return a ? { text: a.textContent.trim(), href: a.getAttribute("href") } : null;
+    // el muro son tres franjas, y su botón lleva a todas las obras
+    const flowWall = await page.evaluate(() => {
+      const rows = document.querySelectorAll("[data-mount='wall'] > .flow-row");
+      const a = document.querySelector("[data-flow] .flow-more a");
+      return { rows: rows.length, empty: Array.from(rows).filter((r) => !r.querySelector(".card")).length, text: a && a.textContent.trim(), href: a && a.getAttribute("href") };
     });
-    if (!flowEnd || flowEnd.text !== "Ver todas las obras" || !/(^|\/)obras\.html$/.test(flowEnd.href))
-      fail(`${label}: la franja de obras no termina en "Ver todas las obras" hacia Obras (${JSON.stringify(flowEnd)})`);
+    if (flowWall.rows !== 3 || flowWall.empty) fail(`${label}: el muro de obras no tiene sus tres franjas con obras (${JSON.stringify(flowWall)})`);
+    if (flowWall.text !== "Ver todas las obras" || !/(^|\/)obras\.html$/.test(flowWall.href || ""))
+      fail(`${label}: el muro no tiene el botón "Ver todas las obras" hacia Obras (${JSON.stringify(flowWall)})`);
     const wallOrder = await page.evaluate(() => {
       const kids = Array.from(document.querySelectorAll("[data-flow], #ahora"));
       return kids.map((n) => n.matches("[data-flow]") ? "muro" : "exposición");
