@@ -539,74 +539,6 @@ main { display: block; padding-top: var(--nav-h); }
 .quote cite { display: block; margin-top: 1.6rem; font-style: normal; color: var(--muted); }
 
 /* Selección */
-.rail { position: relative; }
-.rail-sticky { padding: clamp(4rem, 9vw, 7rem) 0 3rem; }
-.rail.is-pinned .rail-sticky {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: calc(var(--nav-h) + .5rem) 0 1.4rem;
-  overflow: hidden;
-}
-.rail-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: .4rem 1rem;
-  width: min(var(--max), 100%);
-  margin: 0 auto 1.4rem;
-  padding-inline: var(--pad);
-}
-.rail-head h2 { margin: 0; font-size: clamp(2rem, 6vw, 4.2rem); line-height: .95; }
-.rail-head .eyebrow { width: 100%; }
-.rail-lede { width: 100%; max-width: 34rem; margin: .7rem 0 0; color: var(--muted); }
-.rail-track {
-  display: flex;
-  align-items: flex-end;
-  gap: clamp(1rem, 3.5vw, 3.2rem);
-  padding-inline: var(--pad);
-  will-change: transform;
-}
-.rail:not(.is-pinned) .rail-track { overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 1rem; }
-.rail-card {
-  flex: 0 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: .85rem;
-  color: inherit;
-  text-decoration: none;
-  scroll-snap-align: start;
-}
-.rail-frame {
-  display: block;
-  height: min(52svh, 560px);
-  aspect-ratio: var(--ratio, 1);
-  max-width: 82vw;
-  box-shadow: 0 1px 2px rgb(var(--shade) / calc(.12 * var(--shade-k))), 0 22px 40px -18px rgb(var(--shade) / calc(.38 * var(--shade-k)));
-  overflow: hidden;
-  background: var(--paper-3);
-}
-.rail-frame picture, .rail-frame img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.rail-frame img { transition: transform 1.2s var(--ease); }
-.rail-card:hover .rail-frame img { transform: scale(1.035); }
-.rail-cap { display: flex; align-items: baseline; gap: .7rem; }
-.rail-n { font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-.rail-title { font-family: var(--serif); font-size: 1.5rem; line-height: 1; }
-.rail-foot {
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-  width: min(var(--max), 100%);
-  margin: 1.6rem auto 0;
-  padding-inline: var(--pad);
-}
-.rail-bar { position: relative; flex: 1; height: 2px; background: var(--line); overflow: hidden; border-radius: 2px; }
-.rail-bar span { position: absolute; inset: 0; background: var(--accent); transform: scaleX(0); transform-origin: 0 50%; }
-.rail:not(.is-pinned) .rail-bar { display: none; }
 
 /* En tu espacio */
 .walltest { display: grid; gap: 2rem; padding-block: clamp(4rem, 10vw, 8rem); }
@@ -751,6 +683,29 @@ main { display: block; padding-top: var(--nav-h); }
 .filters button[aria-pressed="true"] { background: var(--ink); color: var(--paper); box-shadow: none; }
 .whisper { color: var(--muted); font-size: .92rem; max-width: 40rem; }
 .end-note { padding-top: 1rem; padding-bottom: 6rem; }
+
+/* Inicio: el muro de obras. Las columnas avanzan a distinto ritmo con el scroll
+   (main.js) y se desvanecen arriba y abajo; el botón acompaña mientras se recorre. */
+.flow { position: relative; padding-block: clamp(4rem, 9vw, 7rem) clamp(2.4rem, 6vw, 4rem); }
+.flow-head { margin-bottom: clamp(.6rem, 2vw, 1.4rem); }
+.flow-head h2 { margin: 0; padding-bottom: .12em; font-size: clamp(2.4rem, 7vw, 4.8rem); line-height: .95; }
+.flow-lede { max-width: 34rem; margin: .8rem 0 0; color: var(--muted); }
+.flow-wall {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(.9rem, 2.4vw, 2.4rem);
+  width: min(var(--max), 100%);
+  margin-inline: auto;
+  padding: clamp(3rem, 7vw, 5rem) var(--pad);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
+}
+.flow-col { display: grid; align-content: start; gap: clamp(1.8rem, 4.5vw, 3.2rem); will-change: transform; }
+.flow-col:nth-child(2) { margin-top: clamp(3rem, 12vw, 9rem); }
+.flow-more { position: sticky; bottom: calc(1.4rem + env(safe-area-inset-bottom)); z-index: 3; display: flex; justify-content: center; margin: 0; pointer-events: none; }
+.flow-more .button { pointer-events: auto; box-shadow: 0 14px 34px -14px rgb(var(--shade) / calc(.5 * var(--shade-k))); }
+@media (min-width: 720px) { .flow-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
 /* Galería: un muro colgado */
 /* Obras: una cuadrícula pareja. Todas las tarjetas miden lo mismo (4:3) y la
@@ -1217,7 +1172,6 @@ body.is-locked { position: fixed; inset: 0; width: 100%; overflow: hidden; }
   .page-home .nav:not(.is-solid):not(.is-open) .langs a[aria-current="true"] { color: var(--ink); }
   .page-home .nav:not(.is-solid):not(.is-open) .langs a { color: var(--muted); }
   .page-home .nav:not(.is-solid):not(.is-open) .nav-write { background: var(--ink); color: var(--paper) !important; }
-  .rail-frame { height: min(58svh, 620px); }
   .paths { grid-template-columns: 1fr 1fr; column-gap: 3rem; }
   .statement { grid-template-columns: minmax(0, .78fr) minmax(0, 1fr); gap: 4.6rem; }
   .portal { grid-template-columns: 1.1fr .9fr; align-items: center; }
@@ -1285,7 +1239,6 @@ html:not(.vt) body { animation: page-in .7s var(--ease) both; }
 .page-head h1 { margin-bottom: calc(.2em + .6rem); }
 .cover h1 { margin-bottom: calc(.16em + .6rem); }
 .walltest-copy h2, .statement h2, .portal h2, .catalog-copy h2 { margin-bottom: calc(.14em + .5rem); }
-.rail-head h2 { padding-bottom: .12em; }
 .paths em { padding-bottom: .1em; }
 .footer-big { padding-bottom: .12em; }
 

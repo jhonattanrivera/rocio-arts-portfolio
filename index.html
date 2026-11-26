@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Instrument+Sans:wght@400..600&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=20261125f">
+  <link rel="stylesheet" href="css/styles.css?v=20261126a">
   <script>
     document.documentElement.classList.add("js"); try { if (localStorage.getItem("rocio-theme") === "dark") { document.documentElement.dataset.theme = "dark"; var tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = getComputedStyle(document.documentElement).getPropertyValue("--paper").trim(); var cs = document.querySelector('meta[name="color-scheme"]'); if (cs) cs.content = "dark"; } } catch (err) {}
     if ("onpagereveal" in window) document.documentElement.classList.add("vt");
@@ -99,6 +99,16 @@
     </section>
 
 
+    <section class="flow" data-flow aria-labelledby="flow-title">
+      <div class="wrap flow-head">
+        <p class="eyebrow">Portafolio</p>
+        <h2 id="flow-title">Obras <em>seleccionadas.</em></h2>
+        <p class="flow-lede">Una exploración de la naturaleza, la memoria y el color.</p>
+      </div>
+      <div class="flow-wall" data-mount="wall" data-cycle="wall" aria-label="Obras seleccionadas"></div>
+      <p class="flow-more"><a class="button" href="obras.html">Ver todas las obras</a></p>
+    </section>
+
     <section class="now" id="ahora" aria-labelledby="now-title">
       <div class="wrap now-grid">
         <figure class="now-poster reveal">
@@ -128,20 +138,6 @@
       </div>
     </section>
 
-    <section class="rail" data-rail>
-      <div class="rail-sticky">
-        <div class="rail-head">
-          <p class="eyebrow">Portafolio</p>
-          <h2>Obras <em>seleccionadas.</em></h2>
-          <p class="rail-lede">Una exploración de la naturaleza, la memoria y el color.</p>
-        </div>
-        <div class="rail-track" data-mount="rail" data-cycle="rail" aria-label="Selección de obras"></div>
-        <div class="rail-foot">
-          <span class="rail-bar" aria-hidden="true"><span data-rail-bar></span></span>
-          <a class="text-link" href="obras.html">Ver todas las obras</a>
-        </div>
-      </div>
-    </section>
 
     <section class="walltest wrap">
       <div class="walltest-copy reveal">
@@ -217,6 +213,6 @@
   <script src="js/media.js?v=20261125a"></script>
   <script src="js/works.js?v=20261125a"></script>
   <script src="js/room.js?v=20261125a"></script>
-  <script src="js/main.js?v=20261125a"></script>
+  <script src="js/main.js?v=20261126a"></script>
 </body>
 </html>

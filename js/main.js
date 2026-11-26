@@ -7,7 +7,9 @@
   var fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   var ROOT = (window.SITE && window.SITE.root) || "";
 
-  var RAIL = ["rosal", "hacia-el-cielo", "dos-jardines", "nina-de-las-rosas", "luz-de-mayo", "entre-mujeres", "respirar", "camino-rosa", "la-puerta"];
+  /* Las obras del muro del inicio, en orden de lectura (fila por fila) */
+  var WALL = ["rosal", "respirar", "hacia-el-cielo", "dos-jardines", "luz-de-mayo", "nina-de-las-rosas",
+    "entre-mujeres", "camino-rosa", "hortensias", "la-puerta", "prado", "leer-contigo"];
   var DEMO = [["prado", "comedor"], ["dos-jardines", "sala"], ["bruma-floral", "habitacion"], ["luz-de-mayo", "escalera"], ["respirar", "tarde"], ["hacia-el-cielo", "entrada"]];
 
   function t(key) { return window.ui ? window.ui(key) : key; }
@@ -194,72 +196,19 @@
     heroPic.style.transform = "translate3d(0," + (y * 0.2).toFixed(1) + "px,0)";
   }
 
-  /* Riel de selección: el scroll vertical lo mueve de lado */
-  var rail = document.querySelector("[data-rail]");
-  var railTrack = rail && rail.querySelector("[data-mount='rail']");
-  var railBar = rail && rail.querySelector("[data-rail-bar]");
-  var railPinned = false;
-  var railExtra = 0;
-  if (railTrack && window.artPicture) {
-    RAIL.forEach(function (id, i) {
-      var work = byId[id];
-      if (!work) return;
-      var link = document.createElement("a");
-      link.className = "rail-card";
-      link.href = "obras.html#" + work.id;
-      link.dataset.open = work.id;
-      link.dataset.cursor = t("seeRoomShort");
-      link.style.setProperty("--ratio", (work.w / work.h).toFixed(4));
-      link.setAttribute("aria-label", t("open") + work.title);
-      var frame = document.createElement("span");
-      frame.className = "rail-frame";
-      frame.append(window.artPicture(work, { sizes: "(min-width: 980px) 40vw, 80vw", alt: altOf(work), blur: true }));
-      var cap = document.createElement("span");
-      cap.className = "rail-cap";
-      var n = document.createElement("span");
-      n.className = "rail-n";
-      n.textContent = pad2(i + 1);
-      var title = document.createElement("span");
-      title.className = "rail-title";
-      title.textContent = work.title;
-      cap.append(n, title);
-      link.append(frame, cap);
-      railTrack.append(link);
-    });
-    railPinned = !reduce;
-    rail.classList.toggle("is-pinned", railPinned);
-  }
-  function sizeRail() {
-    if (!railPinned || !railTrack) return;
-    railExtra = Math.max(0, railTrack.scrollWidth - railTrack.clientWidth);
-    rail.style.height = (window.innerHeight + railExtra) + "px";
-  }
-  function paintRail() {
-    if (!railPinned || !railTrack) return;
-    var r = rail.getBoundingClientRect();
-    var p = railExtra ? Math.max(0, Math.min(1, -r.top / railExtra)) : 0;
-    railTrack.style.transform = "translate3d(" + (-p * railExtra).toFixed(1) + "px,0,0)";
-    if (railBar) railBar.style.transform = "scaleX(" + p.toFixed(4) + ")";
-  }
-
   var scrollTick = false;
   function onScroll() {
     scrollTick = false;
     paintWords();
     paintHero();
-    paintRail();
+    paintFlow();
   }
   window.addEventListener("scroll", function () {
     if (scrollTick) return;
     scrollTick = true;
     requestAnimationFrame(onScroll);
   }, { passive: true });
-  window.addEventListener("resize", function () { sizeRail(); onScroll(); });
-  window.addEventListener("load", function () { sizeRail(); onScroll(); });
-  if (railTrack) railTrack.querySelectorAll("img").forEach(function (img) {
-    img.addEventListener("load", sizeRail, { once: true });
-  });
-  sizeRail();
+  window.addEventListener("resize", onScroll);
   onScroll();
 
   /* Intro: el verde oliva, la firma que se escribe, y la firma que vuela al menú.
@@ -439,44 +388,48 @@
     });
   }
 
+  /* La tarjeta de la cuadrícula: la misma en Obras y en el muro del inicio */
+  function gridCard(work, opts) {
+    var link = card(work, {
+    className: "card",
+    href: opts.href || ("#" + work.id),
+    eager: opts.eager,
+    cursor: t("seeRoomShort"),
+    sizes: opts.sizes
+    });
+    var stage = document.createElement("span");
+    stage.className = "card-stage";
+    stage.append(link.querySelector(".frame"));
+    link.prepend(stage);
+    var cap = document.createElement("span");
+    cap.className = "card-cap";
+    var title = document.createElement("span");
+    title.className = "card-title";
+    title.textContent = work.title;
+    cap.append(title);
+    var bits = facts(work);
+    if (bits.length) {
+      var meta = document.createElement("span");
+      meta.className = "card-facts";
+      meta.textContent = bits.join(" · ");
+      cap.append(meta);
+    }
+    if (work.available && SHOW_AVAILABLE) {
+      var note = document.createElement("span");
+      note.className = "card-note";
+      note.textContent = t("available");
+      cap.append(note);
+    }
+    link.append(cap);
+    return link;
+  }
+
   function renderMasonry(list) {
     if (!masonry || !window.artPicture) return;
     visible = list;
     masonry.replaceChildren();
     list.forEach(function (work, i) {
-      var link = card(work, {
-        className: "card",
-        href: "#" + work.id,
-        eager: i < 4,
-        cursor: t("seeRoomShort"),
-        sizes: window.ART_GRID_SIZES
-      });
-      /* la pintura entera dentro de una celda igual para todas */
-      var stage = document.createElement("span");
-      stage.className = "card-stage";
-      stage.append(link.querySelector(".frame"));
-      link.prepend(stage);
-      var cap = document.createElement("span");
-      cap.className = "card-cap";
-      var title = document.createElement("span");
-      title.className = "card-title";
-      title.textContent = work.title;
-      cap.append(title);
-      var bits = facts(work);
-      if (bits.length) {
-        var meta = document.createElement("span");
-        meta.className = "card-facts";
-        meta.textContent = bits.join(" · ");
-        cap.append(meta);
-      }
-      if (work.available && SHOW_AVAILABLE) {
-        var note = document.createElement("span");
-        note.className = "card-note";
-        note.textContent = t("available");
-        cap.append(note);
-      }
-      link.append(cap);
-      masonry.append(link);
+      masonry.append(gridCard(work, { eager: i < 4, sizes: window.ART_GRID_SIZES }));
     });
     enterMasonry();
   }
@@ -533,6 +486,46 @@
   }
 
   if (masonry) { masonry.dataset.cycle = "visible"; renderMasonry(WORKS); }
+
+  /* Inicio: el muro de obras. Columnas que avanzan a distinto ritmo con el
+     scroll, como pasar caminando frente a una pared de galería. Con "menos
+     animación" el muro queda quieto. */
+  var flow = document.querySelector("[data-flow]");
+  var flowHost = flow && flow.querySelector("[data-mount='wall']");
+  var flowCols = [];
+  var flowWide = window.matchMedia("(min-width: 720px)");
+  var FLOW_SPEED = [-0.08, 0.06, -0.14];
+  function buildFlow() {
+    if (!flowHost || !window.artPicture) return;
+    var n = flowWide.matches ? 3 : 2;
+    flowHost.replaceChildren();
+    flowCols = [];
+    for (var c = 0; c < n; c++) {
+      var col = document.createElement("div");
+      col.className = "flow-col";
+      flowHost.append(col);
+      flowCols.push(col);
+    }
+    WALL.forEach(function (id, i) {
+      var work = byId[id];
+      if (!work) return;
+      flowCols[i % n].append(gridCard(work, { href: "obras.html#" + work.id, sizes: n === 3 ? "(min-width: 1520px) 480px, 31vw" : "47vw" }));
+    });
+    paintFlow();
+  }
+  function paintFlow() {
+    if (!flow || reduce || !flowCols || !flowCols.length) return;
+    var r = flow.getBoundingClientRect();
+    var vh = window.innerHeight;
+    if (r.bottom < -vh || r.top > 2 * vh) return;
+    /* -0.5 cuando el muro entra por abajo, 0.5 cuando sale por arriba */
+    var p = Math.max(0, Math.min(1, (vh - r.top) / (vh + r.height))) - 0.5;
+    flowCols.forEach(function (col, i) {
+      col.style.transform = "translate3d(0," + (p * FLOW_SPEED[i] * vh * 2).toFixed(1) + "px,0)";
+    });
+  }
+  buildFlow();
+  if (flowWide.addEventListener) flowWide.addEventListener("change", buildFlow);
 
   /* Obras: cuando la página ya cargó, las imágenes que esperaban el scroll
      se bajan de a tres (de a una en 3G), empezando por las más cercanas.
@@ -867,7 +860,7 @@
     var mount = node && node.closest ? node.closest("[data-cycle]") : null;
     if (!mount) return WORKS;
     if (mount.dataset.cycle === "available") return availableList();
-    if (mount.dataset.cycle === "rail") return RAIL.map(function (id) { return byId[id]; }).filter(Boolean);
+    if (mount.dataset.cycle === "wall") return WALL.map(function (id) { return byId[id]; }).filter(Boolean);
     if (mount.dataset.cycle === "visible") return visible;
     return WORKS;
   }
@@ -940,7 +933,7 @@
     index = nextIndex;
     lastFocus = document.activeElement;
     if (opts.mode) mode = opts.mode;
-    var fromImg = lastOpener && lastOpener.querySelector ? lastOpener.querySelector(".frame img, .rail-frame img, picture img") : null;
+    var fromImg = lastOpener && lastOpener.querySelector ? lastOpener.querySelector(".frame img, picture img") : null;
     function run() {
       viewerOpen = true;
       show();
