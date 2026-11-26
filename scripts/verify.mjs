@@ -286,7 +286,7 @@ async function runViewport(browser, base, vp, english) {
       const kids = Array.from(document.querySelectorAll("[data-flow], #ahora"));
       return kids.map((n) => n.matches("[data-flow]") ? "muro" : "exposición");
     });
-    if (wallOrder[0] !== "muro") fail(`${label}: el muro de obras no va antes de la exposición (${wallOrder.join(" → ")})`);
+    if (wallOrder[0] !== "exposición") fail(`${label}: la exposición no va antes del muro de obras (${wallOrder.join(" → ")})`);
     // la demo se arma recién al acercarse a la pantalla: se lleva hasta ella y debe montarse
     await page.evaluate(() => document.querySelector("[data-mount='room-demo']").scrollIntoView({ block: "center" }));
     await page.waitForSelector("[data-mount='room-demo'] .room", { timeout: 5000 }).catch(() => fail(`${label}: la demo de "En tu espacio" no se montó`));

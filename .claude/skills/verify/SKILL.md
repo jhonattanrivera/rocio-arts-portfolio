@@ -25,7 +25,7 @@ Tarda unos 50 s. Sale con código 0 si todo pasa. Si algo falla, lista cada fall
 En celular (390x844, táctil) y en escritorio (1280x800), con el navegador en español:
 
 - La firma: en la primera visita la intro arranca sobre el verde oliva claro, escribe "Rocío Villamizar" en Fraunces con un barrido por cada parte del nombre, termina sola y deja la misma firma en el menú. El logo viejo (`logo.svg`, `wash.svg`) no se vuelve a pedir.
-- El inicio tiene sus secciones (portada, el muro de obras, la próxima exposición, En tu espacio, la artista, el portal al jardín, Entrar, pie), el muro va antes de la exposición, y el muro y la demo de la sala se montan.
+- El inicio tiene sus secciones (portada, la próxima exposición, el muro de obras, En tu espacio, la artista, el portal al jardín, Entrar, pie), la exposición va antes del muro, y el muro y la demo de la sala se montan.
 - "En tu espacio": "Verla en tu espacio" abre el visor en ese modo con Rosal colgada en una sala que carga, con los botones "En tu espacio", "La obra" y "Cerrar", sin contador de obras, y el visor cierra.
 - Sin conteos: ni el inicio ni Obras, Encargos o La artista dicen cuántas obras hay.
 - El menú lleva a Obras, Encargos y La artista. Cada página tiene título, está en español y todas sus imágenes visibles cargan al bajar.
