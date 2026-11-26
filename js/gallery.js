@@ -121,11 +121,11 @@ function boot() {
 
   /* Los cuadros cuelgan en dos pasadas. Primero una versión liviana de 384 px
      (assets/media/garden, ~30 KB), que deja el jardín entero colgado enseguida.
-     Después, solo los cuadros a los que uno se acerca cambian a su versión nítida:
-     960 px en computador, 640 en teléfono. */
+     Después, solo los cuadros a los que uno se acerca cambian a su versión nítida,
+     la misma de siempre: 1280 px en computador, 640 en teléfono. */
   var SHARP_NEAR = 9;
   function texWidth(work) {
-    var want = low ? 640 : 960;
+    var want = low ? 640 : 1280;
     var list = work.widths || [];
     return list.indexOf(want) >= 0 ? want : list[list.length - 1];
   }
