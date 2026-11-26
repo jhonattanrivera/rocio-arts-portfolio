@@ -451,12 +451,24 @@
         cursor: t("seeRoomShort"),
         sizes: window.ART_GRID_SIZES
       });
+      /* la pintura entera dentro de una celda igual para todas */
+      var stage = document.createElement("span");
+      stage.className = "card-stage";
+      stage.append(link.querySelector(".frame"));
+      link.prepend(stage);
       var cap = document.createElement("span");
       cap.className = "card-cap";
       var title = document.createElement("span");
       title.className = "card-title";
       title.textContent = work.title;
       cap.append(title);
+      var bits = facts(work);
+      if (bits.length) {
+        var meta = document.createElement("span");
+        meta.className = "card-facts";
+        meta.textContent = bits.join(" · ");
+        cap.append(meta);
+      }
       if (work.available && SHOW_AVAILABLE) {
         var note = document.createElement("span");
         note.className = "card-note";
@@ -569,35 +581,24 @@
   }
 
   /* Inicio: con el navegador libre, deja listas en caché las obras de la
-     primera pantalla de Obras. Las columnas se leen del propio CSS con una
-     muestra invisible que se quita enseguida. */
+     primera pantalla de Obras. Columnas y alto de fila se leen del propio CSS
+     con una muestra invisible que se quita enseguida. */
   if (document.body.classList.contains("page-home") && window.artPicture && window.artCanWarm && window.artCanWarm()) {
     window.artWhenIdle(function () {
       var probe = document.createElement("div");
       probe.className = "masonry";
       probe.setAttribute("aria-hidden", "true");
-      probe.style.cssText = "position:absolute;left:0;top:0;visibility:hidden;pointer-events:none;height:0;overflow:hidden;";
-      probe.innerHTML = '<span class="card" style="--ratio:1"><span class="frame"></span><span class="card-cap"><span class="card-title">Ag</span></span></span>';
+      probe.style.cssText = "position:absolute;left:0;top:0;visibility:hidden;pointer-events:none;";
+      probe.innerHTML = '<span class="card"><span class="card-stage"></span><span class="card-cap"><span class="card-title">Ag</span></span></span>';
       document.body.append(probe);
-      var cardNode = probe.firstChild;
-      var cs = window.getComputedStyle(probe);
-      var cols = parseInt(cs.columnCount, 10) || 2;
-      var colW = cardNode.querySelector(".frame").getBoundingClientRect().width;
-      var extra = cardNode.getBoundingClientRect().height - colW + (parseFloat(window.getComputedStyle(cardNode).marginBottom) || 0);
+      var grid = window.getComputedStyle(probe);
+      var cols = grid.gridTemplateColumns.split(" ").filter(Boolean).length || 2;
+      var rowH = probe.firstChild.getBoundingClientRect().height + (parseFloat(grid.rowGap) || 0);
       probe.remove();
-      if (!colW) return;
-      var heights = WORKS.map(function (work) { return colW * work.h / work.w + extra; });
-      var total = heights.reduce(function (a, b) { return a + b; }, 0);
-      var limit = window.innerHeight;
-      var pick = [];
-      var y = 0, col = 0, acc = 0;
-      heights.forEach(function (h, i) {
-        if (col < cols - 1 && acc + h / 2 > total * (col + 1) / cols) { col += 1; y = 0; if (i > 0 && pick.indexOf(i - 1) < 0) pick.push(i - 1); }
-        if (y < limit && pick.indexOf(i) < 0) pick.push(i);
-        y += h;
-        acc += h;
-      });
-      var queue = pick.slice(0, 14).map(function (i) { return WORKS[i]; });
+      if (!rowH) return;
+      /* la cuadrícula es pareja: la primera pantalla de Obras son sus primeras filas */
+      var rows = Math.ceil(window.innerHeight / rowH) + 1;
+      var queue = WORKS.slice(0, Math.min(14, cols * rows));
       var keep = [];
       var running = 0;
       function next() {
@@ -822,7 +823,7 @@
         sizeInput.disabled = info.real;
         q(".tool-size").classList.toggle("is-real", info.real);
         toolNote.textContent = info.real ? t("realSize") : t("simNote");
-        viewerCredit.textContent = t("photoBy") + " " + info.room.credit + " · Unsplash";
+        viewerCredit.textContent = info.room.credit ? t("photoBy") + " " + info.room.credit + " · Unsplash" : "";
       },
       onMove: function () { viewer.classList.add("hint-done"); }
     });

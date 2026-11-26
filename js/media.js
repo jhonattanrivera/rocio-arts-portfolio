@@ -159,7 +159,7 @@
 
   /* sizes de la cuadrícula de Obras. La precarga del inicio usa el mismo,
      para que el navegador elija exactamente el mismo archivo. */
-  window.ART_GRID_SIZES = "(min-width: 1280px) 23vw, (min-width: 900px) 30vw, (min-width: 560px) 45vw, 47vw";
+  window.ART_GRID_SIZES = "(min-width: 720px) 30vw, 47vw";
 
   /* Precarga en segundo plano: nunca con ahorro de datos ni en 2G. */
   window.artCanWarm = function () {

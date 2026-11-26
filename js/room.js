@@ -18,11 +18,12 @@
 (function () {
   var ROOMS = [
     {
-      id: "sala", file: "sala", w: 2000, h: 3000,
-      wall: { quad: [[0.25, 0.1885], [0.7417, 0.0238], [0.7417, 0.6005], [0.25, 0.5925]], cm: [306, 380] },
-      box: [10, 6, 296, 350], at: [172, 344], atBottom: true,
-      light: [0.12, 1], tint: 0.45, warm: 1,
-      credit: "Jonathan Borba", name: { es: "Sala", en: "Living room" }
+      /* Sala frontal de Rocío (imagen generada): sofá de unos 225 cm, la obra
+         cuelga a unos 20 cm sobre el respaldo; el sol entra por la izquierda. */
+      id: "sala", file: "sala", w: 2000, h: 1500,
+      flat: { cm: 307, box: [0.13, 0.02, 0.99, 0.55], x: 0.519, bottom: 0.48 },
+      light: [0.6, 0.8], tint: 0.5, warm: 1,
+      name: { es: "Sala", en: "Living room" }
     },
     {
       id: "escalera", file: "escalera", w: 2000, h: 3000,

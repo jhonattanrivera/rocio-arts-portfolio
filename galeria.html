@@ -18,16 +18,16 @@
   <link rel="icon" href="assets/brand/icon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Instrument+Sans:wght@400..600&family=Sedgwick+Ave&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=20261124f">
-  <link rel="modulepreload" href="js/gallery.js?v=20261124f">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Instrument+Sans:wght@400..600&display=swap">
+  <link rel="stylesheet" href="css/styles.css?v=20261125c">
+  <link rel="modulepreload" href="js/gallery.js?v=20261125a">
   <link rel="modulepreload" href="js/vendor/three.module.min.js?v=20261112c">
   <script>document.documentElement.classList.add("js"); try { if (localStorage.getItem("rocio-theme") === "dark") { document.documentElement.dataset.theme = "dark"; var tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = getComputedStyle(document.documentElement).getPropertyValue("--paper").trim(); var cs = document.querySelector('meta[name="color-scheme"]'); if (cs) cs.content = "dark"; } } catch (err) {}</script>
 </head>
 <body class="page-sala">
   <a class="skip" href="#contenido">Saltar al contenido</a>
   <header class="nav">
-    <a class="brand" href="index.html" aria-label="Rocío Villamizar, inicio"><span class="wordmark" aria-hidden="true"><span>Rocío</span> <em>Villamizar</em></span></a>
+    <a class="brand" href="index.html" aria-label="Rocío Villamizar, inicio"><span class="wordmark" aria-hidden="true"><span>Rocío</span> <em>Villamizar</em></span><span class="brand-tag" aria-hidden="true">Artista visual</span></a>
     <div class="nav-side">
       <p class="langs" aria-label="Idioma">
         <a class="lang-es" href="galeria.html" hreflang="es" lang="es" aria-current="true" data-set-lang="es">ES</a>
@@ -122,14 +122,14 @@
       enter.addEventListener("click", wait);
     })();
   </script>
-  <script src="js/i18n.js?v=20261124f"></script>
-  <script src="js/media.js?v=20261123d"></script>
-  <script src="js/works.js?v=20261124c"></script>
-  <script src="js/room.js?v=20261124a"></script>
-  <script src="js/main.js?v=20261124c"></script>
-  <script src="js/sala.js?v=20261124f"></script>
+  <script src="js/i18n.js?v=20261125a"></script>
+  <script src="js/media.js?v=20261125a"></script>
+  <script src="js/works.js?v=20261125a"></script>
+  <script src="js/room.js?v=20261125a"></script>
+  <script src="js/main.js?v=20261125a"></script>
+  <script src="js/sala.js?v=20261125a"></script>
   <script type="module">
-    import("./js/gallery.js?v=20261124f").catch(function () {
+    import("./js/gallery.js?v=20261125a").catch(function () {
       var enter = document.getElementById("enter");
       if (enter) enter.hidden = true;
       document.documentElement.classList.add("sala-flat");

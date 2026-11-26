@@ -4,7 +4,7 @@ Fotos con la Licencia Unsplash (uso libre, también comercial). La obra se coloc
 
 | Archivo | Foto | Autor |
 | --- | --- | --- |
-| sala | https://unsplash.com/photos/9iljaLpo9uw | Jonathan Borba |
+| sala | Imagen generada por encargo de Rocío Villamizar | — |
 | escalera | https://unsplash.com/photos/YNaGwlNbTwY | Francesca Tosolini |
 | habitacion | https://unsplash.com/photos/OZZOEgwxyfQ | Rohit Thakur |
 | comedor | https://unsplash.com/photos/ozDFb-HMi6w | mindeurle lee |
@@ -13,7 +13,7 @@ Fotos con la Licencia Unsplash (uso libre, también comercial). La obra se coloc
 
 Ajustes:
 
-- `sala`: se borró el cuadro de cuatro paneles y su sombra.
+- `sala`: imagen frontal generada para el visor; se agrandó a 2000 px.
 - `escalera`: se borraron los seis marcos de la pared, sin tocar el pasamanos.
 - `habitacion`: se borró el tapiz sobre el cabecero.
 - `comedor`: la lámpara se separó de la pared (`comedor-front.webp`) para que la obra quede detrás de ella.
