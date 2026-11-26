@@ -2,7 +2,9 @@
   var path = location.pathname || "";
   var inEn = /\/en\/?$/.test(path) || path.indexOf("/en/") !== -1;
   var lang = inEn ? "en" : ((document.documentElement.lang || "es").slice(0, 2) === "en" ? "en" : "es");
-  window.SITE = { lang: lang, root: inEn ? "../" : "", inEn: inEn };
+  /* el 404 fija su raíz: GitHub Pages lo sirve en cualquier ruta que no existe */
+  var root = window.SITE_ROOT != null ? window.SITE_ROOT : (inEn ? "../" : "");
+  window.SITE = { lang: lang, root: root, inEn: inEn };
 
   var ui = {
     es: {
