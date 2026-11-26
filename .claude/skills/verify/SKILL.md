@@ -25,8 +25,8 @@ Tarda unos 50 s. Sale con código 0 si todo pasa. Si algo falla, lista cada fall
 En celular (390x844, táctil) y en escritorio (1280x800), con el navegador en español:
 
 - La firma: en la primera visita la intro arranca sobre el verde oliva claro, escribe "Rocío Villamizar" en Fraunces con un barrido por cada parte del nombre, termina sola y deja la misma firma en el menú. El logo viejo (`logo.svg`, `wash.svg`) no se vuelve a pedir.
-- El inicio tiene sus secciones (portada, la próxima exposición, el muro de obras, En tu espacio, la artista, el portal al jardín, Entrar, pie), la exposición va antes del muro, y el muro y la demo de la sala se montan.
-- "En tu espacio": "Verla en tu espacio" abre el visor en ese modo con Rosal colgada en una sala que carga, con los botones "En tu espacio", "La obra" y "Cerrar", sin contador de obras, y el visor cierra.
+- El inicio tiene sus secciones (portada, la próxima exposición, la franja de obras, En tu espacio, la artista, el portal al jardín, Entrar, pie), la exposición va antes de la franja, la franja y la demo de la sala se montan, y la franja termina en "Ver todas las obras" hacia Obras.
+- "En tu espacio": "Verla en tu espacio" abre el visor con Rosal colgada en una sala que carga (sin botones de modo arriba). Tocar la obra en la pared abre su detalle, y "Verla en tu espacio" vuelve a la pared. Tiene "Cerrar", no cuenta las obras y cierra.
 - Sin conteos: ni el inicio ni Obras, Encargos o La artista dicen cuántas obras hay.
 - El menú lleva a Obras, Encargos y La artista. Cada página tiene título, está en español y todas sus imágenes visibles cargan al bajar.
 - El jardín: desde el menú, "Entrar al jardín" arranca el 3D (WebGL) sin caer a la vista plana. En celular el joystick aparece abajo a la derecha y en escritorio no aparece. La ficha de una obra abre y cierra, no hay vista en plano, y "Todas las obras" lleva del 3D a Obras.

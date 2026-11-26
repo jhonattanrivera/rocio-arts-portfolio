@@ -138,6 +138,20 @@ async function scrollThrough(page) {
       window.scrollTo(0, y);
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
     }
+    // Las franjas que se deslizan de lado (la de obras del inicio) también se recorren
+    // hasta el final, como lo haría una visitante: sus imágenes cargan al acercarse.
+    const strips = Array.from(document.querySelectorAll("body *")).filter((el) => {
+      const cs = getComputedStyle(el);
+      return /auto|scroll/.test(cs.overflowX) && el.clientWidth > 0 && el.scrollWidth > el.clientWidth + 1;
+    });
+    for (const el of strips) {
+      el.scrollIntoView({ block: "center" });
+      for (let x = 0; x < el.scrollWidth; x += Math.round(el.clientWidth * 0.8)) {
+        el.scrollTo({ left: x, behavior: "instant" });
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      }
+      el.scrollTo({ left: 0, behavior: "instant" });
+    }
     window.scrollTo(0, 0);
   });
 }
@@ -282,6 +296,13 @@ async function runViewport(browser, base, vp, english) {
       if (!(await page.$(sel))) fail(`${label}: falta ${sel} en el inicio`);
     await checkNoCount(page, label);
     await page.waitForSelector("[data-mount='wall'] .card", { timeout: 5000 }).catch(() => fail(`${label}: el muro de obras del inicio quedó vacío`));
+    // la franja termina en una tarjeta que lleva a todas las obras
+    const flowEnd = await page.evaluate(() => {
+      const a = document.querySelector("[data-mount='wall'] > a.flow-end:last-child");
+      return a ? { text: a.textContent.trim(), href: a.getAttribute("href") } : null;
+    });
+    if (!flowEnd || flowEnd.text !== "Ver todas las obras" || !/(^|\/)obras\.html$/.test(flowEnd.href))
+      fail(`${label}: la franja de obras no termina en "Ver todas las obras" hacia Obras (${JSON.stringify(flowEnd)})`);
     const wallOrder = await page.evaluate(() => {
       const kids = Array.from(document.querySelectorAll("[data-flow], #ahora"));
       return kids.map((n) => n.matches("[data-flow]") ? "muro" : "exposición");
@@ -297,8 +318,8 @@ async function runViewport(browser, base, vp, english) {
     await page.locator('.hero-actions a[data-mode="room"]').click();
     const viewer = page.locator(".viewer.is-open");
     await viewer.waitFor({ state: "visible" }).catch(() => fail(`${label}: el visor "En tu espacio" no abre`));
-    const pressed = await page.getAttribute('.viewer-top button[data-mode="room"]', "aria-pressed");
-    if (pressed !== "true") fail(`${label}: el visor no abre en modo "En tu espacio"`);
+    const opensIn = await page.evaluate(() => document.querySelector(".viewer").dataset.mode);
+    if (opensIn !== "room") fail(`${label}: el visor no abre con la obra en tu espacio (abre en "${opensIn}")`);
     await page.waitForFunction(() => {
       const room = document.querySelector(".viewer-room .room");
       const imgs = room ? Array.from(room.querySelectorAll("img")).filter((i) => i.getAttribute("src") && i.getClientRects().length) : [];
@@ -306,8 +327,15 @@ async function runViewport(browser, base, vp, english) {
       return imgs.length && imgs.every((i) => i.complete && i.naturalWidth > 0) && art && art.getBoundingClientRect().width > 20;
     }, null, { timeout: 10000 }).catch(() => fail(`${label}: la sala del visor no carga o no muestra la obra`));
     await waitArtDrawn(page, label, "Rosal");
-    for (const t of ["En tu espacio", "La obra", "Cerrar"])
-      if (!(await viewer.getByRole("button", { name: t, exact: true }).count())) fail(`${label}: el visor no tiene el botón "${t}"`);
+    if (!(await viewer.getByRole("button", { name: "Cerrar", exact: true }).count())) fail(`${label}: el visor no tiene el botón "Cerrar"`);
+    // tocar la obra en la pared abre su detalle, y "Verla en tu espacio" vuelve a la pared
+    await page.locator(".viewer .room-art").click();
+    await page.waitForFunction(() => document.querySelector(".viewer").dataset.mode === "art", null, { timeout: 3000 })
+      .catch(() => fail(`${label}: tocar la obra en la pared no abre su detalle`));
+    const backRoom = viewer.getByRole("button", { name: "Verla en tu espacio", exact: true });
+    await backRoom.click({ timeout: 3000 }).catch(() => fail(`${label}: el detalle no tiene el botón "Verla en tu espacio"`));
+    await page.waitForFunction(() => document.querySelector(".viewer").dataset.mode === "room", null, { timeout: 3000 })
+      .catch(() => fail(`${label}: "Verla en tu espacio" no vuelve a la obra en la pared`));
     const title = (await page.textContent("#viewer-title"))?.trim();
     if (title !== "Rosal") fail(`${label}: el visor muestra "${title}" y esperaba "Rosal"`);
     const counted = await page.evaluate(() => /\b\d{1,3}\s*\/\s*\d{1,3}\b/.exec(document.querySelector(".viewer").innerText));
