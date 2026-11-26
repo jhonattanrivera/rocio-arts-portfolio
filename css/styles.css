@@ -684,59 +684,34 @@ main { display: block; padding-top: var(--nav-h); }
 .whisper { color: var(--muted); font-size: .92rem; max-width: 40rem; }
 .end-note { padding-top: 1rem; padding-bottom: 6rem; }
 
-/* Inicio: una franja de obras que se recorre a mano (dedo, arrastre o flechas).
-   Nada se mueve con el scroll de la página. */
-.flow { position: relative; padding-block: clamp(4rem, 9vw, 7rem) clamp(3rem, 7vw, 5rem); }
-.flow-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 1.5rem; margin-bottom: clamp(1.6rem, 4vw, 2.6rem); }
+/* Inicio: el muro de obras en tres franjas. Al bajar, cada franja corre de lado
+   a la vista (main.js), la del medio al revés, y se desvanecen en los bordes;
+   el botón acompaña mientras se recorre. Con "menos animación" se deslizan a mano. */
+.flow { position: relative; padding-block: clamp(4rem, 9vw, 7rem) clamp(2.4rem, 6vw, 4rem); }
+.flow-head { margin-bottom: clamp(1.8rem, 4.5vw, 3.2rem); }
 .flow-head h2 { margin: 0; padding-bottom: .12em; font-size: clamp(2.4rem, 7vw, 4.8rem); line-height: .95; }
 .flow-lede { max-width: 34rem; margin: .8rem 0 0; color: var(--muted); }
-.flow-controls { display: none; gap: .6rem; flex: none; }
-.flow-arrow { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(var(--ink-rgb) / .22); color: var(--ink); transition: background .3s ease, color .3s ease, opacity .3s ease; }
-.flow-arrow svg { width: 20px; height: 20px; }
-.flow-arrow:hover { background: var(--ink); color: var(--paper); box-shadow: none; }
-.flow-arrow:disabled { opacity: .28; pointer-events: none; }
-@media (hover: hover) and (pointer: fine) { .flow-controls { display: flex; } }
 .flow-wall {
   --edge: max(var(--pad), calc((100vw - var(--max)) / 2 + var(--pad)));
-  display: flex;
-  gap: clamp(1rem, 2.4vw, 2.2rem);
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x mandatory;
-  scroll-padding-inline: var(--edge);
-  padding: .4rem var(--edge) 1.6rem;
-  scrollbar-width: none;
+  display: grid;
+  gap: clamp(1.4rem, 3.4vw, 2.6rem);
+  padding: .4rem 0 clamp(3rem, 7vw, 5rem);
+  overflow: clip;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--pad), #000 calc(100% - var(--pad)), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 var(--pad), #000 calc(100% - var(--pad)), transparent);
 }
-.flow-wall::-webkit-scrollbar { display: none; }
-.flow-wall:focus-visible { outline-offset: -2px; }
-@media (hover: hover) and (pointer: fine) { .flow-wall { cursor: grab; } }
-.flow-wall.is-dragging { cursor: grabbing; scroll-snap-type: none; }
-.flow-wall.is-dragging .card { pointer-events: none; }
-.flow-wall > * { flex: 0 0 min(78vw, 380px); scroll-snap-align: start; }
-@media (min-width: 720px) { .flow-wall > * { flex-basis: 42vw; } }
-@media (min-width: 1100px) { .flow-wall > * { flex-basis: clamp(320px, 28vw, 460px); } }
-.js .flow-wall:not(.is-in) > * { opacity: 0; }
-.flow-end {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 1rem;
-  aspect-ratio: 4 / 3;
-  align-self: flex-start;
-  padding: 2rem;
-  border-radius: 4px;
-  background: var(--paper-2);
-  color: var(--ink);
-  text-decoration: none;
-  font-family: var(--serif);
-  font-size: clamp(1.5rem, 3vw, 2.2rem);
-  line-height: 1.05;
-  transition: background .4s ease, color .4s ease;
+.flow-row { position: relative; display: flex; gap: clamp(1rem, 2.4vw, 2.2rem); width: max-content; padding-inline: var(--edge); will-change: transform; }
+.flow-row > * { flex: none; width: 64vw; }
+@media (min-width: 720px) { .flow-row > * { width: 40vw; } }
+@media (min-width: 1100px) { .flow-row > * { width: min(30vw, 480px); } }
+.js .flow-wall:not(.is-in) .flow-row { opacity: 0; }
+.js .flow-wall.is-in .flow-row { animation: card-fade 1.3s cubic-bezier(.33, 0, .2, 1) var(--d, 0ms) both; }
+.flow-more { position: sticky; bottom: calc(1.4rem + env(safe-area-inset-bottom)); z-index: 3; display: flex; justify-content: center; margin: 0; pointer-events: none; }
+.flow-more .button { pointer-events: auto; box-shadow: 0 14px 34px -14px rgb(var(--shade) / calc(.5 * var(--shade-k))); }
+@media (prefers-reduced-motion: reduce) {
+  .flow-row { width: auto; overflow-x: auto; scrollbar-width: none; will-change: auto; }
+  .flow-row::-webkit-scrollbar { display: none; }
 }
-.flow-end svg { width: 34px; height: 34px; transition: transform .5s var(--ease); }
-.flow-end:hover { background: var(--ink); color: var(--paper); }
-.flow-end:hover svg { transform: translateX(6px); }
 
 /* Galería: un muro colgado */
 /* Obras: una cuadrícula pareja. Todas las tarjetas miden lo mismo (4:3) y la
@@ -1423,4 +1398,3 @@ html:not(.vt) body { animation: page-in .7s var(--ease) both; }
   .flow-wall .card .frame .art-blur.is-ready img { transition: opacity 1.2s cubic-bezier(.33, 0, .2, 1), transform 1.2s var(--ease); }
   .flow-wall .card:hover .frame .art-blur.is-ready img { transform: scale(1.04); }
 }
-.js .flow-wall > .is-arriving { animation: card-fade 1.3s cubic-bezier(.33, 0, .2, 1) var(--d, 0ms) both, card-rise 1.6s var(--ease) var(--d, 0ms) both; }

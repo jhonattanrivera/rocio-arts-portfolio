@@ -496,84 +496,113 @@
 
   if (masonry) { masonry.dataset.cycle = "visible"; renderMasonry(WORKS); }
 
-  /* Inicio: una franja de obras que se recorre a mano. Con el dedo en el
-     teléfono; en el computador, arrastrando o con las flechas. No se mueve sola
-     ni con el scroll de la página. Las tarjetas entran escalonadas una vez. */
+  /* Inicio: el muro de obras en tres franjas. Al bajar, cada franja corre de
+     lado mientras está a la vista (la primera y la tercera hacia la izquierda,
+     la del medio hacia la derecha), como pasar frente a una pared de galería.
+     Cada una recorre justo lo que le sobra, así todas sus obras pasan enteras
+     por la pantalla. Con "menos animación" las franjas se deslizan a mano. */
   var flow = document.querySelector("[data-flow]");
-  var flowWall = flow && flow.querySelector("[data-mount='wall']");
-  if (flowWall && window.artPicture) {
-    WALL.forEach(function (id) {
+  var flowHost = flow && flow.querySelector("[data-mount='wall']");
+  if (flowHost && window.artPicture) {
+    var flowRows = [0, 1, 2].map(function (r) {
+      var el = document.createElement("div");
+      el.className = "flow-row";
+      el.style.setProperty("--d", r * 140 + "ms");
+      flowHost.append(el);
+      return { el: el, dir: r === 1 ? 1 : -1, x: 0, goal: 0, span: 0, hold: 0 };
+    });
+    WALL.forEach(function (id, i) {
       var work = byId[id];
       if (!work) return;
-      flowWall.append(gridCard(work, { href: "obras.html#" + work.id, sizes: "(min-width: 1100px) 460px, (min-width: 720px) 42vw, 78vw" }));
+      flowRows[i % 3].el.append(gridCard(work, { href: "obras.html#" + work.id, sizes: "(min-width: 1600px) 480px, (min-width: 1100px) 30vw, (min-width: 720px) 40vw, 64vw" }));
     });
-    var end = document.createElement("a");
-    end.className = "flow-end";
-    end.href = "obras.html";
-    end.innerHTML = '<span></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    end.querySelector("span").textContent = t("seeAll");
-    flowWall.append(end);
 
-    /* flechas (solo con mouse) y su estado en los extremos */
-    var arrows = flow.querySelectorAll("[data-flow-dir]");
-    var paintArrows = function () {
-      var max = flowWall.scrollWidth - flowWall.clientWidth - 2;
-      arrows.forEach(function (b) {
-        b.disabled = Number(b.dataset.flowDir) < 0 ? flowWall.scrollLeft <= 2 : flowWall.scrollLeft >= max;
+    var flowRaf = 0;
+    var flowLast = 0;
+    var drawRows = function (now) {
+      flowRaf = 0;
+      /* un poco de inercia: la rueda del mouse salta de a 100 px, las franjas no */
+      var dt = flowLast ? Math.min(64, now - flowLast) : 16.7;
+      flowLast = now;
+      var k = 1 - Math.pow(0.84, dt / 16.7);
+      var moving = false;
+      flowRows.forEach(function (row) {
+        var d = row.goal - row.x;
+        row.x = Math.abs(d) < 0.4 ? row.goal : row.x + d * k;
+        if (row.x !== row.goal) moving = true;
+        row.el.style.transform = "translate3d(" + row.x.toFixed(1) + "px,0,0)";
       });
+      if (moving) flowRaf = requestAnimationFrame(drawRows);
+      else flowLast = 0;
     };
-    arrows.forEach(function (b) {
-      b.addEventListener("click", function () {
-        flowWall.scrollBy({ left: Number(b.dataset.flowDir) * flowWall.clientWidth * 0.8, behavior: reduce ? "auto" : "smooth" });
+    var readRows = function () {
+      if (reduce) return;
+      var vh = window.innerHeight;
+      var box = flowHost.getBoundingClientRect();
+      if (box.bottom < -vh || box.top > 2 * vh) return;
+      var now = performance.now();
+      flowRows.forEach(function (row) {
+        if (row.hold > now) return;
+        var r = row.el.getBoundingClientRect();
+        /* 0 cuando la franja asoma por abajo, 1 cuando se va por arriba */
+        var p = Math.max(0, Math.min(1, (vh - r.top) / (vh + r.height)));
+        row.goal = row.dir < 0 ? -p * row.span : -(1 - p) * row.span;
       });
+      if (!flowRaf) flowRaf = requestAnimationFrame(drawRows);
+    };
+    var measureRows = function () {
+      if (reduce) return;
+      var vw = flowHost.clientWidth;
+      flowRows.forEach(function (row) { row.span = Math.max(0, row.el.offsetWidth - vw); });
+      readRows();
+      flowRows.forEach(function (row) { row.x = row.goal; });
+      drawRows(0);
+    };
+    var flowResize = 0;
+    window.addEventListener("resize", function () {
+      cancelAnimationFrame(flowResize);
+      flowResize = requestAnimationFrame(measureRows);
     });
-    flowWall.addEventListener("scroll", paintArrows, { passive: true });
-    window.addEventListener("resize", paintArrows);
-    paintArrows();
+    window.addEventListener("scroll", readRows, { passive: true });
+    measureRows();
 
-    /* arrastrar con el mouse; un arrastre no abre la obra */
-    var drag = null;
-    var dragged = false;
-    flowWall.addEventListener("pointerdown", function (event) {
-      if (event.pointerType !== "mouse" || event.button !== 0) return;
-      drag = { x: event.clientX, left: flowWall.scrollLeft };
-      dragged = false;
+    /* con el teclado, la obra enfocada se trae a la vista dentro de su franja */
+    flowHost.addEventListener("focusin", function (event) {
+      if (reduce) return;
+      var card = event.target.closest(".flow-row > *");
+      var row = card && flowRows.filter(function (r) { return r.el === card.parentNode; })[0];
+      if (!row) return;
+      var edge = parseFloat(getComputedStyle(row.el).paddingLeft) || 0;
+      var vw = flowHost.clientWidth;
+      var left = card.offsetLeft + row.goal;
+      var goal = row.goal;
+      if (left < edge) goal += edge - left;
+      else if (left + card.offsetWidth > vw - edge) goal -= left + card.offsetWidth - (vw - edge);
+      row.goal = Math.max(-row.span, Math.min(0, goal));
+      row.hold = performance.now() + 1500;
+      if (!flowRaf) flowRaf = requestAnimationFrame(drawRows);
     });
-    window.addEventListener("pointermove", function (event) {
-      if (!drag) return;
-      var dx = event.clientX - drag.x;
-      if (!dragged && Math.abs(dx) > 6) {
-        dragged = true;
-        flowWall.classList.add("is-dragging");
-      }
-      if (dragged) flowWall.scrollLeft = drag.left - dx;
-    });
-    window.addEventListener("pointerup", function () {
-      if (!drag) return;
-      drag = null;
-      flowWall.classList.remove("is-dragging");
-    });
-    flowWall.addEventListener("click", function (event) {
-      if (!dragged) return;
-      dragged = false;
-      event.preventDefault();
-      event.stopPropagation();
-    }, true);
-    flowWall.addEventListener("dragstart", function (event) { event.preventDefault(); });
 
-    /* entrada escalonada de las tarjetas, una sola vez */
-    if (reduce || !("IntersectionObserver" in window)) flowWall.classList.add("is-in");
+    /* Las franjas corridas dejan obras fuera de la pantalla por los lados, donde
+       la carga diferida no las ve venir: al acercarse el muro se piden todas. */
+    var flowImgs = flowHost.querySelectorAll("img[loading='lazy']");
+    var warmRows = function () { flowImgs.forEach(function (img) { img.loading = "eager"; }); };
+
+    /* entrada: las franjas aparecen una tras otra, una sola vez */
+    if (!("IntersectionObserver" in window)) { flowHost.classList.add("is-in"); warmRows(); }
     else {
+      var flowNear = new IntersectionObserver(function (entries) {
+        if (!entries[0].isIntersecting) return;
+        flowNear.disconnect();
+        warmRows();
+      }, { rootMargin: "120% 0px" });
+      flowNear.observe(flowHost);
       var flowIo = new IntersectionObserver(function (entries) {
         if (!entries[0].isIntersecting) return;
         flowIo.disconnect();
-        Array.prototype.forEach.call(flowWall.children, function (card, i) {
-          card.style.setProperty("--d", Math.min(i, 6) * 90 + "ms");
-          card.classList.add("is-arriving");
-        });
-        flowWall.classList.add("is-in");
-      }, { threshold: 0.18 });
-      flowIo.observe(flowWall);
+        flowHost.classList.add("is-in");
+      }, { threshold: 0.12 });
+      flowIo.observe(flowHost);
     }
   }
 
