@@ -201,7 +201,6 @@
     scrollTick = false;
     paintWords();
     paintHero();
-    paintFlow();
   }
   window.addEventListener("scroll", function () {
     if (scrollTick) return;
@@ -497,45 +496,86 @@
 
   if (masonry) { masonry.dataset.cycle = "visible"; renderMasonry(WORKS); }
 
-  /* Inicio: el muro de obras. Columnas que avanzan a distinto ritmo con el
-     scroll, como pasar caminando frente a una pared de galería. Con "menos
-     animación" el muro queda quieto. */
+  /* Inicio: una franja de obras que se recorre a mano. Con el dedo en el
+     teléfono; en el computador, arrastrando o con las flechas. No se mueve sola
+     ni con el scroll de la página. Las tarjetas entran escalonadas una vez. */
   var flow = document.querySelector("[data-flow]");
-  var flowHost = flow && flow.querySelector("[data-mount='wall']");
-  var flowCols = [];
-  var flowWide = window.matchMedia("(min-width: 720px)");
-  var FLOW_SPEED = [-0.08, 0.06, -0.14];
-  function buildFlow() {
-    if (!flowHost || !window.artPicture) return;
-    var n = flowWide.matches ? 3 : 2;
-    flowHost.replaceChildren();
-    flowCols = [];
-    for (var c = 0; c < n; c++) {
-      var col = document.createElement("div");
-      col.className = "flow-col";
-      flowHost.append(col);
-      flowCols.push(col);
-    }
-    WALL.forEach(function (id, i) {
+  var flowWall = flow && flow.querySelector("[data-mount='wall']");
+  if (flowWall && window.artPicture) {
+    WALL.forEach(function (id) {
       var work = byId[id];
       if (!work) return;
-      flowCols[i % n].append(gridCard(work, { href: "obras.html#" + work.id, sizes: n === 3 ? "(min-width: 1520px) 480px, 31vw" : "47vw" }));
+      flowWall.append(gridCard(work, { href: "obras.html#" + work.id, sizes: "(min-width: 1100px) 460px, (min-width: 720px) 42vw, 78vw" }));
     });
-    paintFlow();
-  }
-  function paintFlow() {
-    if (!flow || reduce || !flowCols || !flowCols.length) return;
-    var r = flow.getBoundingClientRect();
-    var vh = window.innerHeight;
-    if (r.bottom < -vh || r.top > 2 * vh) return;
-    /* -0.5 cuando el muro entra por abajo, 0.5 cuando sale por arriba */
-    var p = Math.max(0, Math.min(1, (vh - r.top) / (vh + r.height))) - 0.5;
-    flowCols.forEach(function (col, i) {
-      col.style.transform = "translate3d(0," + (p * FLOW_SPEED[i] * vh * 2).toFixed(1) + "px,0)";
+    var end = document.createElement("a");
+    end.className = "flow-end";
+    end.href = "obras.html";
+    end.innerHTML = '<span></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    end.querySelector("span").textContent = t("seeAll");
+    flowWall.append(end);
+
+    /* flechas (solo con mouse) y su estado en los extremos */
+    var arrows = flow.querySelectorAll("[data-flow-dir]");
+    var paintArrows = function () {
+      var max = flowWall.scrollWidth - flowWall.clientWidth - 2;
+      arrows.forEach(function (b) {
+        b.disabled = Number(b.dataset.flowDir) < 0 ? flowWall.scrollLeft <= 2 : flowWall.scrollLeft >= max;
+      });
+    };
+    arrows.forEach(function (b) {
+      b.addEventListener("click", function () {
+        flowWall.scrollBy({ left: Number(b.dataset.flowDir) * flowWall.clientWidth * 0.8, behavior: reduce ? "auto" : "smooth" });
+      });
     });
+    flowWall.addEventListener("scroll", paintArrows, { passive: true });
+    window.addEventListener("resize", paintArrows);
+    paintArrows();
+
+    /* arrastrar con el mouse; un arrastre no abre la obra */
+    var drag = null;
+    var dragged = false;
+    flowWall.addEventListener("pointerdown", function (event) {
+      if (event.pointerType !== "mouse" || event.button !== 0) return;
+      drag = { x: event.clientX, left: flowWall.scrollLeft };
+      dragged = false;
+    });
+    window.addEventListener("pointermove", function (event) {
+      if (!drag) return;
+      var dx = event.clientX - drag.x;
+      if (!dragged && Math.abs(dx) > 6) {
+        dragged = true;
+        flowWall.classList.add("is-dragging");
+      }
+      if (dragged) flowWall.scrollLeft = drag.left - dx;
+    });
+    window.addEventListener("pointerup", function () {
+      if (!drag) return;
+      drag = null;
+      flowWall.classList.remove("is-dragging");
+    });
+    flowWall.addEventListener("click", function (event) {
+      if (!dragged) return;
+      dragged = false;
+      event.preventDefault();
+      event.stopPropagation();
+    }, true);
+    flowWall.addEventListener("dragstart", function (event) { event.preventDefault(); });
+
+    /* entrada escalonada de las tarjetas, una sola vez */
+    if (reduce || !("IntersectionObserver" in window)) flowWall.classList.add("is-in");
+    else {
+      var flowIo = new IntersectionObserver(function (entries) {
+        if (!entries[0].isIntersecting) return;
+        flowIo.disconnect();
+        Array.prototype.forEach.call(flowWall.children, function (card, i) {
+          card.style.setProperty("--d", Math.min(i, 6) * 90 + "ms");
+          card.classList.add("is-arriving");
+        });
+        flowWall.classList.add("is-in");
+      }, { threshold: 0.18 });
+      flowIo.observe(flowWall);
+    }
   }
-  buildFlow();
-  if (flowWide.addEventListener) flowWide.addEventListener("change", buildFlow);
 
   /* Obras: cuando la página ya cargó, las imágenes que esperaban el scroll
      se bajan de a tres (de a una en 3G), empezando por las más cercanas.
@@ -714,10 +754,7 @@
   }).join("");
   viewer.innerHTML =
     '<div class="viewer-top">' +
-      '<div class="modes" role="group" aria-label="' + t("viewMode") + '">' +
-        '<button type="button" data-mode="room" aria-pressed="false">' + t("inRoom") + "</button>" +
-        '<button type="button" data-mode="art" aria-pressed="false">' + t("artOnly") + "</button>" +
-      "</div>" +
+      '<button type="button" class="viewer-back" data-back>' + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' + t("backRoom") + "</button>" +
       '<button type="button" class="viewer-close" data-close>' + t("close") + "</button>" +
     "</div>" +
     '<div class="viewer-body">' +
@@ -732,6 +769,7 @@
         '<button type="button" class="viewer-grip" aria-expanded="false" aria-label="' + t("tools") + '"><span></span></button>' +
         '<p class="viewer-status" hidden></p>' +
         '<h2 id="viewer-title"></h2>' +
+        '<button type="button" class="viewer-detail text-link" data-detail>' + t("seeDetail") + "</button>" +
         '<p class="viewer-facts"></p>' +
         '<p class="viewer-desc"></p>' +
         '<div class="viewer-tools">' +
@@ -803,7 +841,7 @@
     swipe = { y: t.clientY, x: t.clientX, top: side.scrollTop, done: false };
   }, { passive: true });
   side.addEventListener("touchmove", function (event) {
-    if (!swipe || !phone()) return;
+    if (!swipe || !phone() || mode === "art") return;
     var t = event.touches[0];
     var dy = t.clientY - swipe.y;
     var dx = t.clientX - swipe.x;
@@ -819,7 +857,7 @@
   }, { passive: false });
   side.addEventListener("touchend", function () { swipe = null; }, { passive: true });
   side.addEventListener("wheel", function (event) {
-    if (!phone()) return;
+    if (!phone() || mode === "art") return;
     if (!compact && event.deltaY > 4) { event.preventDefault(); if (performance.now() > gestureLock) setCompact(true); }
     else if (compact && side.scrollTop <= 0 && event.deltaY < -4) { event.preventDefault(); if (performance.now() > gestureLock) setCompact(false); }
   }, { passive: false });
@@ -836,7 +874,9 @@
   var moved = false;
   var lastTap = 0;
   var lastOpener = null;
-  var mode = store("rocio-view") === "art" ? "art" : "room";
+  /* El visor abre siempre con la obra colgada en el espacio; tocarla abre su detalle. */
+  var mode = "room";
+  var tapSeen = store("rocio-tap") === "1";
   var room = null;
   var roomId = store("rocio-room") || "sala";
   var frameKind = store("rocio-frame") || "none";
@@ -855,7 +895,9 @@
         toolNote.textContent = info.real ? t("realSize") : t("simNote");
         viewerCredit.textContent = info.room.credit ? t("photoBy") + " " + info.room.credit + " · Unsplash" : "";
       },
-      onMove: function () { viewer.classList.add("hint-done"); }
+      onMove: function () { viewer.classList.add("hint-done"); },
+      onTap: function () { seenTap(); setMode("art"); },
+      tapLabel: t("seeDetail")
     });
     viewer.querySelectorAll(".pick img[data-src]").forEach(function (img) { img.src = img.dataset.src; });
     return room;
@@ -870,14 +912,28 @@
     });
   }
 
-  function setMode(next, quiet) {
+  /* La gotita y su aviso invitan a tocar la obra; desaparecen para siempre al primer toque */
+  function seenTap() {
+    if (tapSeen) return;
+    tapSeen = true;
+    store("rocio-tap", "1");
+    viewer.classList.remove("tap-hint");
+  }
+  function tapHint() {
+    viewer.classList.remove("tap-hint");
+    if (tapSeen || reduce || mode !== "room") return;
+    void viewer.offsetWidth;
+    viewer.classList.add("tap-hint");
+  }
+  function setMode(next) {
+    var was = mode;
     mode = next === "art" || !window.Room ? "art" : "room";
-    if (!quiet) store("rocio-view", mode);
     viewer.dataset.mode = mode;
-    viewer.querySelectorAll(".modes [data-mode]").forEach(function (b) {
-      b.setAttribute("aria-pressed", b.dataset.mode === mode ? "true" : "false");
-    });
-    viewerHint.textContent = mode === "room" ? t("dragHint") : (fine ? t("loupeHint") : t("pinchHint"));
+    if (was !== mode) { setCompact(false); side.scrollTop = 0; }
+    viewerHint.textContent = mode === "room"
+      ? (tapSeen ? t("dragHint") : (fine ? t("tapHintFine") : t("tapHintTouch")))
+      : (fine ? t("loupeHint") : t("pinchHint"));
+    tapHint();
     if (mode === "room") {
       ensureRoom();
       if (room && cycle[index] && room.work !== cycle[index]) room.setWork(cycle[index]);
@@ -969,12 +1025,12 @@
     if (nextIndex < 0) return;
     index = nextIndex;
     lastFocus = document.activeElement;
-    if (opts.mode) mode = opts.mode;
+    mode = opts.mode === "art" ? "art" : "room";
     var fromImg = lastOpener && lastOpener.querySelector ? lastOpener.querySelector(".frame img, picture img") : null;
     function run() {
       viewerOpen = true;
       show();
-      setMode(mode, true);
+      setMode(mode);
       if (opts.room && room) { room.setRoom(opts.room); syncPicks(); }
       paint();
       var hash = "#" + id;
@@ -1038,8 +1094,8 @@
 
   viewer.addEventListener("click", function (event) {
     if (event.target.closest("[data-close]")) { requestClose(); return; }
-    var m = event.target.closest(".modes [data-mode]");
-    if (m) { setMode(m.dataset.mode); return; }
+    if (event.target.closest("[data-back]")) { setMode("room"); return; }
+    if (event.target.closest("[data-detail]")) { seenTap(); setMode("art"); return; }
     var pick = event.target.closest(".pick");
     if (pick && room) {
       room.setRoom(pick.dataset.room);

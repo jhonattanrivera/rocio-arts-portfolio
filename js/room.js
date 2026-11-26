@@ -213,8 +213,9 @@
     el.innerHTML =
       '<div class="room-view">' +
         '<picture class="room-photo"><source type="image/webp"><img alt="" decoding="async"></picture>' +
-        '<div class="room-art"' + (opts.interactive ? ' tabindex="0" role="img"' : "") + '>' +
+        '<div class="room-art"' + (opts.interactive ? ' tabindex="0" role="' + (opts.onTap ? "button" : "img") + '"' : "") + '>' +
           '<canvas class="room-render" width="2" height="2"></canvas><span class="room-paint" aria-hidden="true"></span>' +
+          (opts.interactive ? '<span class="room-tap" aria-hidden="true"></span>' : "") +
         "</div>" +
         '<img class="room-front" alt="" decoding="async" hidden>' +
       "</div>";
@@ -285,7 +286,7 @@
         paintImg = pic.querySelector("img");
         paintImg.addEventListener("load", draw);
       }
-      art.setAttribute("aria-label", work.title);
+      art.setAttribute("aria-label", opts.tapLabel ? work.title + " · " + opts.tapLabel : work.title);
     }
 
     function dims() {
@@ -580,28 +581,41 @@
 
     var drag = null;
     if (opts.interactive) {
+      /* Un toque abre la obra (onTap); un arrastre de más de unos píxeles la mueve por la pared. */
       art.addEventListener("pointerdown", function (event) {
         if (event.button || !state.cam || !state.cur) return;
         event.preventDefault();
         art.setPointerCapture(event.pointerId);
-        drag = { at: wallAt(event.clientX, event.clientY), start: state.cur.slice() };
-        el.classList.add("is-dragging");
+        drag = { at: wallAt(event.clientX, event.clientY), start: state.cur.slice(), x: event.clientX, y: event.clientY, t: Date.now(), moved: false };
       });
       art.addEventListener("pointermove", function (event) {
         if (!drag) return;
+        if (!drag.moved) {
+          if (Math.hypot(event.clientX - drag.x, event.clientY - drag.y) < 7) return;
+          drag.moved = true;
+          el.classList.add("is-dragging");
+        }
         var now = wallAt(event.clientX, event.clientY);
         state.pos = [drag.start[0] + now[0] - drag.at[0], drag.start[1] + now[1] - drag.at[1]];
         layout(true);
       });
-      var end = function () {
+      var end = function (event) {
         if (!drag) return;
+        var tap = !drag.moved && Date.now() - drag.t < 700 && event.type === "pointerup";
         drag = null;
         el.classList.remove("is-dragging");
-        if (opts.onMove) opts.onMove();
+        if (tap) { if (opts.onTap) opts.onTap(); }
+        else if (opts.onMove) opts.onMove();
       };
       art.addEventListener("pointerup", end);
       art.addEventListener("pointercancel", end);
       art.addEventListener("keydown", function (event) {
+        if ((event.key === "Enter" || event.key === " ") && opts.onTap) {
+          event.preventDefault();
+          event.stopPropagation();
+          opts.onTap();
+          return;
+        }
         var step = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[event.key];
         if (!step || !state.cur) return;
         event.preventDefault();
