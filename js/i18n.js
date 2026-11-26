@@ -40,8 +40,8 @@
       photoBy: "Foto del espacio:",
       dragHint: "Arrastra la obra para moverla",
       tools: "Ver opciones de la vista",
-      loupeHint: "Haz clic en la obra para ver la pincelada",
-      pinchHint: "Pellizca para ver la pincelada"
+      loupeHint: "Haz clic en la obra para acercarte",
+      pinchHint: "Pellizca o toca dos veces para acercarte"
     },
     en: {
       available: "Available",
@@ -78,8 +78,8 @@
       photoBy: "Space photo:",
       dragHint: "Drag the work to move it",
       tools: "Show view options",
-      loupeHint: "Click the work to see the brushwork",
-      pinchHint: "Pinch to see the brushwork"
+      loupeHint: "Click the work to zoom in",
+      pinchHint: "Pinch or double-tap to zoom in"
     }
   };
 

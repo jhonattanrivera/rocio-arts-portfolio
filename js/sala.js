@@ -29,7 +29,7 @@
   function fill(work) {
     if (!sheet) return;
     photo.replaceChildren(window.artPicture(work, {
-      sizes: "(min-width: 700px) 520px, 92vw",
+      sizes: "(min-width: 1100px) 600px, (min-width: 760px) 52vw, 92vw",
       eager: true
     }));
     photo.style.background = work.tone || "#e7e1d8";

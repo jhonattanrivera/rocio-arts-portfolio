@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Instrument+Sans:wght@400..600&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=20261126f">
+  <link rel="stylesheet" href="css/styles.css?v=20261126g">
   <link rel="modulepreload" href="js/gallery.js?v=20261127a">
   <link rel="modulepreload" href="js/vendor/three.module.min.js?v=20261112c">
   <script>document.documentElement.classList.add("js"); try { if (localStorage.getItem("rocio-theme") === "dark") { document.documentElement.dataset.theme = "dark"; var tc = document.querySelector('meta[name="theme-color"]'); if (tc) tc.content = getComputedStyle(document.documentElement).getPropertyValue("--paper").trim(); var cs = document.querySelector('meta[name="color-scheme"]'); if (cs) cs.content = "dark"; } } catch (err) {}</script>
@@ -80,15 +80,19 @@
 
   <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheet-title">
     <div class="sheet-card" tabindex="-1">
-      <button type="button" class="sheet-close" data-sheet-close>Cerrar</button>
       <div class="sheet-photo"></div>
-      <div class="sheet-copy">
-        <p class="sheet-status" hidden></p>
-        <h2 id="sheet-title"></h2>
-        <p class="sheet-facts"></p>
-        <p class="sheet-desc"></p>
-        <a class="dock" id="sheet-ask" target="_blank" rel="noopener noreferrer">Consultar esta obra</a>
-        <a class="text-link" id="sheet-more" href="obras.html">Ver en la galería</a>
+      <div class="sheet-body">
+        <div class="sheet-copy">
+          <button type="button" class="sheet-close" data-sheet-close>Cerrar</button>
+          <p class="sheet-status" hidden></p>
+          <h2 id="sheet-title"></h2>
+          <p class="sheet-facts"></p>
+          <p class="sheet-desc"></p>
+        </div>
+        <div class="sheet-actions">
+          <a class="button sheet-ask" id="sheet-ask" target="_blank" rel="noopener noreferrer">Consultar esta obra</a>
+          <a class="button sheet-more" id="sheet-more" href="obras.html"><span>Verla en tu espacio</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
       </div>
     </div>
   </div>
@@ -122,12 +126,12 @@
       enter.addEventListener("click", wait);
     })();
   </script>
-  <script src="js/i18n.js?v=20261126f"></script>
+  <script src="js/i18n.js?v=20261126g"></script>
   <script src="js/media.js?v=20261126c"></script>
   <script src="js/works.js?v=20261126c"></script>
   <script src="js/room.js?v=20261126d"></script>
-  <script src="js/main.js?v=20261126f"></script>
-  <script src="js/sala.js?v=20261126e"></script>
+  <script src="js/main.js?v=20261126g"></script>
+  <script src="js/sala.js?v=20261126g"></script>
   <script type="module">
     import("./js/gallery.js?v=20261127a").catch(function () {
       var enter = document.getElementById("enter");

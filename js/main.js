@@ -893,14 +893,9 @@
   if (grip) grip.addEventListener("click", function () { setCompact(!compact); });
   window.addEventListener("resize", function () { if (!phone()) setCompact(false); });
   var view = { s: 1, x: 0, y: 0 };
-  var pointers = new Map();
-  var pinchStart = null;
   var cycle = WORKS;
   var index = 0;
   var lastFocus = null;
-  var touchX = 0;
-  var touchY = 0;
-  var moved = false;
   var lastTap = 0;
   var lastOpener = null;
   /* El visor abre siempre con la obra colgada en el espacio; tocarla abre su detalle. */
@@ -987,13 +982,29 @@
     return WORKS;
   }
 
-  function renderPinch() {
-    pinch.style.transform = "translate3d(" + view.x + "px," + view.y + "px,0) scale(" + view.s + ")";
+  /* La obra acercada no se sale de su marco: se puede correr hasta su borde, no más */
+  function renderPinch(ease) {
+    var mx = Math.max(0, (view.s - 1) * viewerImg.offsetWidth / 2);
+    var my = Math.max(0, (view.s - 1) * viewerImg.offsetHeight / 2);
+    view.x = Math.max(-mx, Math.min(mx, view.x));
+    view.y = Math.max(-my, Math.min(my, view.y));
+    pinch.classList.toggle("is-easing", !!ease);
+    pinch.style.transform = "translate3d(" + view.x.toFixed(1) + "px," + view.y.toFixed(1) + "px,0) scale(" + view.s.toFixed(3) + ")";
+    if (view.s > 1.2) wantDetail();
   }
   function resetZoom() {
     view = { s: 1, x: 0, y: 0 };
     renderPinch();
     photo.classList.remove("is-loupe");
+  }
+  /* Al acercarse se pide la foto original (2000 px), no la de pantalla: así se ve
+     la textura de la pintura. Mientras llega, sigue la que estaba. */
+  var detailOn = false;
+  function wantDetail() {
+    if (detailOn || !cycle[index] || cycle[index].w <= 1280) return;
+    detailOn = true;
+    srcAvif.media = srcWebp.media = "not all";
+    viewerImg.sizes = cycle[index].w + "px";
   }
 
   var preloads = [];
@@ -1001,6 +1012,8 @@
     var work = cycle[index];
     if (!work) return;
     resetZoom();
+    detailOn = false;
+    srcAvif.media = srcWebp.media = "";
     if (window.artSrcset) {
       srcAvif.srcset = window.artSrcset(work, "avif");
       srcWebp.srcset = window.artSrcset(work, "webp");
@@ -1145,67 +1158,119 @@
   q(".viewer-prev").addEventListener("click", function () { step(-1); });
   q(".viewer-next").addEventListener("click", function () { step(1); });
 
-  /* Lupa con mouse; pellizco y doble toque en el teléfono */
-  photo.addEventListener("pointerdown", function (event) {
-    if (event.pointerType === "mouse") return;
-    photo.setPointerCapture(event.pointerId);
-    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-    touchX = event.clientX;
-    touchY = event.clientY;
-    moved = false;
-    if (pointers.size === 2) {
-      var pts = Array.from(pointers.values());
-      pinchStart = { dist: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1, s: view.s };
-    }
-  });
+  /* Lupa con mouse */
   photo.addEventListener("pointermove", function (event) {
-    if (event.pointerType === "mouse") {
-      var rect = viewerImg.getBoundingClientRect();
-      viewerImg.style.transformOrigin = ((event.clientX - rect.left) / rect.width * 100) + "% " + ((event.clientY - rect.top) / rect.height * 100) + "%";
+    if (event.pointerType !== "mouse") return;
+    var rect = viewerImg.getBoundingClientRect();
+    viewerImg.style.transformOrigin = ((event.clientX - rect.left) / rect.width * 100) + "% " + ((event.clientY - rect.top) / rect.height * 100) + "%";
+  });
+  photo.addEventListener("click", function () {
+    if (!fine) return;
+    photo.classList.toggle("is-loupe");
+    if (photo.classList.contains("is-loupe")) { wantDetail(); viewer.classList.add("zoom-done"); }
+  });
+  photo.addEventListener("pointerleave", function () { photo.classList.remove("is-loupe"); });
+
+  /* Teléfono: pellizco (acerca donde están los dedos), arrastre con la obra
+     acercada, doble toque y deslizar para pasar de obra. Va con eventos táctiles
+     y no con pointer: en el iPhone, Safari se queda con el pellizco para su
+     propio zoom y le cancela los pointer a la página. */
+  var tch = null;
+  function center() {
+    var r = pinch.getBoundingClientRect();
+    /* el centro de .pinch sin su transform: su caja menos el corrimiento actual */
+    return { x: r.left + r.width / 2 - view.x, y: r.top + r.height / 2 - view.y };
+  }
+  function zoomAt(s, fx, fy, from) {
+    /* el punto de la obra que estaba bajo (from) queda bajo (fx, fy) */
+    var c = center();
+    var px = (from.fx - c.x - from.x) / from.s;
+    var py = (from.fy - c.y - from.y) / from.s;
+    view.s = Math.min(4, Math.max(1, s));
+    view.x = fx - c.x - view.s * px;
+    view.y = fy - c.y - view.s * py;
+  }
+  function twoFingers(e) {
+    var a = e.touches[0], b = e.touches[1];
+    return { d: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY) || 1, x: (a.clientX + b.clientX) / 2, y: (a.clientY + b.clientY) / 2 };
+  }
+  photo.addEventListener("touchstart", function (event) {
+    event.preventDefault();
+    if (event.touches.length >= 2) {
+      var f = twoFingers(event);
+      tch = { pinch: { d: f.d, fx: f.x, fy: f.y, s: view.s, x: view.x, y: view.y }, moved: true };
+    } else if (event.touches.length === 1 && !tch) {
+      var t = event.touches[0];
+      tch = { x0: t.clientX, y0: t.clientY, x: t.clientX, y: t.clientY, moved: false, pinch: null };
+    }
+  }, { passive: false });
+  photo.addEventListener("touchmove", function (event) {
+    event.preventDefault();
+    if (!tch) return;
+    if (event.touches.length >= 2 && tch.pinch) {
+      var f = twoFingers(event);
+      zoomAt(tch.pinch.s * f.d / tch.pinch.d, f.x, f.y, tch.pinch);
+      renderPinch();
       return;
     }
-    if (!pointers.has(event.pointerId)) return;
-    var prev = pointers.get(event.pointerId);
-    var dx = event.clientX - prev.x;
-    var dy = event.clientY - prev.y;
-    if (Math.abs(dx) + Math.abs(dy) > 4) moved = true;
-    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-    if (pointers.size === 2 && pinchStart) {
-      var pts = Array.from(pointers.values());
-      var dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-      view.s = Math.min(4, Math.max(1, pinchStart.s * (dist / pinchStart.dist)));
-      if (view.s === 1) { view.x = 0; view.y = 0; }
-      renderPinch();
-    } else if (pointers.size === 1 && view.s > 1) {
+    var t = event.touches[0];
+    if (!t) return;
+    if (tch.pinch) {
+      /* quedó un dedo después del pellizco: sigue arrastrando desde ahí */
+      tch.pinch = null;
+      tch.x = t.clientX;
+      tch.y = t.clientY;
+      return;
+    }
+    var dx = t.clientX - tch.x;
+    var dy = t.clientY - tch.y;
+    tch.x = t.clientX;
+    tch.y = t.clientY;
+    if (Math.abs(t.clientX - tch.x0) + Math.abs(t.clientY - tch.y0) > 8) tch.moved = true;
+    if (view.s > 1) {
       view.x += dx;
       view.y += dy;
       renderPinch();
     }
-  });
-  photo.addEventListener("click", function () {
-    if (fine) photo.classList.toggle("is-loupe");
-  });
-  photo.addEventListener("pointerleave", function () { photo.classList.remove("is-loupe"); });
-  function endPointer(event) {
-    pointers.delete(event.pointerId);
-    if (pointers.size < 2) pinchStart = null;
-    if (event.type !== "pointerup" || event.pointerType === "mouse") return;
-    var dx = event.clientX - touchX;
-    var dy = event.clientY - touchY;
-    if (view.s > 1) return;
-    if (!moved) {
+  }, { passive: false });
+  function touchEnd(event) {
+    if (!tch) return;
+    if (event.touches.length) {
+      /* de dos dedos a uno: el que queda sigue arrastrando */
+      if (tch.pinch && event.touches.length === 1) {
+        var t = event.touches[0];
+        tch = { x0: t.clientX, y0: t.clientY, x: t.clientX, y: t.clientY, moved: true, pinch: null };
+      }
+      return;
+    }
+    var done = tch;
+    tch = null;
+    if (event.type === "touchcancel") return;
+    if (view.s < 1.05) { view = { s: 1, x: 0, y: 0 }; renderPinch(true); }
+    if (view.s > 1) viewer.classList.add("zoom-done");
+    var end = event.changedTouches[0];
+    if (!done.moved) {
       var now = performance.now();
-      if (now - lastTap < 280) {
-        view = { s: 2.5, x: 0, y: 0 };
-        renderPinch();
+      if (now - lastTap < 300) {
         lastTap = 0;
+        if (view.s > 1) view = { s: 1, x: 0, y: 0 };
+        else zoomAt(2.5, end.clientX, end.clientY, { fx: end.clientX, fy: end.clientY, s: 1, x: 0, y: 0 });
+        renderPinch(true);
+        viewer.classList.add("zoom-done");
       } else lastTap = now;
       return;
     }
-    if (Math.abs(dx) > 52 && Math.abs(dx) > Math.abs(dy) * 1.2) step(dx < 0 ? 1 : -1);
+    if (view.s > 1 || done.pinch) return;
+    var sx = end.clientX - done.x0;
+    var sy = end.clientY - done.y0;
+    if (Math.abs(sx) > 52 && Math.abs(sx) > Math.abs(sy) * 1.2) step(sx < 0 ? 1 : -1);
   }
-  photo.addEventListener("pointerup", endPointer);
-  photo.addEventListener("pointercancel", endPointer);
+  photo.addEventListener("touchend", touchEnd);
+  photo.addEventListener("touchcancel", touchEnd);
+  /* Safari: que el pellizco sobre la obra no acerque la página entera */
+  ["gesturestart", "gesturechange"].forEach(function (type) {
+    photo.addEventListener(type, function (event) { event.preventDefault(); });
+  });
 
   /* En la sala: deslizar fuera de la obra pasa de obra; doble clic acerca */
   var roomSwipe = null;

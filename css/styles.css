@@ -853,6 +853,7 @@ main { display: block; padding-top: var(--nav-h); }
 .viewer-photo, .viewer-room { transition: opacity .45s ease; }
 .viewer-photo { display: flex; align-items: center; justify-content: center; padding: 1.2rem; overflow: hidden; touch-action: none; }
 .pinch { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+.pinch.is-easing { transition: transform .35s var(--ease); }
 .pinch picture { display: contents; }
 .viewer-photo img {
   max-width: 100%;
@@ -900,7 +901,7 @@ main { display: block; padding-top: var(--nav-h); }
   pointer-events: none;
   transition: opacity .6s ease;
 }
-.viewer.hint-done[data-mode="room"] .viewer-hint { opacity: 0; }
+.viewer.hint-done[data-mode="room"] .viewer-hint, .viewer.zoom-done[data-mode="art"] .viewer-hint { opacity: 0; }
 .viewer-side {
   flex: 1;
   min-height: 0;
@@ -1076,17 +1077,62 @@ body.is-walking { overflow: hidden; }
 #to-list { min-width: 7rem; }
 .sheet[hidden] { display: none !important; }
 .sheet { position: fixed; inset: 0; z-index: 110; display: flex; align-items: flex-end; justify-content: center; background: rgb(var(--scrim) / .45); }
-.sheet-card { width: min(620px, 100%); max-height: min(90dvh, 820px); overflow: auto; background: var(--paper); padding: .8rem 1rem calc(1rem + env(safe-area-inset-bottom)); border-radius: 14px 14px 0 0; transform: translateY(16px); }
+/* La ficha del jardín. En el teléfono sube desde abajo: foto y texto se desplazan,
+   y los botones van en su propio pie, así nunca tapan la descripción.
+   Desde tablet es una lámina: la obra a la izquierda y su ficha a la derecha. */
+.sheet-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(620px, 100%);
+  max-height: min(92dvh, 820px);
+  overflow: hidden;
+  background: var(--paper);
+  border-radius: 16px 16px 0 0;
+  transform: translateY(16px);
+  box-shadow: 0 30px 80px -30px rgb(var(--shade) / calc(.6 * var(--shade-k)));
+}
 .sheet.is-in .sheet-card { transform: none; transition: transform .45s var(--ease); }
-.sheet-close { min-height: 44px; letter-spacing: .12em; text-transform: uppercase; font-size: .74rem; font-weight: 500; }
-.sheet-photo { background: var(--paper-2); }
-.sheet-photo img { display: block; width: 100%; max-height: 46dvh; object-fit: contain; margin-inline: auto; }
-.sheet-copy h2 { font-size: clamp(2rem, 8vw, 3rem); margin: .7rem 0 .3rem; line-height: .95; }
-.sheet-status { margin: .6rem 0 0; font-family: var(--sans); font-size: .72rem; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; font-style: normal; color: var(--accent-ink); }
-.sheet-facts { margin: 0 0 .4rem; color: var(--muted); }
-.sheet-desc { margin: 0 0 1rem; color: var(--ink-2); }
-.sheet .dock { position: sticky; bottom: .4rem; left: auto; right: auto; }
-.sheet .text-link { display: inline-block; margin: .9rem 0 .2rem; }
+.sheet-photo { flex: none; display: flex; align-items: center; justify-content: center; padding: 3.4rem 1rem 1.2rem; background: var(--paper-2); }
+.sheet-photo picture { display: contents; }
+.sheet-photo img { display: block; width: auto; max-width: 100%; height: auto; max-height: 40dvh; object-fit: contain; box-shadow: 0 1px 2px rgb(var(--shade) / calc(.12 * var(--shade-k))), 0 24px 40px -24px rgb(var(--shade) / calc(.5 * var(--shade-k))); }
+.sheet-body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.sheet-copy { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: .2rem clamp(1rem, 4vw, 2rem) 1rem; }
+.sheet-close { display: block; min-height: 44px; margin: 0 -.2rem 0 auto; padding: 0 .2rem; letter-spacing: .12em; text-transform: uppercase; font-size: .74rem; font-weight: 500; }
+.sheet-copy h2 { font-size: clamp(2rem, 8vw, 3rem); margin: 1rem 0 .4rem; line-height: .95; }
+@media (max-width: 759px) {
+  .sheet-close { position: absolute; z-index: 2; top: .6rem; right: .6rem; min-height: 38px; margin: 0; padding: 0 1rem; border-radius: 999px; background: rgb(var(--glass) / .9); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+}
+.sheet-status { margin: 0 0 .4rem; font-family: var(--sans); font-size: .72rem; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; font-style: normal; color: var(--accent-ink); }
+.sheet-facts { margin: 0 0 .5rem; color: var(--muted); }
+.sheet-desc { margin: 0; color: var(--ink-2); }
+.sheet-actions {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  padding: .9rem clamp(1rem, 4vw, 2rem) calc(.9rem + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+}
+.sheet-actions .button { flex: 1 1 11rem; min-height: 52px; padding: 0 1.2rem; }
+.sheet-ask { background: var(--accent-cta); color: var(--on-accent); }
+.sheet-ask:hover { background: var(--accent-ink); }
+.sheet-more { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px rgb(var(--ink-rgb) / .8); }
+.sheet-more svg { width: 18px; height: 18px; flex: none; transition: transform .45s var(--ease); }
+.sheet-more:hover { background: var(--ink); color: var(--paper); box-shadow: none; }
+.sheet-more:hover svg { transform: translateX(4px); }
+@media (min-width: 760px) {
+  .sheet { align-items: center; padding: clamp(1rem, 3vw, 2rem); }
+  .sheet-card { flex-direction: row; width: min(1080px, 100%); height: min(86dvh, 680px); max-height: none; border-radius: 16px; }
+  .sheet-photo { flex: 1.25 1 0; min-width: 0; padding: clamp(1.4rem, 3vw, 2.4rem); }
+  .sheet-photo img { max-height: 100%; }
+  .sheet-body { flex: 1 1 0; min-width: 0; }
+  .sheet-copy { padding: 1rem clamp(1.4rem, 3vw, 2.4rem) 1.4rem; }
+  .sheet-copy h2 { font-size: clamp(2.4rem, 4vw, 3.4rem); margin-top: clamp(.6rem, 4vh, 2.2rem); }
+  .sheet-actions { flex-direction: column; border-top: 0; padding: 0 clamp(1.4rem, 3vw, 2.4rem) clamp(1.4rem, 3vw, 2.2rem); }
+  .sheet-actions .button { flex: none; width: 100%; }
+}
 
 .page-home body:hover .cursor { opacity: .9; }
 .cursor.is-on { width: auto; height: auto; margin: 14px 0 0 14px; padding: .4rem .8rem; opacity: 1; }
@@ -1245,8 +1291,6 @@ body.is-locked { position: fixed; inset: 0; width: 100%; overflow: hidden; }
   .pick img { width: 100%; height: auto; aspect-ratio: 3 / 2; }
   .viewer-nav { top: 50%; bottom: auto; margin-top: -23px; }
   .viewer-photo { padding: 2.4rem 4.5rem; }
-  .sheet { align-items: center; }
-  .sheet-card { border-radius: 14px; }
   .cover { align-items: center; }
   .cover-inner { max-width: 44rem; }
 }
