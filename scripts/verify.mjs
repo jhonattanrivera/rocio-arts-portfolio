@@ -282,7 +282,10 @@ async function runViewport(browser, base, vp, english) {
       return kids.map((n) => n.matches("[data-flow]") ? "muro" : "exposición");
     });
     if (wallOrder[0] !== "muro") fail(`${label}: el muro de obras no va antes de la exposición (${wallOrder.join(" → ")})`);
+    // la demo se arma recién al acercarse a la pantalla: se lleva hasta ella y debe montarse
+    await page.evaluate(() => document.querySelector("[data-mount='room-demo']").scrollIntoView({ block: "center" }));
     await page.waitForSelector("[data-mount='room-demo'] .room", { timeout: 5000 }).catch(() => fail(`${label}: la demo de "En tu espacio" no se montó`));
+    await page.evaluate(() => window.scrollTo(0, 0));
 
     // 3. "En tu espacio": el visor abre con la obra colgada en una sala.
     mark(step); step = "en tu espacio";
