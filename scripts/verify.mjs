@@ -324,6 +324,8 @@ async function runViewport(browser, base, vp, english) {
 
     // 4. Imágenes del inicio.
     mark(step); step = "imágenes inicio";
+    // el paso del díptico dejó la página en Obras con el visor abierto: de vuelta al inicio
+    await page.goto(base, { waitUntil: "load" });
     await checkImages(page, label);
 
     // 5. Menú: cada enlace lleva a su página, que carga en español y con imágenes.
