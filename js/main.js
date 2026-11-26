@@ -10,7 +10,7 @@
   /* Las obras del muro del inicio, en orden de lectura (fila por fila) */
   var WALL = ["rosal", "respirar", "hacia-el-cielo", "dos-jardines", "luz-de-mayo", "nina-de-las-rosas",
     "entre-mujeres", "camino-rosa", "hortensias", "la-puerta", "prado", "leer-contigo"];
-  var DEMO = [["prado", "comedor"], ["dos-jardines", "sala"], ["bruma-floral", "habitacion"], ["luz-de-mayo", "escalera"], ["respirar", "tarde"], ["hacia-el-cielo", "entrada"]];
+  var DEMO = [["dos-jardines", "sala"], ["prado", "comedor"], ["luz-de-mayo", "pasillo"], ["respirar", "recepcion"], ["hacia-el-cielo", "consultorio"]];
 
   function t(key) { return window.ui ? window.ui(key) : key; }
   function wa(text) { return window.artWa ? window.artWa(text) : "https://wa.me/50689877207?text=" + encodeURIComponent(text); }

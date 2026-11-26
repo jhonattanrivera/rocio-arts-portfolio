@@ -12,52 +12,59 @@
      ref        brillo de pared que cuenta como luz plena (si falta, se mide)
      front      lo que queda delante de la obra, como una lámpara
    Con una pared de frente basta flat: cm (ancho de la foto en la pared),
-   box en fracciones de la foto, x y bottom (o y).
+   box en fracciones de la foto, x y bottom (o y), y blocks: lo que sube por
+   delante de la pared (floreros, plantas) y la obra no tapa; sobre eso se acomoda.
    La luz se toma de la misma foto, punto por punto, a través de la perspectiva.
-   Fotos con licencia Unsplash. Créditos en assets/rooms/CREDITS.md. */
+   Origen de las fotos en assets/rooms/CREDITS.md. */
 (function () {
+  /* Los cinco espacios son imágenes generadas por encargo de Rocío, de frente y
+     con luz de día. Medidas: el ancho de la foto en la pared (cm) sale de los
+     muebles (sofá, mesa, consola, sillones) y la altura del techo. blocks son
+     floreros, ramas y plantas que la obra no tapa: [x desde, x hasta, y de arriba]. */
   var ROOMS = [
     {
-      /* Sala frontal de Rocío (imagen generada): sofá de unos 225 cm, la obra
-         cuelga a unos 20 cm sobre el respaldo; el sol entra por la izquierda. */
-      id: "sala", file: "sala", w: 2000, h: 1500,
-      flat: { cm: 307, box: [0.13, 0.02, 0.99, 0.55], x: 0.519, bottom: 0.48 },
+      /* sofá de unos 225 cm; el sol entra por la ventana de la izquierda */
+      id: "sala", file: "sala", w: 2000, h: 1333,
+      flat: { cm: 340, box: [0.115, 0.02, 0.99, 0.555], x: 0.512, bottom: 0.49,
+        blocks: [[0.11, 0.225, 0.34]] },
       light: [0.6, 0.8], tint: 0.5, warm: 1,
       name: { es: "Sala", en: "Living room" }
     },
     {
-      id: "escalera", file: "escalera", w: 2000, h: 3000,
-      wall: { quad: [[0.373, 0.2754], [0.973, -0.0382], [0.973, 0.4735], [0.373, 0.5105]], cm: [330, 190] },
-      box: [6, -160, 318, 188], at: [235, 120], atBottom: true,
-      rail: [[0, -26], [330, 170]], railGap: 14,
-      ceil: [[48, -188], [337, 19]], ceilGap: 4,
-      light: [0.35, 0.9], tint: 0.3, warm: 0,
-      credit: "Francesca Tosolini", name: { es: "Escalera", en: "Staircase" }
+      /* mesa de unos 235 cm; luz de la galería de la izquierda. Las flores del
+         centro van recortadas por delante (comedor-flores): la obra cuelga detrás. */
+      id: "comedor", file: "comedor", w: 2000, h: 1333,
+      flat: { cm: 470, box: [0.08, 0.03, 0.92, 0.59], x: 0.503, bottom: 0.52,
+        blocks: [[0.075, 0.2, 0.26]] },
+      front: { file: "comedor-flores", rect: [0.43, 0.4276, 0.6, 0.6527] },
+      light: [0.5, 0.85], tint: 0.45, warm: 1,
+      name: { es: "Comedor", en: "Dining room" }
     },
     {
-      id: "habitacion", file: "habitacion", w: 2000, h: 1337,
-      flat: { cm: 557, box: [0.305, 0.085, 0.695, 0.472], x: 0.4975, bottom: 0.44 },
-      light: [0, 1], tint: 0.3, warm: 1,
-      credit: "Rohit Thakur", name: { es: "Habitación", en: "Bedroom" }
+      /* consola de unos 190 cm y techo de unos 240 cm; ventanal a la izquierda.
+         El florero con ramas va recortado por delante (pasillo-ramas). */
+      id: "pasillo", file: "pasillo", w: 2000, h: 1333,
+      flat: { cm: 430, box: [0.125, 0.03, 0.88, 0.6], x: 0.5, y: 0.3,
+        blocks: [[0.4, 0.49, 0.6], [0.72, 0.91, 0.515]] },
+      front: { file: "pasillo-ramas", rect: [0.27, 0.4201, 0.45, 0.6902] },
+      light: [0.4, 0.9], tint: 0.35, warm: 0,
+      name: { es: "Pasillo", en: "Hallway" }
     },
     {
-      id: "comedor", file: "comedor", w: 2000, h: 1500,
-      flat: { cm: 350, box: [0.03, 0.02, 0.855, 0.655], x: 0.47, bottom: 0.632 },
-      light: [-0.7, 0.6], tint: 0.65, warm: 1, ref: 205,
-      front: { file: "comedor-front", rect: [985 / 2400, 0, 1305 / 2400, 690 / 1800] },
-      credit: "mindeurle lee", name: { es: "Comedor", en: "Dining room" }
+      /* sofá de unos 175 cm junto al mostrador; ventanal a la izquierda */
+      id: "recepcion", file: "recepcion", w: 2000, h: 1333,
+      flat: { cm: 585, box: [0.095, 0.065, 0.995, 0.6], x: 0.71, bottom: 0.59,
+        blocks: [[0.13, 0.285, 0.42], [0.83, 1, 0.34]] },
+      light: [0.5, 0.85], tint: 0.4, warm: 1,
+      name: { es: "Recepción", en: "Reception" }
     },
     {
-      id: "tarde", file: "tarde", w: 2400, h: 1350,
-      flat: { cm: 365, box: [0.2, 0.04, 0.66, 0.6], x: 0.487, y: 0.34 },
-      light: [1, 0.55], tint: 0.9, warm: 1,
-      credit: "Visual Laurence", name: { es: "Luz de tarde", en: "Afternoon light" }
-    },
-    {
-      id: "entrada", file: "entrada", w: 2400, h: 1600,
-      flat: { cm: 230, box: [0.548, 0.03, 0.985, 0.665], x: 0.765, bottom: 0.655 },
-      light: [0.6, 0.8], tint: 0.3, warm: 0,
-      credit: "Liana Mikah", name: { es: "Entrada", en: "Entryway" }
+      /* dos sillones de unos 80 cm y una mesa baja; ventanal a la izquierda */
+      id: "consultorio", file: "consultorio", w: 2000, h: 1333,
+      flat: { cm: 436, box: [0.115, 0.04, 0.995, 0.6], x: 0.525, bottom: 0.5,
+        blocks: [[0.06, 0.205, 0.43], [0.455, 0.535, 0.53], [0.525, 0.64, 0.57]] },
+      light: [0.45, 0.88], tint: 0.4, warm: 1,
+      name: { es: "Consultorio", en: "Office" }
     }
   ];
   var byId = {};
@@ -114,7 +121,7 @@
   /* Geometría de cada espacio, calculada una vez. */
   function prep(room) {
     if (room._g) return room._g;
-    var iw = room.w, ih = room.h, quad, W, Hh, box, at, bottom;
+    var iw = room.w, ih = room.h, quad, W, Hh, box, at, bottom, blocks = [];
     if (room.flat) {
       var f = room.flat, ppc = iw / f.cm, b = f.box;
       W = (b[2] - b[0]) * iw / ppc;
@@ -123,6 +130,9 @@
       box = [0, 0, W, Hh];
       bottom = f.bottom != null;
       at = [(f.x - b[0]) * iw / ppc, ((bottom ? f.bottom : f.y) - b[1]) * ih / ppc];
+      blocks = (f.blocks || []).map(function (k) {
+        return [(k[0] - b[0]) * iw / ppc, (k[1] - b[0]) * iw / ppc, (k[2] - b[1]) * ih / ppc];
+      });
     } else {
       quad = room.wall.quad;
       W = room.wall.cm[0];
@@ -132,7 +142,7 @@
       bottom = !!room.atBottom;
     }
     var H = solve([[0, 0], [W, 0], [W, Hh], [0, Hh]], quad.map(function (p) { return [p[0] * iw, p[1] * ih]; }));
-    room._g = { H: H, Hi: invert(H), box: box, at: at, bottom: bottom };
+    room._g = { H: H, Hi: invert(H), box: box, at: at, bottom: bottom, blocks: blocks };
     return room._g;
   }
   function lineAt(r, u) {
@@ -143,6 +153,7 @@
   function span(room, g, uL, uR, strict) {
     var b = g.box, top = b[1], bottom = b[3];
     if (room.rail) bottom = Math.min(bottom, lineAt(room.rail, uL), lineAt(room.rail, uR)) - (room.railGap || 10);
+    g.blocks.forEach(function (k) { if (uR > k[0] && uL < k[1]) bottom = Math.min(bottom, k[2] - 8); });
     if (room.ceil && strict) top = Math.max(top, lineAt(room.ceil, uL), lineAt(room.ceil, uR)) + (room.ceilGap || 6);
     return [top, bottom];
   }
@@ -331,7 +342,7 @@
     /* El alto más grande que cabe para un ancho dado, en el mejor lugar de la pared. */
     function roomFor(room, g, ow) {
       var b = g.box, best = 0;
-      if (!room.rail && !room.ceil) return b[3] - b[1];
+      if (!room.rail && !room.ceil && !g.blocks.length) return b[3] - b[1];
       for (var n = 0; n <= 24; n++) {
         var uL = b[0] + (b[2] - b[0] - ow) * n / 24, v = span(room, g, uL, uL + ow);
         best = Math.max(best, v[1] - v[0]);
@@ -503,7 +514,9 @@
       if (!keepCamera || !cam || cam.W !== W || cam.H !== H) {
         var s = Math.max(W / iw, H / ih) * state.zoom;
         var vw = W / s, vh = H / s;
-        var focus = state.zoom > 1 ? apply(g.H, cu, cv) : apply(g.H, g.at[0], g.bottom ? g.at[1] - 35 : g.at[1]);
+        /* la cámara sigue a la obra a lo ancho: si no cabe en el lugar por defecto
+           y se acomodó a un lado, en el teléfono no queda cortada */
+        var focus = state.zoom > 1 ? apply(g.H, cu, cv) : apply(g.H, cu, g.bottom ? g.at[1] - 35 : g.at[1]);
         var ox = clamp(focus[0] - vw / 2, 0, Math.max(0, iw - vw));
         var oy = clamp(focus[1] - vh * (state.zoom > 1 ? 0.5 : 0.52), 0, Math.max(0, ih - vh));
         cam = state.cam = { s: s, ox: ox, oy: oy, W: W, H: H };

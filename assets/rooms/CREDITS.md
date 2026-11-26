@@ -1,22 +1,17 @@
 # Espacios
 
-Fotos con la Licencia Unsplash (uso libre, también comercial). La obra se coloca encima en el navegador; las fotos no se venden ni se redistribuyen solas.
+Las cinco fotos del visor "En tu espacio" son imágenes generadas por encargo de Rocío Villamizar: sala, comedor, pasillo, recepción y consultorio. Se ven de frente, con la pared vacía y luz de día.
 
-| Archivo | Foto | Autor |
-| --- | --- | --- |
-| sala | Imagen generada por encargo de Rocío Villamizar | — |
-| escalera | https://unsplash.com/photos/YNaGwlNbTwY | Francesca Tosolini |
-| habitacion | https://unsplash.com/photos/OZZOEgwxyfQ | Rohit Thakur |
-| comedor | https://unsplash.com/photos/ozDFb-HMi6w | mindeurle lee |
-| tarde | https://unsplash.com/photos/al0srakHkkY | Visual Laurence |
-| entrada | https://unsplash.com/photos/HstwCJX0jT4 | Liana Mikah |
+| Archivo | Espacio |
+| --- | --- |
+| sala | Sala con sofá y ventanal |
+| comedor | Comedor con mesa de madera |
+| pasillo | Pasillo con consola y monstera |
+| recepcion | Recepción con mostrador y sofá |
+| consultorio | Consultorio con dos sillones |
 
-Ajustes:
+Las originales llegaron a 1728 × 1152 px y se exportaron a 1200 y 2000 px (JPG y WebP) con sharp.
 
-- `sala`: imagen frontal generada para el visor; se agrandó a 2000 px.
-- `escalera`: se borraron los seis marcos de la pared, sin tocar el pasamanos.
-- `habitacion`: se borró el tapiz sobre el cabecero.
-- `comedor`: la lámpara se separó de la pared (`comedor-front.webp`) para que la obra quede detrás de ella.
-- `tarde`: se borró el marco vacío de la pared.
+En el comedor y el pasillo, lo que queda delante de la pared (las flores del centro de la mesa, el florero con ramas) se recortó en `comedor-flores.webp` y `pasillo-ramas.webp`: la obra cuelga detrás. El recorte compara cada píxel con el color de la pared en su fila y le quita al borde el halo de la pared.
 
-Para sumar un espacio se exportan `{nombre}-1200` y `{nombre}-2000` en JPG y WebP, y se agrega una entrada en `js/room.js`. Si la pared se ve de frente basta `flat` (ancho en cm y zona de pared). Si se ve en perspectiva, `wall.quad` son las cuatro esquinas en la foto de un rectángulo de pared con medida conocida (`wall.cm`); la obra y su luz se proyectan con esa perspectiva.
+Para sumar un espacio se exportan `{nombre}-1200` y `{nombre}-2000` en JPG y WebP, y se agrega una entrada en `js/room.js`. Si la pared se ve de frente basta `flat`: el ancho de la foto en la pared en cm (medido con los muebles), la zona de pared libre, el punto por defecto y `blocks` para lo que sube por delante de la pared (floreros, ramas, plantas), que la obra no tapa. Si se ve en perspectiva, `wall.quad` son las cuatro esquinas en la foto de un rectángulo de pared con medida conocida (`wall.cm`); la obra y su luz se proyectan con esa perspectiva.
