@@ -1027,14 +1027,16 @@ input[type="range"]:disabled { opacity: .35; cursor: default; }
 .bio { display: grid; gap: 2rem; align-items: end; }
 .bio img { display: block; width: 100%; height: auto; }
 .bio p, .chapter p, .more-art p, .close-invite p { margin: 0 0 1rem; max-width: 38rem; color: var(--ink-2); }
-.bio p:first-child { font-family: var(--serif); font-size: clamp(1.5rem, 3.6vw, 2.2rem); line-height: 1.2; color: var(--ink); letter-spacing: -.015em; }
+/* La bio abre con una frase corta en grande y sigue con una entrada mediana */
+.bio-title { margin: 0 0 1rem; font-size: clamp(2.1rem, 4.6vw, 3.3rem); line-height: 1; letter-spacing: -.02em; text-wrap: balance; }
+.bio .bio-lede { margin-bottom: 1.6rem; font-family: var(--serif); font-weight: 340; font-size: clamp(1.18rem, 1.9vw, 1.42rem); line-height: 1.4; color: var(--ink); letter-spacing: -.005em; }
 .exhibits h2, .more-art h2, .chapter h2 { margin: 0 0 .8rem; font-size: clamp(2.4rem, 7vw, 4.4rem); line-height: .95; }
 .timeline { list-style: none; margin: 1.2rem 0 0; padding: 0; display: grid; gap: .8rem; max-width: 46rem; }
 .timeline li { display: grid; grid-template-columns: 3.4rem 1fr; gap: .8rem; align-items: baseline; }
 .timeline .when { font-family: var(--serif); font-style: italic; font-variation-settings: "SOFT" 100, "WONK" 1; font-size: 1.05rem; color: var(--muted); }
 .timeline strong { display: block; font-family: var(--serif); font-weight: 400; font-size: 1.06rem; line-height: 1.2; }
-.timeline em { color: var(--muted); font-style: normal; font-size: .84rem; }
-.timeline .now { display: block; margin: 0 0 .25rem; font-family: var(--sans); font-size: .72rem; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; font-style: normal; color: var(--accent-ink); }
+.timeline em { display: block; color: var(--muted); font-style: normal; font-size: .84rem; line-height: 1.45; }
+.timeline .next-tag { display: block; margin: 0 0 .25rem; font-family: var(--sans); font-size: .72rem; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; font-style: normal; color: var(--accent-ink); }
 .timeline .is-next strong { font-size: 1.2rem; }
 .close-invite p { font-family: var(--serif); font-size: clamp(2.2rem, 6.4vw, 4.4rem); line-height: 1; letter-spacing: -.03em; color: var(--ink); max-width: 14em; }
 
@@ -1044,6 +1046,16 @@ input[type="range"]:disabled { opacity: .35; cursor: default; }
 .chapter .button { margin-top: .6rem; }
 .chapter img { display: block; width: 100%; height: auto; max-height: 86svh; object-fit: cover; object-position: 50% 30%; box-shadow: 0 24px 44px -28px rgb(var(--shade) / calc(.5 * var(--shade-k))); }
 .chapter + .chapter, .exhibits + .exhibits { padding-top: 0; }
+/* En pantallas anchas: el título queda a la izquierda mientras se recorre,
+   y la lista corre en dos columnas a la derecha (sigue siendo de letra chica). */
+@media (min-width: 980px) {
+  .exhibits { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.3fr); gap: clamp(2rem, 4vw, 4rem); align-items: start; }
+  .exhibits h2 { position: sticky; top: calc(var(--nav-h) + 2rem); font-size: clamp(2.4rem, 3.6vw, 3.4rem); }
+  .exhibits .timeline { display: block; max-width: none; margin-top: .5rem; columns: 2; column-gap: clamp(2rem, 4vw, 4rem); }
+  .exhibits .timeline li { break-inside: avoid; margin-bottom: 1.05rem; }
+  /* las fotos caben enteras en su columna */
+  .exhibits .timeline .when-photos img { height: min(150px, 9.5vw); }
+}
 .scroller { overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 0 var(--pad) .6rem; }
 .scroller::-webkit-scrollbar { display: none; }
 .scroller-track { display: flex; gap: 1rem; width: max-content; }
