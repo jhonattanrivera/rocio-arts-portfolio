@@ -273,10 +273,15 @@ async function runViewport(browser, base, vp, english) {
     // 2. Inicio en español, con sus secciones.
     step = "inicio";
     await checkSpanish(page, label, english);
-    for (const sel of [".hero h1", "[data-rail]", ".walltest", ".statement", "a.portal", "nav.paths", "footer.footer"])
+    for (const sel of [".hero h1", "[data-flow]", "#ahora", ".walltest", ".statement", "a.portal", "nav.paths", "footer.footer"])
       if (!(await page.$(sel))) fail(`${label}: falta ${sel} en el inicio`);
     await checkNoCount(page, label);
-    await page.waitForSelector(".rail-track > *", { timeout: 5000 }).catch(() => fail(`${label}: la selección de obras quedó vacía`));
+    await page.waitForSelector("[data-mount='wall'] .card", { timeout: 5000 }).catch(() => fail(`${label}: el muro de obras del inicio quedó vacío`));
+    const wallOrder = await page.evaluate(() => {
+      const kids = Array.from(document.querySelectorAll("[data-flow], #ahora"));
+      return kids.map((n) => n.matches("[data-flow]") ? "muro" : "exposición");
+    });
+    if (wallOrder[0] !== "muro") fail(`${label}: el muro de obras no va antes de la exposición (${wallOrder.join(" → ")})`);
     await page.waitForSelector("[data-mount='room-demo'] .room", { timeout: 5000 }).catch(() => fail(`${label}: la demo de "En tu espacio" no se montó`));
 
     // 3. "En tu espacio": el visor abre con la obra colgada en una sala.
