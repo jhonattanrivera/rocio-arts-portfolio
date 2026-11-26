@@ -214,8 +214,13 @@ async function checkGarden(page, label, vp, english) {
   await page.waitForSelector("#sheet[hidden]", { state: "attached", timeout: 5000 }).catch(() => fail(`${label}: la ficha del jardín no cierra`));
   // El jardín es solo 3D: para ver todas las obras se va a Obras.
   if (await page.$("#muro, [data-wall]")) fail(`${label}: el jardín todavía tiene la vista en plano`);
-  await Promise.all([page.waitForURL((u) => u.pathname.endsWith("/obras.html"), { timeout: 30000 }), page.locator("#to-list").click()])
-    .catch(() => fail(`${label}: "Todas las obras" no lleva del jardín a Obras`));
+  // Lo que se comprueba es que el enlace lleve a Obras: basta con que la navegación empiece
+  // (waitUntil "commit"); esperar la carga completa de Obras en red real volvía inestable el paso.
+  // El toque tiene 30 s, como las demás esperas del jardín, porque el 3D por software ocupa la CPU.
+  await Promise.all([
+    page.waitForURL((u) => u.pathname.endsWith("/obras.html"), { timeout: 30000, waitUntil: "commit" }),
+    page.locator("#to-list").click({ timeout: 30000 })
+  ]).catch(() => fail(`${label}: "Todas las obras" no lleva del jardín a Obras`));
 }
 
 // ---------- Recorrido por tamaño de pantalla ----------
