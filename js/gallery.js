@@ -441,13 +441,16 @@ function boot() {
 
   /* Sombras de nubes: de vez en cuando una nube tapa el sol sobre el pasto, el pasillo,
      los setos y los arbustos (en promedio, una cuarta parte del pasillo; la primera
-     pasa por la entrada a los 15 o 20 segundos). Solo baja la luz directa (la del cielo sigue), con un
-     ruido suave que se desplaza con el viento; nada de geometría ni dibujos extra. */
+     pasa por la entrada a los 15 o 20 segundos). Solo baja la luz directa (la del
+     cielo sigue), con un ruido suave que se desplaza con el viento.
+     Se calcula una vez por vértice, no por píxel: las nubes miden decenas de metros y
+     la malla es mucho más fina que eso (el suelo se subdivide cerca del jardín, ver
+     groundGeo), así que se ve igual y a la tarjeta gráfica casi no le cuesta. */
   var CLOUD = "float cHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }\n" +
     "float cNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);\n" +
     " return mix(mix(cHash(i), cHash(i + vec2(1.0, 0.0)), f.x), mix(cHash(i + vec2(0.0, 1.0)), cHash(i + vec2(1.0, 1.0)), f.x), f.y); }\n" +
-    "float cloudShade(vec2 xz) {\n" +
-    " float t = uTime + 37.0;\n" +
+    "float cloudShade(vec2 xz, float time) {\n" +
+    " float t = time + 37.0;\n" +
     " vec2 p = xz * 0.05 + vec2(t * 0.03, t * 0.011);\n" +
     " float n = cNoise(p) * 0.65 + cNoise(p * 2.3 + 4.1) * 0.35;\n" +
     " return 1.0 - 0.42 * smoothstep(0.62, 0.78, n);\n}\n";
@@ -458,16 +461,35 @@ function boot() {
       if (had) prev.call(this, shader, r);
       shader.uniforms.uTime = wind;
       var hasTime = shader.vertexShader.indexOf("uniform float uTime;") >= 0;
-      shader.vertexShader = (hasTime ? "" : "uniform float uTime;\n") + "varying vec3 vCloudPos;\n" + shader.vertexShader.replace(
+      shader.vertexShader = (hasTime ? "" : "uniform float uTime;\n") + "varying float vCloud;\n" + CLOUD + shader.vertexShader.replace(
         "#include <begin_vertex>",
-        "#include <begin_vertex>\n vec4 cwp = vec4(transformed, 1.0);\n#ifdef USE_INSTANCING\n cwp = instanceMatrix * cwp;\n#endif\n vCloudPos = (modelMatrix * cwp).xyz;");
-      shader.fragmentShader = "uniform float uTime;\nvarying vec3 vCloudPos;\n" + CLOUD + shader.fragmentShader.replace(
+        "#include <begin_vertex>\n vec4 cwp = vec4(transformed, 1.0);\n#ifdef USE_INSTANCING\n cwp = instanceMatrix * cwp;\n#endif\n vCloud = cloudShade((modelMatrix * cwp).xz, uTime);");
+      shader.fragmentShader = "varying float vCloud;\n" + shader.fragmentShader.replace(
         "#include <lights_fragment_end>",
-        "#include <lights_fragment_end>\n float cs = cloudShade(vCloudPos.xz);\n reflectedLight.directDiffuse *= cs;\n reflectedLight.directSpecular *= cs;");
+        "#include <lights_fragment_end>\n reflectedLight.directDiffuse *= vCloud;\n reflectedLight.directSpecular *= vCloud;");
     };
     /* el shader depende de lo que ya tenía el material: que three no los confunda */
     mat.customProgramCacheKey = function () { return "nubes:" + (had ? prev.toString() : ""); };
     return mat;
+  }
+
+  /* El suelo: una malla más densa cerca del jardín (unos 1,5 m entre puntos) y cada vez
+     más abierta hacia el horizonte, que se pierde en la bruma. Antes era un solo
+     cuadrado de 400 m; la sombra de las nubes necesita puntos donde calcularse.
+     La textura se apoya en la posición, así el pasto se ve igual que antes. */
+  function groundGeo(centerZ) {
+    var n = 80, half = 200;
+    var geo = new THREE.PlaneGeometry(2, 2, n, n);
+    var p = geo.attributes.position, uv = geo.attributes.uv;
+    function warp(u) { return half * (0.3 * u + 0.7 * Math.pow(Math.abs(u), 5) * Math.sign(u)); }
+    for (var i = 0; i < p.count; i++) {
+      /* el plano se acuesta después (rotación en x): su "y" es la -z del mundo */
+      var x = warp(p.getX(i)), y = warp(p.getY(i)) - centerZ;
+      p.setXY(i, x, y);
+      uv.setXY(i, (x + half) / (2 * half), (y + half) / (2 * half));
+    }
+    geo.computeBoundingSphere();
+    return geo;
   }
 
   function planarUV(geo, tile) {
@@ -622,7 +644,7 @@ function boot() {
     var grass = grassTex();
     grass.repeat.set(136, 136);
     var ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(400, 400),
+      groundGeo((START_Z + END_Z) / 2),
       cloudy(new THREE.MeshStandardMaterial({ map: grass, roughness: 1, metalness: 0, color: 0xe8f0dc }))
     );
     ground.rotation.x = -Math.PI / 2;
