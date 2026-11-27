@@ -1052,6 +1052,16 @@ input[type="range"]:disabled { opacity: .35; cursor: default; }
 .chapter .button { margin-top: .6rem; }
 .chapter img { display: block; width: 100%; height: auto; max-height: 86svh; object-fit: cover; object-position: 50% 30%; box-shadow: 0 24px 44px -28px rgb(var(--shade) / calc(.5 * var(--shade-k))); }
 .chapter + .chapter, .exhibits + .exhibits { padding-top: 0; }
+/* Encargos: el título, el texto y el botón van juntos a la izquierda, centrados junto
+   a la foto, y en pantallas anchas todo cabe en una pantalla (antes el título iba arriba
+   y quedaba un gran hueco bajo el botón). */
+.commission { padding-top: clamp(2.4rem, 7vw, 5rem); }
+.commission h1 { margin: .2rem 0 clamp(1.8rem, 4vw, 3rem); padding-bottom: .1em; font-size: clamp(3.4rem, 13vw, 7.2rem); line-height: .86; letter-spacing: -.04em; font-weight: 330; }
+@media (min-width: 720px) { .commission { align-items: center; } }
+@media (min-width: 980px) {
+  .commission { min-height: calc(100svh - var(--nav-h)); padding-block: clamp(2rem, 4vw, 3rem); }
+  .commission img { max-height: calc(100svh - var(--nav-h) - clamp(4rem, 8vw, 6rem)); object-position: 50% 55%; }
+}
 /* En pantallas anchas: el título queda a la izquierda mientras se recorre,
    y la lista corre en dos columnas a la derecha (sigue siendo de letra chica). */
 @media (min-width: 980px) {
