@@ -521,6 +521,10 @@ main { display: block; padding-top: var(--nav-h); }
 .now-facts div { display: grid; gap: .1rem; }
 .now-facts dt { font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
 .now-facts dd { margin: 0; font-size: 1.08rem; }
+/* Fecha y lugar en dos renglones pensados: lo principal arriba y la hora o la
+   ciudad debajo, así nunca queda "p. m." o "José" solo en una línea */
+.now-facts dd span { display: block; text-wrap: balance; }
+.now-facts dd .now-sub { color: var(--ink-2); }
 
 /* La frase */
 .quote { padding: clamp(5rem, 14vw, 11rem) 0; background: var(--paper-2); }
@@ -1036,6 +1040,8 @@ input[type="range"]:disabled { opacity: .35; cursor: default; }
 .timeline .when { font-family: var(--serif); font-style: italic; font-variation-settings: "SOFT" 100, "WONK" 1; font-size: 1.05rem; color: var(--muted); }
 .timeline strong { display: block; font-family: var(--serif); font-weight: 400; font-size: 1.06rem; line-height: 1.2; }
 .timeline em { display: block; color: var(--muted); font-style: normal; font-size: .84rem; line-height: 1.45; }
+/* la ciudad va en su propio renglón, así no se parte "San / José" */
+.timeline .city { display: block; }
 .timeline .next-tag { display: block; margin: 0 0 .25rem; font-family: var(--sans); font-size: .72rem; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; font-style: normal; color: var(--accent-ink); }
 .timeline .is-next strong { font-size: 1.2rem; }
 .close-invite p { font-family: var(--serif); font-size: clamp(2.2rem, 6.4vw, 4.4rem); line-height: 1; letter-spacing: -.03em; color: var(--ink); max-width: 14em; }
