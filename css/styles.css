@@ -381,8 +381,10 @@ html.is-theming::view-transition-new(root) { z-index: 2; }
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: .1rem;
+  /* aire entre las opciones del menú del teléfono, según el alto de la pantalla */
+  gap: clamp(.45rem, 1.9svh, 1.1rem);
   padding: calc(var(--nav-h) + 1rem) var(--pad) calc(2rem + env(safe-area-inset-bottom));
+  overflow-y: auto;
   background: var(--paper);
   visibility: hidden;
   pointer-events: none;
@@ -396,7 +398,8 @@ html.is-theming::view-transition-new(root) { z-index: 2; }
   font-family: var(--serif);
   font-variation-settings: "SOFT" 100, "WONK" 0;
   font-weight: 360;
-  font-size: clamp(2.5rem, 11.5vw, 4.6rem);
+  /* con el teléfono acostado, la letra se mide también por el alto: así cabe */
+  font-size: clamp(2.2rem, min(11.5vw, 8.5svh), 4.6rem);
   letter-spacing: -.03em;
   line-height: 1.02;
   width: fit-content;
@@ -409,7 +412,7 @@ html.is-theming::view-transition-new(root) { z-index: 2; }
 .nav.is-open .nav-panel a:nth-child(6) { animation-delay: .25s; }
 .nav-panel a[aria-current="page"] { font-style: italic; font-variation-settings: "SOFT" 100, "WONK" 1; color: var(--accent-ink); }
 .nav-panel .nav-write {
-  margin-top: 1.4rem;
+  margin-top: clamp(1.2rem, 4svh, 2.4rem);
   font-style: italic;
   font-variation-settings: "SOFT" 100, "WONK" 1;
   color: var(--accent-ink);
