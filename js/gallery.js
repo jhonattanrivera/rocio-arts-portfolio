@@ -439,6 +439,37 @@ function boot() {
     };
   }
 
+  /* Sombras de nubes: de vez en cuando una nube tapa el sol sobre el pasto, el pasillo,
+     los setos y los arbustos (en promedio, una cuarta parte del pasillo; la primera
+     pasa por la entrada a los 15 o 20 segundos). Solo baja la luz directa (la del cielo sigue), con un
+     ruido suave que se desplaza con el viento; nada de geometría ni dibujos extra. */
+  var CLOUD = "float cHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }\n" +
+    "float cNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);\n" +
+    " return mix(mix(cHash(i), cHash(i + vec2(1.0, 0.0)), f.x), mix(cHash(i + vec2(0.0, 1.0)), cHash(i + vec2(1.0, 1.0)), f.x), f.y); }\n" +
+    "float cloudShade(vec2 xz) {\n" +
+    " float t = uTime + 37.0;\n" +
+    " vec2 p = xz * 0.05 + vec2(t * 0.03, t * 0.011);\n" +
+    " float n = cNoise(p) * 0.65 + cNoise(p * 2.3 + 4.1) * 0.35;\n" +
+    " return 1.0 - 0.42 * smoothstep(0.62, 0.78, n);\n}\n";
+  function cloudy(mat) {
+    var prev = mat.onBeforeCompile;
+    var had = prev !== THREE.Material.prototype.onBeforeCompile;
+    mat.onBeforeCompile = function (shader, r) {
+      if (had) prev.call(this, shader, r);
+      shader.uniforms.uTime = wind;
+      var hasTime = shader.vertexShader.indexOf("uniform float uTime;") >= 0;
+      shader.vertexShader = (hasTime ? "" : "uniform float uTime;\n") + "varying vec3 vCloudPos;\n" + shader.vertexShader.replace(
+        "#include <begin_vertex>",
+        "#include <begin_vertex>\n vec4 cwp = vec4(transformed, 1.0);\n#ifdef USE_INSTANCING\n cwp = instanceMatrix * cwp;\n#endif\n vCloudPos = (modelMatrix * cwp).xyz;");
+      shader.fragmentShader = "uniform float uTime;\nvarying vec3 vCloudPos;\n" + CLOUD + shader.fragmentShader.replace(
+        "#include <lights_fragment_end>",
+        "#include <lights_fragment_end>\n float cs = cloudShade(vCloudPos.xz);\n reflectedLight.directDiffuse *= cs;\n reflectedLight.directSpecular *= cs;");
+    };
+    /* el shader depende de lo que ya tenía el material: que three no los confunda */
+    mat.customProgramCacheKey = function () { return "nubes:" + (had ? prev.toString() : ""); };
+    return mat;
+  }
+
   function planarUV(geo, tile) {
     var p = geo.attributes.position, n = geo.attributes.normal, uv = geo.attributes.uv;
     for (var i = 0; i < p.count; i++) {
@@ -592,14 +623,14 @@ function boot() {
     grass.repeat.set(136, 136);
     var ground = new THREE.Mesh(
       new THREE.PlaneGeometry(400, 400),
-      new THREE.MeshStandardMaterial({ map: grass, roughness: 1, metalness: 0, color: 0xe8f0dc })
+      cloudy(new THREE.MeshStandardMaterial({ map: grass, roughness: 1, metalness: 0, color: 0xe8f0dc }))
     );
     ground.rotation.x = -Math.PI / 2;
     ground.receiveShadow = true;
     scene.add(ground);
 
     var stone = stoneTex();
-    var paverMat = new THREE.MeshStandardMaterial({ map: stone, roughness: 0.82, metalness: 0, color: 0xffffff });
+    var paverMat = cloudy(new THREE.MeshStandardMaterial({ map: stone, roughness: 0.82, metalness: 0, color: 0xffffff }));
     var paverGeo = new THREE.BoxGeometry(1.04, 0.05, 0.6);
     var rows = Math.floor((len - 1.6) / 0.66);
     var pavers = new THREE.InstancedMesh(paverGeo, paverMat, rows * 2);
@@ -625,7 +656,7 @@ function boot() {
 
     var leaf = leafTex(false);
     var leafBump = leafTex(true);
-    var hedgeMat = new THREE.MeshStandardMaterial({ map: leaf, bumpMap: leafBump, bumpScale: 3, roughness: 0.95, metalness: 0, color: 0xdfe8d2 });
+    var hedgeMat = cloudy(new THREE.MeshStandardMaterial({ map: leaf, bumpMap: leafBump, bumpScale: 3, roughness: 0.95, metalness: 0, color: 0xdfe8d2 }));
     function hedge(w, h, d, x, z) {
       var geo = new THREE.BoxGeometry(w, h, d, Math.max(2, Math.round(w * 5)), Math.round(h * 5), Math.max(2, Math.round(d * 5)));
       var p = geo.attributes.position;
@@ -670,7 +701,7 @@ function boot() {
     /* Canteros: arbustos y flores al pie de los setos */
     var shrubGeo = lumpy(new THREE.IcosahedronGeometry(0.36, 3), 0.16, 4.2);
     planarUV(shrubGeo, 0.9);
-    var shrubMat = new THREE.MeshStandardMaterial({ map: leaf, bumpMap: leafBump, bumpScale: 2, roughness: 0.92, color: 0xffffff });
+    var shrubMat = cloudy(new THREE.MeshStandardMaterial({ map: leaf, bumpMap: leafBump, bumpScale: 2, roughness: 0.92, color: 0xffffff }));
     var spots = [];
     [-1, 1].forEach(function (side) {
       for (var z2 = START_Z - 0.4; z2 > END_Z + 1.2; z2 -= low ? 1.1 : 0.8) {
@@ -827,6 +858,148 @@ function boot() {
       scene.add(mesh);
     }
 
+    /* Pétalos y mariposas: se mueven solo en la tarjeta gráfica (cada uno sabe de dónde
+       sale y su semilla; el shader calcula dónde está en cada momento). Un dibujo cada
+       grupo y nada de trabajo del procesador por cuadro. Usan su propio sorteo para
+       no cambiar el resto del jardín. */
+    var fx = 77123;
+    function fxRand() {
+      fx = (fx * 1103515245 + 12345) & 0x7fffffff;
+      return fx / 0x7fffffff;
+    }
+    function petalTex() {
+      return paint(64, 64, function (g, w, h) {
+        g.clearRect(0, 0, w, h);
+        var grd = g.createRadialGradient(w * 0.5, h * 0.62, 2, w * 0.5, h * 0.5, w * 0.48);
+        grd.addColorStop(0, "rgba(255,255,255,1)");
+        grd.addColorStop(1, "rgba(246,214,226,1)");
+        g.fillStyle = grd;
+        g.beginPath();
+        g.moveTo(w * 0.5, h * 0.06);
+        g.bezierCurveTo(w * 0.96, h * 0.2, w * 0.9, h * 0.86, w * 0.5, h * 0.96);
+        g.bezierCurveTo(w * 0.1, h * 0.86, w * 0.04, h * 0.2, w * 0.5, h * 0.06);
+        g.fill();
+      });
+    }
+    function buildPetals() {
+      if (!pinkCrowns.length) return;
+      var n = low ? 150 : 320;
+      var data = new Float32Array(n * 4);
+      var mesh = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.11, 0.085), null, n);
+      var col = new THREE.Color();
+      for (var i = 0; i < n; i++) {
+        var c = pinkCrowns[i % pinkCrowns.length];
+        var a = fxRand() * Math.PI * 2, r = Math.sqrt(fxRand()) * c.r;
+        data[i * 4] = c.x + Math.cos(a) * r;
+        data[i * 4 + 1] = c.h * (0.75 + fxRand() * 0.45);
+        data[i * 4 + 2] = c.z + Math.sin(a) * r;
+        data[i * 4 + 3] = fxRand();
+        col.setHSL(0.94 + fxRand() * 0.04, 0.6 + fxRand() * 0.3, 0.74 + fxRand() * 0.12);
+        mesh.setColorAt(i, col);
+      }
+      mesh.geometry.setAttribute("aPetal", new THREE.InstancedBufferAttribute(data, 4));
+      var mat = new THREE.MeshBasicMaterial({ map: petalTex(), alphaTest: 0.4, alphaToCoverage: true, side: THREE.DoubleSide });
+      mat.onBeforeCompile = function (shader) {
+        shader.uniforms.uTime = wind;
+        shader.vertexShader = "uniform float uTime;\nattribute vec4 aPetal;\n" + shader.vertexShader.replace(
+          "#include <begin_vertex>",
+          "#include <begin_vertex>\n" +
+          " float sd = aPetal.w;\n" +
+          " float period = 7.0 + sd * 6.0;\n" +
+          " float ph = fract((uTime + sd * 53.0) / period);\n" +
+          " vec3 at = vec3(aPetal.x, aPetal.y * (1.0 - ph), aPetal.z);\n" +
+          " at.x += ph * 1.8 + sin(uTime * 1.3 + sd * 20.0) * 0.2;\n" +
+          " at.z -= ph * 0.8 - cos(uTime * 1.1 + sd * 13.0) * 0.2;\n" +
+          " float ra = uTime * (1.6 + sd * 2.2) + sd * 6.28, rb = uTime * (1.1 + sd) + sd * 3.0;\n" +
+          " mat3 rx = mat3(1.0, 0.0, 0.0, 0.0, cos(ra), sin(ra), 0.0, -sin(ra), cos(ra));\n" +
+          " mat3 ry = mat3(cos(rb), 0.0, -sin(rb), 0.0, 1.0, 0.0, sin(rb), 0.0, cos(rb));\n" +
+          " float grow = smoothstep(0.0, 0.05, ph) * (1.0 - smoothstep(0.92, 1.0, ph));\n" +
+          " transformed = ry * rx * (transformed * grow) + at;"
+        );
+      };
+      mesh.material = mat;
+      /* las posiciones las pone el shader: three no puede saber si se ven */
+      mesh.frustumCulled = false;
+      scene.add(mesh);
+    }
+
+    function wingTex() {
+      return paint(128, 64, function (g, w, h) {
+        g.clearRect(0, 0, w, h);
+        [-1, 1].forEach(function (side) {
+          g.save();
+          g.translate(w / 2, h / 2);
+          g.scale(side, 1);
+          g.fillStyle = "#1c1712";
+          g.beginPath();
+          g.moveTo(2, -2);
+          g.bezierCurveTo(22, -34, 64, -32, 60, -8);
+          g.bezierCurveTo(58, 4, 30, 6, 2, 2);
+          g.bezierCurveTo(26, 8, 50, 22, 36, 30);
+          g.bezierCurveTo(24, 36, 8, 20, 2, 4);
+          g.fill();
+          g.fillStyle = "#ffffff";
+          g.beginPath();
+          g.moveTo(5, -3);
+          g.bezierCurveTo(22, -28, 56, -27, 54, -9);
+          g.bezierCurveTo(52, 0, 28, 2, 5, 0);
+          g.bezierCurveTo(26, 9, 44, 20, 33, 26);
+          g.bezierCurveTo(24, 30, 10, 18, 5, 4);
+          g.fill();
+          g.fillStyle = "#ffffff";
+          for (var d = 0; d < 4; d++) {
+            g.beginPath();
+            g.arc(56 - d * 5, -6 + d * 2, 1.6, 0, Math.PI * 2);
+            g.fill();
+          }
+          g.restore();
+        });
+        g.fillStyle = "#1c1712";
+        g.fillRect(w / 2 - 1.5, h / 2 - 14, 3, 28);
+      });
+    }
+    function buildButterflies() {
+      var spots = [[-2.55, 0.62, 2.2], [2.6, 0.7, -5.5], [-2.5, 0.6, -13.5], [2.55, 0.68, -21.5]];
+      if (!low) spots.push([-2.6, 0.64, -27.4], [1.7, 0.8, 4.4]);
+      var tints = [0xf3a64a, 0xf7f1d6, 0x9fc2ea, 0xf2c94c, 0xf3a64a, 0xe9d7f2];
+      var span = 0.17, deep = 0.085;
+      var geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array([
+        -span, 0, -deep, 0, 0, -deep, 0, 0, deep, -span, 0, deep,
+        0, 0, -deep, span, 0, -deep, span, 0, deep, 0, 0, deep
+      ]), 3));
+      geo.setAttribute("uv", new THREE.BufferAttribute(new Float32Array([0, 1, 0.5, 1, 0.5, 0, 0, 0, 0.5, 1, 1, 1, 1, 0, 0.5, 0]), 2));
+      geo.setIndex([0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7]);
+      var data = new Float32Array(spots.length * 4);
+      var mesh = new THREE.InstancedMesh(geo, null, spots.length);
+      var col = new THREE.Color();
+      spots.forEach(function (sp, i) {
+        data.set([sp[0], sp[1], sp[2], fxRand()], i * 4);
+        mesh.setColorAt(i, col.set(tints[i % tints.length]));
+      });
+      geo.setAttribute("aFly", new THREE.InstancedBufferAttribute(data, 4));
+      var mat = new THREE.MeshBasicMaterial({ map: wingTex(), alphaTest: 0.4, alphaToCoverage: true, side: THREE.DoubleSide });
+      mat.onBeforeCompile = function (shader) {
+        shader.uniforms.uTime = wind;
+        shader.vertexShader = "uniform float uTime;\nattribute vec4 aFly;\n" + shader.vertexShader.replace(
+          "#include <begin_vertex>",
+          "#include <begin_vertex>\n" +
+          " float sd = aFly.w * 30.0;\n" +
+          " float flap = 0.2 + 1.0 * (0.5 + 0.5 * sin(uTime * 15.0 + sd));\n" +
+          " vec3 p = vec3(position.x * cos(flap), abs(position.x) * sin(flap), position.z);\n" +
+          " float t = uTime * 0.32 + sd;\n" +
+          " vec3 c = aFly.xyz + vec3(sin(t * 1.3) * 0.8 + sin(t * 0.7) * 0.35, sin(t * 2.1) * 0.18 + sin(uTime * 3.1 + sd) * 0.04, cos(t * 0.9) * 1.5);\n" +
+          " vec2 d = vec2(cos(t * 1.3) * 1.04 + cos(t * 0.7) * 0.245, -sin(t * 0.9) * 1.35);\n" +
+          " float yaw = atan(d.x, d.y);\n" +
+          " mat3 ry = mat3(cos(yaw), 0.0, -sin(yaw), 0.0, 1.0, 0.0, sin(yaw), 0.0, cos(yaw));\n" +
+          " transformed = ry * p + c;"
+        );
+      };
+      mesh.material = mat;
+      mesh.frustumCulled = false;
+      scene.add(mesh);
+    }
+
     /* El arco de la entrada, con enredadera */
     function buildArch() {
       var oak = new THREE.MeshStandardMaterial({ map: woodTex(), roughness: 0.75, color: 0xd8c4a8 });
@@ -886,6 +1059,7 @@ function boot() {
     tuftGeo.setAttribute("normal", new THREE.BufferAttribute(up, 3));
     var tuftMat = new THREE.MeshStandardMaterial({ map: bladeTex(), alphaTest: 0.5, alphaToCoverage: true, side: THREE.DoubleSide, roughness: 1, color: 0xe6efd8 });
     windify(tuftMat, 0.05, true);
+    cloudy(tuftMat);
     var tuftN = low ? 1300 : 3600;
     var tufts = new THREE.InstancedMesh(tuftGeo, tuftMat, tuftN);
     for (var t2 = 0; t2 < tuftN; t2++) {
@@ -961,6 +1135,7 @@ function boot() {
     /* ramas: con sombra (los árboles del jardín) y sin ella (prados y fondo) */
     var trunkParts = { cast: [], quiet: [] };
     var leafSets = {};
+    var pinkCrowns = [];
 
     function limb(parts, from, dir, len, r0, r1) {
       var geo = new THREE.CylinderGeometry(r1, r0, len, 7, 1);
@@ -1073,6 +1248,7 @@ function boot() {
       var turnY = rand() * 6.28;
       var phase = rand() * 6.28;
       var place = new THREE.Matrix4().compose(new THREE.Vector3(x, 0, z), new THREE.Quaternion().setFromAxisAngle(upV, turnY), one);
+      if (o.pinkTree && o.shadow) pinkCrowns.push({ x: x, z: z, h: th, r: 1.25 * (o.spread || 1) });
       var bucket = o.shadow ? trunkParts.cast : trunkParts.quiet;
       parts.forEach(function (geo) { geo.applyMatrix4(place); bucket.push({ geo: geo, sway: [x, z, phase] }); });
       var key = (o.pinkTree ? "pink" : "green") + (o.shadow ? ":sombra" : "");
@@ -1141,6 +1317,8 @@ function boot() {
       makeTree(Math.cos(fa) * fr, midZ + Math.sin(fa) * fr, { kind: fpk ? pink : green, pinkTree: fpk, cards: low ? 6 : 9, shadow: false, h: between(4, 6), r: 0.34, spread: between(2.1, 2.7), branches: 4 });
     }
     finishTrees();
+    buildPetals();
+    buildButterflies();
 
     var blobGeo = new THREE.PlaneGeometry(1, 1);
     blobGeo.rotateX(-Math.PI / 2);
@@ -1606,7 +1784,20 @@ function boot() {
      frenar la página. Sin ella (Safari), de a unos pocos materiales nuevos por vez,
      dibujando la escena de a partes (sin mostrarla) y dejando respirar a la página
      entre tanda y tanda. Las luces quedan siempre: cambiarlas cambiaría los shaders. */
-  function warm(done) {
+  function warm(finish) {
+    /* Se compila todo, también lo que la cámara no ve al empezar (el arco queda a la
+       espalda) y lo que está escondido (el resaltado de cada obra): si no, su shader
+       se compilaba al darse vuelta o al apuntar a una obra, y el paseo se trababa. */
+    var culled = [];
+    scene.traverse(function (o) {
+      if ((o.isMesh || o.isPoints) && o.frustumCulled) { culled.push(o); o.frustumCulled = false; }
+    });
+    glows.forEach(function (g) { g.visible = true; });
+    function done() {
+      culled.forEach(function (o) { o.frustumCulled = true; });
+      glows.forEach(function (g) { g.visible = g.userData.id === aimed; });
+      finish();
+    }
     if (renderer.extensions.has("KHR_parallel_shader_compile")) {
       renderer.compileAsync(scene, camera).then(done, done);
       return;

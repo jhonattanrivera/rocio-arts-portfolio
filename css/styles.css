@@ -1399,6 +1399,20 @@ html:not(.vt) body { animation: page-in .7s var(--ease) both; }
 .is-preview .cover { align-items: flex-end; }
 .is-preview .cover-inner { padding-bottom: 1rem; }
 .no-flash .stage::before { animation: none; }
+/* La portada del jardín: el texto entra escalonado al cargar, y cuando el jardín
+   aparece detrás pasa con suavidad a su color claro (antes cambiaba de golpe).
+   Los botones solo se funden, sin moverse, para no correr lo que uno va a tocar. */
+.js .cover-inner > * { animation: cover-in 1.1s var(--ease) both; }
+.js .cover-inner > .eyebrow { animation-delay: .08s; }
+.js .cover-inner > h1 { animation-delay: .18s; }
+.js .cover-inner > .lede { animation-delay: .32s; }
+.js .cover-inner > .cover-actions { animation-name: cover-fade; animation-delay: .46s; }
+.js .cover-inner > .cover-help { animation-name: cover-fade; animation-delay: .58s; }
+@keyframes cover-in { from { opacity: 0; transform: translateY(16px); } }
+@keyframes cover-fade { from { opacity: 0; } }
+.cover, .cover .eyebrow, .cover h1 em, .cover .lede, .cover-help { transition: color 1.1s ease; }
+.cover .text-link { transition: color 1.1s ease, box-shadow 1.1s ease, background-size .55s var(--ease); }
+.cover .enter { transition: background-color 1.1s ease, color 1.1s ease; }
 @media (pointer: coarse), (max-width: 800px) {
   .hud { flex-direction: column; align-items: flex-start; gap: .5rem; padding-right: 150px; }
 }
