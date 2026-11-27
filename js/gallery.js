@@ -27,6 +27,12 @@ if (early) early.stop();
 
 function ui(key, fallback) { return window.ui ? window.ui(key) : fallback; }
 
+/* Hojas, pasto y flores son recortes de una textura: el suavizado de bordes común no
+   los alcanza y quedaban con dientes de sierra. Con "alpha to coverage" el borde del
+   recorte se reparte entre las muestras del suavizado; para eso el corte deja de ser
+   seco y pasa a un escalón de un píxel (fwidth). */
+THREE.ShaderChunk.alphatest_fragment = "#ifdef USE_ALPHATEST\n diffuseColor.a = smoothstep(alphaTest, alphaTest + fwidth(diffuseColor.a), diffuseColor.a);\n if (diffuseColor.a == 0.0) discard;\n#endif";
+
 function showFlat(message) {
   document.documentElement.classList.add("sala-flat");
   if (enterBtn) {
@@ -798,7 +804,7 @@ function boot() {
       }
       var geo = clumpGeo(0.5, 0.56);
       var cells = new Float32Array(places.length);
-      var mat = new THREE.MeshStandardMaterial({ map: flowerAtlas(), alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.75, metalness: 0, color: 0xffffff });
+      var mat = new THREE.MeshStandardMaterial({ map: flowerAtlas(), alphaTest: 0.5, alphaToCoverage: true, side: THREE.DoubleSide, roughness: 0.75, metalness: 0, color: 0xffffff });
       mat.onBeforeCompile = function (shader) {
         shader.uniforms.uTime = wind;
         shader.vertexShader = "uniform float uTime;\nattribute float aCell;\n" + shader.vertexShader
@@ -838,7 +844,7 @@ function boot() {
         b.receiveShadow = true;
         scene.add(b);
       });
-      var vineMat = new THREE.MeshStandardMaterial({ map: leafCard(), alphaTest: 0.42, side: THREE.DoubleSide, roughness: 0.85, color: 0xffffff });
+      var vineMat = new THREE.MeshStandardMaterial({ map: leafCard(), alphaTest: 0.42, alphaToCoverage: true, side: THREE.DoubleSide, roughness: 0.85, color: 0xffffff });
       var n = low ? 90 : 170;
       var vine = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.55, 0.55), vineMat, n);
       var tint = new THREE.Color();
@@ -878,7 +884,7 @@ function boot() {
     var up = new Float32Array(tuftGeo.attributes.position.count * 3);
     for (var u2 = 0; u2 < up.length; u2 += 3) up[u2 + 1] = 1;
     tuftGeo.setAttribute("normal", new THREE.BufferAttribute(up, 3));
-    var tuftMat = new THREE.MeshStandardMaterial({ map: bladeTex(), alphaTest: 0.5, side: THREE.DoubleSide, roughness: 1, color: 0xe6efd8 });
+    var tuftMat = new THREE.MeshStandardMaterial({ map: bladeTex(), alphaTest: 0.5, alphaToCoverage: true, side: THREE.DoubleSide, roughness: 1, color: 0xe6efd8 });
     windify(tuftMat, 0.05, true);
     var tuftN = low ? 1300 : 3600;
     var tufts = new THREE.InstancedMesh(tuftGeo, tuftMat, tuftN);
@@ -931,7 +937,7 @@ function boot() {
       return mat;
     }
     function foliage(tex) {
-      var mat = flutter(new THREE.MeshStandardMaterial({ map: tex, alphaTest: 0.42, side: THREE.DoubleSide, roughness: 0.82, metalness: 0, color: 0xffffff }), 0.06);
+      var mat = flutter(new THREE.MeshStandardMaterial({ map: tex, alphaTest: 0.42, alphaToCoverage: true, side: THREE.DoubleSide, roughness: 0.82, metalness: 0, color: 0xffffff }), 0.06);
       var depth = flutter(new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: tex, alphaTest: 0.42, side: THREE.DoubleSide }), 0.06);
       return { mat: mat, depth: depth };
     }
@@ -1483,7 +1489,7 @@ function boot() {
       canvas.dataset.fps = String(Math.round(fps));
       fpsN = 0;
       fpsAcc = 0;
-      if (!preview) tune(fps);
+      tune(fps);
       sharpen();
     }
   }
@@ -1499,14 +1505,15 @@ function boot() {
     window.cancelAnimationFrame(raf);
   }
 
-  /* Nitidez: hasta 2x en todos lados, con bordes suavizados (antes, en el teléfono,
-     1,5x y sin suavizar: de ahí los dientes de sierra). Si un teléfono no llega a
-     40 cuadros por segundo, baja de a un cuarto hasta 1,25x, solo mientras se camina. */
+  /* Nitidez: hasta 2x al caminar y 1,5x en la portada, con bordes suavizados (antes,
+     en el teléfono, 1,5x y 1x sin suavizar: de ahí los dientes de sierra). Si un
+     teléfono no llega a 40 cuadros por segundo (20 en la portada, que va a medio
+     ritmo), baja de a un cuarto hasta 1x en la portada o 1,25x al caminar. */
   var ratioNow = 1;
   var slow = 0;
   function fullRatio(light) {
     var dpr = window.devicePixelRatio || 1;
-    return light ? Math.min(dpr, low ? 1 : 1.25) : Math.min(dpr, 2);
+    return light ? Math.min(dpr, 1.5) : Math.min(dpr, 2);
   }
   function setRatio(r) {
     ratioNow = r;
@@ -1514,9 +1521,10 @@ function boot() {
     resize();
   }
   function tune(fps) {
-    slow = fps < 40 ? slow + 1 : 0;
-    if (slow >= 3 && ratioNow > 1.25) {
-      setRatio(Math.max(1.25, ratioNow - 0.25));
+    var floor = preview ? 1 : 1.25;
+    slow = fps < (preview && low ? 20 : 40) ? slow + 1 : 0;
+    if (slow >= 3 && ratioNow > floor) {
+      setRatio(Math.max(floor, ratioNow - 0.25));
       slow = 0;
     }
   }
@@ -1797,15 +1805,14 @@ function boot() {
     showFlat(ui("lost", ""));
   }, false);
 
-  /* La portada muestra el jardín de fondo cuando ya está listo: en computador
-     recorriéndolo; en el teléfono, quieto (un cuadro), para no gastar batería ni
-     trabar la página mientras uno lee. */
+  /* La portada muestra el jardín de fondo, recorriéndolo, cuando ya está listo.
+     Quieto solo con "menos movimiento". En el teléfono va a medio ritmo (ver loop). */
   function showCover() {
     if (wantEnter || failed) return;
     var cover = document.getElementById("cover");
     if (!cover) return;
     preview = true;
-    stillCover = low || reduce;
+    stillCover = reduce;
     introT = 99;
     tour.t = 3;
     document.body.classList.add("is-preview");
