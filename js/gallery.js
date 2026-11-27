@@ -8,18 +8,10 @@ var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 var coarse = window.matchMedia("(pointer: coarse)").matches;
 var saveData = navigator.connection && navigator.connection.saveData;
 
+/* Sin abrir un contexto de prueba (en un celular costaba casi un segundo de página
+   trabada): si el navegador no puede, crear el renderer falla y el jardín manda a Obras. */
 function hasWebGL() {
-  try {
-    var test = document.createElement("canvas");
-    var gl = test.getContext("webgl2", { failIfMajorPerformanceCaveat: false })
-      || test.getContext("webgl", { failIfMajorPerformanceCaveat: false });
-    if (!gl) return false;
-    var lose = gl.getExtension("WEBGL_lose_context");
-    if (lose) lose.loseContext();
-    return true;
-  } catch (err) {
-    return false;
-  }
+  return !!(window.WebGL2RenderingContext || window.WebGLRenderingContext);
 }
 
 var enterBtn = document.getElementById("enter");
@@ -69,7 +61,6 @@ function boot() {
   var pointer = new THREE.Vector2();
   var pickables = [];
   var glows = [];
-  var trees = [];
   var started = false;
   var running = false;
   var raf = 0;
@@ -535,11 +526,37 @@ function boot() {
     renderer.toneMappingExposure = 0.86;
   }
 
+  /* El sol no se mueve, así que su sombra se calcula una sola vez (no en cada cuadro)
+     y cubre todo el jardín de una: el pasillo, los árboles cercanos y lo que alcanzan
+     a sombrear. Antes la sombra seguía a la cámara y se volvía a dibujar siempre. */
+  var SUN_AT = new THREE.Vector3(0, 0, -12);
   function placeSun() {
-    var cx = pos.x, cz = pos.z - 7;
-    sun.target.position.set(cx, 0, cz);
-    sun.position.set(cx + sunDir.x * 50, sunDir.y * 50, cz + sunDir.z * 50);
+    sun.target.position.copy(SUN_AT);
+    sun.position.copy(SUN_AT).addScaledVector(sunDir, 60);
     sun.target.updateMatrixWorld();
+    sun.updateMatrixWorld();
+  }
+  function fitShadow() {
+    placeSun();
+    var cam = sun.shadow.camera;
+    cam.position.copy(sun.position);
+    cam.lookAt(SUN_AT);
+    cam.updateMatrixWorld(true);
+    var inv = cam.matrixWorld.clone().invert();
+    var lo = new THREE.Vector3(Infinity, Infinity, Infinity), hi = new THREE.Vector3(-Infinity, -Infinity, -Infinity);
+    var c = new THREE.Vector3();
+    [-13, 13].forEach(function (x) {
+      [0, 7.5].forEach(function (y) {
+        [END_Z - 12, START_Z + 15].forEach(function (z) {
+          c.set(x, y, z).applyMatrix4(inv);
+          lo.min(c);
+          hi.max(c);
+        });
+      });
+    });
+    cam.left = lo.x; cam.right = hi.x; cam.bottom = lo.y; cam.top = hi.y;
+    cam.near = Math.max(0.5, -hi.z - 4); cam.far = -lo.z + 4;
+    cam.updateProjectionMatrix();
   }
 
 
@@ -555,9 +572,8 @@ function boot() {
     scene.add(hemi);
     sun = new THREE.DirectionalLight(0xffdcae, 2.9);
     sun.castShadow = true;
-    sun.shadow.mapSize.set(low ? 1024 : 2048, low ? 1024 : 2048);
-    var sc = sun.shadow.camera;
-    sc.left = -21; sc.right = 21; sc.top = 21; sc.bottom = -21; sc.near = 2; sc.far = 110;
+    /* se dibuja una vez: puede ser más fina que antes sin costar nada por cuadro */
+    sun.shadow.mapSize.set(low ? 2048 : 3072, low ? 2048 : 3072);
     sun.shadow.bias = -0.0004;
     sun.shadow.normalBias = 0.04;
     sun.shadow.radius = 3;
@@ -884,15 +900,32 @@ function boot() {
     scene.add(tufts);
 
     /* Árboles con ramas: el follaje se agrupa en copas sobre cada rama,
-       y las hojas tiemblan con el viento (también en la sombra). */
+       y las hojas tiemblan con el viento.
+       Todas las ramas van en una sola malla y todas las hojas en pocas (por color y
+       sombra): antes cada rama era una pieza aparte, unas 640, y el teléfono hacía
+       cientos de dibujos por cuadro. El vaivén de cada árbol lo hace ahora el shader:
+       cada vértice sabe dónde está el pie de su árbol (aSway.xy) y su fase (aSway.z). */
+    var SWAY = "attribute vec3 aSway;\n" +
+      "vec3 treeSway(vec3 p) {\n" +
+      " float gs = 0.65 + 0.35 * sin(uTime * 0.23) * sin(uTime * 0.11 + 1.3);\n" +
+      " float rz = (sin(uTime * 0.9 + aSway.z) * 0.014 + sin(uTime * 2.1 + aSway.z * 2.0) * 0.004) * gs;\n" +
+      " float rx = (sin(uTime * 0.7 + aSway.z * 1.3) * 0.01 + sin(uTime * 1.7 + aSway.z) * 0.003) * gs;\n" +
+      " vec3 r = p - vec3(aSway.x, 0.0, aSway.y);\n" +
+      " r = vec3(r.x * cos(rz) - r.y * sin(rz), r.x * sin(rz) + r.y * cos(rz), r.z);\n" +
+      " r = vec3(r.x, r.y * cos(rx) - r.z * sin(rx), r.y * sin(rx) + r.z * cos(rx));\n" +
+      " return r + vec3(aSway.x, 0.0, aSway.y);\n}\n";
     function flutter(mat, amp) {
       mat.onBeforeCompile = function (shader) {
         shader.uniforms.uTime = wind;
-        shader.vertexShader = "uniform float uTime;\n" + shader.vertexShader.replace(
+        shader.vertexShader = "uniform float uTime;\n" + SWAY + shader.vertexShader.replace(
           "#include <begin_vertex>",
           "#include <begin_vertex>\n vec3 lp = instanceMatrix[3].xyz;\n float ph = lp.x * 1.7 + lp.y * 2.3 + lp.z * 1.1;\n" +
           " float gs = 0.65 + 0.35 * sin(uTime * 0.23) * sin(uTime * 0.11 + 1.3);\n" +
           " transformed += vec3(sin(uTime * 2.2 + ph), sin(uTime * 2.9 + ph * 1.3) * 0.5, cos(uTime * 1.8 + ph)) * " + amp.toFixed(3) + " * gs;"
+        ).replace(
+          "#include <project_vertex>",
+          "vec4 mvPosition = vec4(transformed, 1.0);\n#ifdef USE_INSTANCING\n mvPosition = instanceMatrix * mvPosition;\n#endif\n" +
+          " mvPosition.xyz = treeSway(mvPosition.xyz);\n mvPosition = modelViewMatrix * mvPosition;\n gl_Position = projectionMatrix * mvPosition;"
         );
       };
       return mat;
@@ -909,32 +942,88 @@ function boot() {
     var bark = barkTex();
     bark.repeat.set(1, 2);
     var trunkMat = new THREE.MeshStandardMaterial({ map: bark, roughness: 0.95, color: 0xcfc6bc });
+    trunkMat.onBeforeCompile = function (shader) {
+      shader.uniforms.uTime = wind;
+      shader.vertexShader = "uniform float uTime;\n" + SWAY + shader.vertexShader.replace(
+        "#include <begin_vertex>", "#include <begin_vertex>\n transformed = treeSway(transformed);");
+    };
     var cardGeo = new THREE.PlaneGeometry(0.95, 0.95);
     var upV = new THREE.Vector3(0, 1, 0);
+    var one = new THREE.Vector3(1, 1, 1);
+    var limbQ = new THREE.Quaternion();
+    var limbM = new THREE.Matrix4();
+    /* ramas: con sombra (los árboles del jardín) y sin ella (prados y fondo) */
+    var trunkParts = { cast: [], quiet: [] };
+    var leafSets = {};
 
-    function limb(group, from, dir, len, r0, r1) {
+    function limb(parts, from, dir, len, r0, r1) {
       var geo = new THREE.CylinderGeometry(r1, r0, len, 7, 1);
       geo.translate(0, len / 2, 0);
-      var mesh = new THREE.Mesh(geo, trunkMat);
-      mesh.position.copy(from);
-      mesh.quaternion.setFromUnitVectors(upV, dir);
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      group.add(mesh);
+      geo.applyMatrix4(limbM.compose(from, limbQ.setFromUnitVectors(upV, dir), one));
+      parts.push(geo);
       return from.clone().addScaledVector(dir, len);
+    }
+
+    /* Une las ramas de muchos árboles en una sola geometría (posición, normal, uv y aSway). */
+    function mergeParts(list) {
+      var nv = 0, ni = 0;
+      list.forEach(function (p) { nv += p.geo.attributes.position.count; ni += p.geo.index.count; });
+      var posA = new Float32Array(nv * 3), norA = new Float32Array(nv * 3), uvA = new Float32Array(nv * 2), swA = new Float32Array(nv * 3);
+      var idx = nv > 65535 ? new Uint32Array(ni) : new Uint16Array(ni);
+      var vo = 0, io = 0;
+      list.forEach(function (p) {
+        var g = p.geo, c = g.attributes.position.count, src = g.index.array;
+        posA.set(g.attributes.position.array, vo * 3);
+        norA.set(g.attributes.normal.array, vo * 3);
+        uvA.set(g.attributes.uv.array, vo * 2);
+        for (var i = 0; i < c; i++) { swA[(vo + i) * 3] = p.sway[0]; swA[(vo + i) * 3 + 1] = p.sway[1]; swA[(vo + i) * 3 + 2] = p.sway[2]; }
+        for (var j = 0; j < src.length; j++) idx[io + j] = src[j] + vo;
+        vo += c;
+        io += src.length;
+        g.dispose();
+      });
+      var out = new THREE.BufferGeometry();
+      out.setAttribute("position", new THREE.BufferAttribute(posA, 3));
+      out.setAttribute("normal", new THREE.BufferAttribute(norA, 3));
+      out.setAttribute("uv", new THREE.BufferAttribute(uvA, 2));
+      out.setAttribute("aSway", new THREE.BufferAttribute(swA, 3));
+      out.setIndex(new THREE.BufferAttribute(idx, 1));
+      out.computeBoundingSphere();
+      return out;
+    }
+
+    function finishTrees() {
+      ["cast", "quiet"].forEach(function (key) {
+        if (!trunkParts[key].length) return;
+        var mesh = new THREE.Mesh(mergeParts(trunkParts[key]), trunkMat);
+        mesh.castShadow = key === "cast";
+        mesh.receiveShadow = true;
+        scene.add(mesh);
+      });
+      Object.keys(leafSets).forEach(function (key) {
+        var set = leafSets[key];
+        var geo = cardGeo.clone();
+        geo.setAttribute("aSway", new THREE.InstancedBufferAttribute(new Float32Array(set.sway), 3));
+        var mesh = new THREE.InstancedMesh(geo, set.kind.mat, set.mats.length);
+        set.mats.forEach(function (mx, i) { mesh.setMatrixAt(i, mx); mesh.setColorAt(i, set.colors[i]); });
+        mesh.castShadow = set.shadow;
+        mesh.receiveShadow = !low && set.shadow;
+        if (set.shadow) mesh.customDepthMaterial = set.kind.depth;
+        mesh.computeBoundingSphere();
+        scene.add(mesh);
+      });
     }
 
     var blobs = [];
     function makeTree(x, z, o) {
-      var group = new THREE.Group();
+      var parts = [];
       var th = o.h || between(2.5, 3.3);
       var tilt = new THREE.Vector3(between(-0.08, 0.08), 1, between(-0.08, 0.08)).normalize();
       var r0 = (o.r || 0.2) * 0.85;
-      var top = limb(group, new THREE.Vector3(0, -0.1, 0), tilt, th, r0, r0 * 0.5);
-      var foot = new THREE.Mesh(new THREE.CylinderGeometry(r0 * 1.05, r0 * 1.9, 0.45, 9, 1), trunkMat);
-      foot.position.y = 0.12;
-      foot.castShadow = !!o.shadow;
-      group.add(foot);
+      var top = limb(parts, new THREE.Vector3(0, -0.1, 0), tilt, th, r0, r0 * 0.5);
+      var foot = new THREE.CylinderGeometry(r0 * 1.05, r0 * 1.9, 0.45, 9, 1);
+      foot.translate(0, 0.12, 0);
+      parts.push(foot);
       var tips = [top.clone().add(new THREE.Vector3(0, 0.75, 0))];
       var nb = o.branches || (4 + ((rand() * 3) | 0));
       for (var b = 0; b < nb; b++) {
@@ -945,20 +1034,20 @@ function boot() {
         start.x += tilt.x * th * 0.8;
         start.z += tilt.z * th * 0.8;
         var len = between(1.2, 2.1) * (o.spread || 1);
-        var tip = limb(group, start, dir, len, 0.085, 0.03);
+        var tip = limb(parts, start, dir, len, 0.085, 0.03);
         tips.push(tip);
         if (rand() > 0.35) {
           var mid = start.clone().addScaledVector(dir, len * between(0.45, 0.65));
           var d2 = dir.clone().applyAxisAngle(upV, between(-0.9, 0.9));
           d2.y += 0.35;
           d2.normalize();
-          tips.push(limb(group, mid, d2, len * between(0.4, 0.6), 0.045, 0.018));
+          tips.push(limb(parts, mid, d2, len * between(0.4, 0.6), 0.045, 0.018));
         }
       }
       var per = o.cards;
-      var leaves = new THREE.InstancedMesh(cardGeo, o.kind.mat, tips.length * per);
+      var cards = [];
+      var tints = [];
       var tint = new THREE.Color();
-      var k = 0;
       tips.forEach(function (tp, ti) {
         var rc = between(0.75, 1.15) * (o.spread || 1) * (ti === 0 ? 1.25 : 1);
         for (var c = 0; c < per; c++) {
@@ -967,25 +1056,26 @@ function boot() {
           q.setFromEuler(e.set(rand() * 6.28, rand() * 6.28, rand() * 6.28));
           var ls = between(0.7, 1.2);
           s.set(ls, ls, ls);
-          m.compose(v, q, s);
-          leaves.setMatrixAt(k, m);
+          cards.push(new THREE.Matrix4().compose(v, q, s));
           if (o.pinkTree) tint.setHSL(between(0.92, 0.98), between(0.1, 0.3), between(0.8, 0.95));
           else tint.setHSL(between(0.2, 0.3), between(0.28, 0.5), between(0.52, 0.8));
-          leaves.setColorAt(k, tint);
-          k++;
+          tints.push(tint.clone());
         }
       });
-      leaves.castShadow = !!o.shadow;
-      leaves.receiveShadow = !low && !!o.shadow;
-      if (o.shadow) leaves.customDepthMaterial = o.kind.depth;
-      group.add(leaves);
-      group.position.set(x, 0, z);
       if (!o.shadow) blobs.push({ x: x, z: z, h: th + 1.2 * (o.spread || 1), r: 1.9 * (o.spread || 1) });
-      group.rotation.y = rand() * 6.28;
-      group.userData.phase = rand() * 6.28;
-      scene.add(group);
-      trees.push(group);
-      return group;
+      /* el mismo orden de sorteo que antes: el jardín queda idéntico */
+      var turnY = rand() * 6.28;
+      var phase = rand() * 6.28;
+      var place = new THREE.Matrix4().compose(new THREE.Vector3(x, 0, z), new THREE.Quaternion().setFromAxisAngle(upV, turnY), one);
+      var bucket = o.shadow ? trunkParts.cast : trunkParts.quiet;
+      parts.forEach(function (geo) { geo.applyMatrix4(place); bucket.push({ geo: geo, sway: [x, z, phase] }); });
+      var key = (o.pinkTree ? "pink" : "green") + (o.shadow ? ":sombra" : "");
+      var set = leafSets[key] || (leafSets[key] = { kind: o.kind, shadow: !!o.shadow, mats: [], colors: [], sway: [] });
+      cards.forEach(function (mx, i) {
+        set.mats.push(mx.premultiply(place));
+        set.colors.push(tints[i]);
+        set.sway.push(x, z, phase);
+      });
     }
 
     var treeSpots = [];
@@ -1044,6 +1134,7 @@ function boot() {
       var fpk = rand() > 0.82;
       makeTree(Math.cos(fa) * fr, midZ + Math.sin(fa) * fr, { kind: fpk ? pink : green, pinkTree: fpk, cards: low ? 6 : 9, shadow: false, h: between(4, 6), r: 0.34, spread: between(2.1, 2.7), branches: 4 });
     }
+    finishTrees();
 
     var blobGeo = new THREE.PlaneGeometry(1, 1);
     blobGeo.rotateX(-Math.PI / 2);
@@ -1074,7 +1165,7 @@ function boot() {
       var tone = new THREE.Color(item.work.tone || "#e4ddd4");
       var edge = new THREE.MeshStandardMaterial({ color: tone.clone().multiplyScalar(0.8), roughness: 0.9 });
       var back = new THREE.MeshStandardMaterial({ color: 0xd9cfbe, roughness: 1 });
-      var art = new THREE.MeshStandardMaterial({ color: tone, roughness: 0.66, metalness: 0, envMapIntensity: 0.45 });
+      var art = new THREE.MeshStandardMaterial({ color: tone, roughness: 0.66, metalness: 0, envMapIntensity: 0.45, map: blankTex(), emissiveMap: blankTex(), emissive: 0x000000, emissiveIntensity: 0.13 });
       var box = new THREE.Mesh(new THREE.BoxGeometry(item.w, item.h, 0.038), [edge, edge, edge, edge, art, back]);
       box.castShadow = true;
       box.receiveShadow = true;
@@ -1136,7 +1227,7 @@ function boot() {
     pmrem = new THREE.PMREMGenerator(renderer);
     applyLight();
     refreshEnv();
-    placeSun();
+    fitShadow();
 
     queue.sort(function (a, b) { return Math.abs(a.z - pos.z) - Math.abs(b.z - pos.z); });
     total = queue.length;
@@ -1181,6 +1272,17 @@ function boot() {
     return out;
   }
 
+  /* Un píxel blanco: el lugar de la imagen mientras llega (ver las obras en buildGarden). */
+  var blank = null;
+  function blankTex() {
+    if (!blank) {
+      blank = new THREE.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1);
+      blank.colorSpace = THREE.SRGBColorSpace;
+      blank.needsUpdate = true;
+    }
+    return blank;
+  }
+
   function pump() {
     while (inflight < concurrency && queue.length) loadOne(queue.shift());
   }
@@ -1195,7 +1297,7 @@ function boot() {
     mat.emissiveIntensity = 0.13;
     mat.color.set(0xffffff);
     mat.needsUpdate = true;
-    if (old && old !== tex) old.dispose();
+    if (old && old !== tex && old !== blank) old.dispose();
   }
 
   function loadOne(item) {
@@ -1264,6 +1366,10 @@ function boot() {
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
+    if (ready && !running) {
+      applyLook();
+      renderer.render(scene, camera);
+    }
   }
 
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
@@ -1284,12 +1390,6 @@ function boot() {
       pitch = 0.12 - ease * 0.15;
       if (!keys.size && !stick.x && !stick.y) pos.z = 4.4 - ease * 1.2;
     }
-    var gust = 0.65 + 0.35 * Math.sin(now * 0.23) * Math.sin(now * 0.11 + 1.3);
-    trees.forEach(function (tree) {
-      var ph = tree.userData.phase;
-      tree.rotation.z = (Math.sin(now * 0.9 + ph) * 0.014 + Math.sin(now * 2.1 + ph * 2) * 0.004) * gust;
-      tree.rotation.x = (Math.sin(now * 0.7 + ph * 1.3) * 0.01 + Math.sin(now * 1.7 + ph) * 0.003) * gust;
-    });
     if (pollen) {
       var arr = pollen.geometry.attributes.position.array;
       for (var i = 0; i < arr.length; i += 3) {
@@ -1317,7 +1417,6 @@ function boot() {
         }
       }
       pos.y = 1.62;
-      placeSun();
       applyLook();
       return;
     }
@@ -1338,7 +1437,6 @@ function boot() {
       pos.z = clamp(pos.z + (-Math.cos(yaw) * forward + Math.sin(yaw) * strafe) * speed * dt, WALK.z0, WALK.z1);
     }
     pos.y = 1.6 + Math.sin(now * 1.1) * 0.006;
-    placeSun();
     applyLook();
     if (!document.body.dataset.sheet) aimCenter();
     canvas.dataset.pos = pos.x.toFixed(2) + "," + pos.z.toFixed(2);
@@ -1381,9 +1479,11 @@ function boot() {
     fpsN += 1;
     fpsAcc += dt;
     if (fpsAcc >= 0.8) {
-      canvas.dataset.fps = String(Math.round(fpsN / fpsAcc));
+      var fps = fpsN / fpsAcc;
+      canvas.dataset.fps = String(Math.round(fps));
       fpsN = 0;
       fpsAcc = 0;
+      if (!preview) tune(fps);
       sharpen();
     }
   }
@@ -1399,31 +1499,178 @@ function boot() {
     window.cancelAnimationFrame(raf);
   }
 
+  /* Nitidez: hasta 2x en todos lados, con bordes suavizados (antes, en el teléfono,
+     1,5x y sin suavizar: de ahí los dientes de sierra). Si un teléfono no llega a
+     40 cuadros por segundo, baja de a un cuarto hasta 1,25x, solo mientras se camina. */
+  var ratioNow = 1;
+  var slow = 0;
   function fullRatio(light) {
     var dpr = window.devicePixelRatio || 1;
-    return light ? Math.min(dpr, low ? 1 : 1.25) : Math.min(dpr, low ? 1.5 : 2);
+    return light ? Math.min(dpr, low ? 1 : 1.25) : Math.min(dpr, 2);
+  }
+  function setRatio(r) {
+    ratioNow = r;
+    renderer.setPixelRatio(r);
+    resize();
+  }
+  function tune(fps) {
+    slow = fps < 40 ? slow + 1 : 0;
+    if (slow >= 3 && ratioNow > 1.25) {
+      setRatio(Math.max(1.25, ratioNow - 0.25));
+      slow = 0;
+    }
   }
 
-  function build() {
-    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: !low, alpha: false, powerPreference: "high-performance", preserveDrawingBuffer: false });
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.95;
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = low ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
-    renderer.setPixelRatio(fullRatio(preview));
-    buildGarden();
-    resize();
-    applyLook();
-    renderer.render(scene, camera);
-    clock = new THREE.Clock();
-    started = true;
-    canvas.dataset.ready = "1";
+  /* El jardín se prepara en segundo plano apenas carga la página, sin trabarla:
+     primero la escena (unos milisegundos), después los shaders de a poco y al final
+     la sombra, una sola vez. Cuando uno toca "Entrar al jardín" ya está listo. */
+  var ready = false;
+  var preparing = false;
+  var failed = false;
+  var wantEnter = false;
+  var stillCover = false;
+  var whenReady = [];
+  function later(fn) { window.requestAnimationFrame(function () { window.setTimeout(fn, 0); }); }
+  /* para medir el arranque desde las pruebas: window.__gardenTrace = [] antes de cargar */
+  function trace(label) { if (window.__gardenTrace) window.__gardenTrace.push([label, Math.round(performance.now())]); }
+  function flush() {
+    var list = whenReady;
+    whenReady = [];
+    list.forEach(function (fn) { fn(); });
+  }
+  function fail() {
+    if (failed) return;
+    failed = true;
+    stopLoop();
+    document.body.classList.remove("is-walking", "is-preview", "left-cover");
+    busy(false);
+    showFlat(ui("noWebgl", ""));
+  }
+  function prepare(then) {
+    if (then) whenReady.push(then);
+    if (ready) return flush();
+    if (preparing || failed) return;
+    preparing = true;
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false, powerPreference: "high-performance", preserveDrawingBuffer: false });
+      /* sin esto three pide el resultado de cada shader al compilarlo y espera */
+      renderer.debug.checkShaderErrors = false;
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 0.95;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.autoUpdate = false;
+      renderer.shadowMap.type = low ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+      renderer.setPixelRatio(1);
+    } catch (err) {
+      return fail();
+    }
+    trace("renderer");
+    later(function () {
+      try {
+        trace("escena:inicio");
+        buildGarden();
+        trace("escena:fin");
+        resize();
+        applyLook();
+      } catch (err) {
+        return fail();
+      }
+      warm(function () {
+        if (failed) return;
+        try {
+          trace("sombra:inicio");
+          renderer.shadowMap.needsUpdate = true;
+          renderer.render(scene, camera);
+          trace("sombra:fin");
+        } catch (err) {
+          return fail();
+        }
+        clock = new THREE.Clock();
+        started = true;
+        ready = true;
+        flush();
+      });
+    });
+  }
+
+  /* Los shaders: con compilación en paralelo (Chrome, Android) van todos juntos sin
+     frenar la página. Sin ella (Safari), de a unos pocos materiales nuevos por vez,
+     dibujando la escena de a partes (sin mostrarla) y dejando respirar a la página
+     entre tanda y tanda. Las luces quedan siempre: cambiarlas cambiaría los shaders. */
+  function warm(done) {
+    if (renderer.extensions.has("KHR_parallel_shader_compile")) {
+      renderer.compileAsync(scene, camera).then(done, done);
+      return;
+    }
+    var all = scene.children.filter(function (o) { return !o.isLight && o !== sun.target; });
+    var keep = all.map(function (o) { return o.visible; });
+    var seen = new Set();
+    var batches = [];
+    var cur = [];
+    var fresh = 0;
+    all.forEach(function (o) {
+      o.traverse(function (c) {
+        if (!c.material) return;
+        [].concat(c.material).forEach(function (mt) {
+          var key = [mt.type, !!mt.map, !!mt.emissiveMap, !!mt.bumpMap, !!mt.alphaMap, mt.alphaTest > 0, mt.transparent, mt.side, !!c.isInstancedMesh, !!c.isPoints, c.receiveShadow, mt.onBeforeCompile.toString().length].join("|");
+          if (!seen.has(key)) { seen.add(key); fresh++; }
+        });
+      });
+      cur.push(o);
+      if (fresh >= 1) { batches.push(cur); cur = []; fresh = 0; }
+    });
+    if (cur.length) batches.push(cur);
+    all.forEach(function (o) { o.visible = false; });
+    var i = 0;
+    (function step() {
+      if (failed) return;
+      if (i >= batches.length) {
+        all.forEach(function (o, k) { o.visible = keep[k]; });
+        done();
+        return;
+      }
+      batches[i++].forEach(function (o) { o.visible = keep[all.indexOf(o)]; });
+      try {
+        trace("tanda " + i + ":inicio");
+        renderer.render(scene, camera);
+        trace("tanda " + i + ":fin");
+      } catch (err) {
+        return fail();
+      }
+      later(step);
+    })();
+  }
+
+  /* "Cargando…" en el botón mientras se termina de preparar, con su mismo ancho */
+  var enterText = enterBtn.textContent === enterBtn.dataset.loading ? "" : enterBtn.textContent;
+  function busy(on) {
+    if (on) {
+      if (enterBtn.getAttribute("aria-busy") === "true") return;
+      enterText = enterText || enterBtn.textContent;
+      enterBtn.style.minWidth = enterBtn.getBoundingClientRect().width + "px";
+      enterBtn.setAttribute("aria-busy", "true");
+      enterBtn.textContent = enterBtn.dataset.loading || enterBtn.textContent;
+      return;
+    }
+    if (early) early.done();
+    enterBtn.removeAttribute("aria-busy");
+    enterBtn.style.minWidth = "";
+    if (enterText && enterBtn.textContent === enterBtn.dataset.loading) enterBtn.textContent = enterText;
   }
 
   function enterSala() {
+    if (failed) return;
+    if (!ready) {
+      wantEnter = true;
+      busy(true);
+      prepare(enterSala);
+      return;
+    }
+    busy(false);
     var fromPreview = preview;
     preview = false;
+    stillCover = false;
     document.body.classList.remove("is-preview");
     document.body.classList.add("is-walking", "left-cover");
     var st = document.getElementById("stage");
@@ -1436,16 +1683,12 @@ function boot() {
     }
     window.requestAnimationFrame(function () {
       try {
-        if (!started) build();
-        else renderer.setPixelRatio(fullRatio(false));
-        resize();
+        setRatio(fullRatio(false));
         startLoop();
+        canvas.dataset.ready = "1";
       } catch (err) {
-        stopLoop();
-        document.body.classList.remove("is-walking");
-        showFlat(ui("noWebgl", ""));
+        fail();
       }
-      if (early) early.done();
     });
   }
 
@@ -1544,7 +1787,7 @@ function boot() {
   window.addEventListener("resize", resize);
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) stopLoop();
-    else if (document.body.classList.contains("is-walking") || (preview && previewSeen)) startLoop();
+    else if (document.body.classList.contains("is-walking") || (preview && previewSeen && !stillCover)) startLoop();
   });
 
   canvas.addEventListener("webglcontextlost", function (event) {
@@ -1554,20 +1797,22 @@ function boot() {
     showFlat(ui("lost", ""));
   }, false);
 
-  function startPreview() {
+  /* La portada muestra el jardín de fondo cuando ya está listo: en computador
+     recorriéndolo; en el teléfono, quieto (un cuadro), para no gastar batería ni
+     trabar la página mientras uno lee. */
+  function showCover() {
+    if (wantEnter || failed) return;
     var cover = document.getElementById("cover");
     if (!cover) return;
     preview = true;
-    document.body.classList.add("is-preview");
-    try {
-      build();
-    } catch (err) {
-      preview = false;
-      document.body.classList.remove("is-preview");
-      return;
-    }
+    stillCover = low || reduce;
     introT = 99;
     tour.t = 3;
+    document.body.classList.add("is-preview");
+    setRatio(fullRatio(true));
+    update(0, 0);
+    renderer.render(scene, camera);
+    if (stillCover) return;
     if ("IntersectionObserver" in window) {
       new IntersectionObserver(function (entries) {
         previewSeen = entries[0].isIntersecting;
@@ -1582,8 +1827,12 @@ function boot() {
   var params = new URLSearchParams(location.search);
   if (params.get("entrar") === "1" || (early && early.pending)) enterSala();
   else if (!saveData) {
-    if (document.readyState === "complete") startPreview();
-    else window.addEventListener("load", startPreview, { once: true });
+    var soon = function () {
+      if (window.requestIdleCallback) window.requestIdleCallback(function () { prepare(showCover); }, { timeout: 700 });
+      else window.setTimeout(function () { prepare(showCover); }, 200);
+    };
+    if (document.readyState === "complete") soon();
+    else window.addEventListener("load", soon, { once: true });
   }
   window.JARDIN = {
     goto: function (x, z, y, p) { pos.x = x; pos.z = z; if (y != null) yaw = y; if (p != null) pitch = p; introT = 99; },
